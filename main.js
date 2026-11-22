@@ -25,3 +25,25 @@ if(document.getElementById('konf')){document.getElementById('konf').addEventList
 
 
 (function(){const b=document.querySelector('.mnav'),n=document.getElementById('navlinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',o)});n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{n.classList.remove('open');b.setAttribute('aria-expanded',false)}));})();
+
+/* ===== Moderné interakcie (doplnok) ===== */
+(function(){
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const bar=document.createElement('div');bar.className='sprog';document.body.prepend(bar);
+const top=document.createElement('button');top.className='totop';top.type='button';top.setAttribute('aria-label','Hore');top.textContent='↑';document.body.append(top);
+top.addEventListener('click',()=>scrollTo({top:0,behavior:RM?'auto':'smooth'}));
+const hdr=document.getElementById('hlavicka');
+function onS(){const h=document.documentElement,p=h.scrollTop/((h.scrollHeight-h.clientHeight)||1);bar.style.width=(p*100)+'%';
+ if(hdr)hdr.classList.toggle('scrolled',h.scrollTop>10);top.classList.toggle('on',h.scrollTop>700)}
+addEventListener('scroll',onS,{passive:true});onS();
+document.querySelectorAll('.svc,.bcard,.wcard,.feat>div,.ukz,.wben>div,.rq').forEach(e=>{e.classList.add('spot');
+ e.addEventListener('pointermove',ev=>{const r=e.getBoundingClientRect();e.style.setProperty('--mx',(ev.clientX-r.left)+'px');e.style.setProperty('--my',(ev.clientY-r.top)+'px')})});
+const v=document.querySelector('.hero-vid');
+if(v&&!RM&&matchMedia('(pointer:fine)').matches){const hero=v.closest('.hero');
+ hero.addEventListener('pointermove',ev=>{const r=v.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;v.style.transform='perspective(1000px) rotateY('+(x*6)+'deg) rotateX('+(-y*6)+'deg)'});
+ hero.addEventListener('pointerleave',()=>v.style.transform='')}
+if(!RM&&'IntersectionObserver' in window){document.documentElement.classList.add('js-rv');
+ const els=document.querySelectorAll('main .sec-h,main .lead,main .card,main .bcard,main .feat>div,main .wben>div,main .ukz,main .faq details,main .cta,main .packs>*,main .steps>*,main .grid2>*,main .grid3>*');
+ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
+ els.forEach((e,i)=>{if(e.closest('.hero'))return;e.classList.add('rv');e.style.transitionDelay=((i%3)*80)+'ms';io.observe(e)})}
+})();
