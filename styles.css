@@ -240,3 +240,21 @@ header.scrolled{background:rgba(255,255,255,.92);border-bottom-color:var(--line)
 .faq details[open] summary::after{transform:rotate(180deg)}
 .faq .fg{margin-bottom:12px}
 @media (prefers-reduced-motion:reduce){.hero:before,.hero:after,.hero h1 span{animation:none}.js-rv .rv{opacity:1;transform:none;transition:none}.btn:after{display:none}}
+
+/* Úvodná ukážka – prepínač Video / Asistent / Web */
+.hstage{position:relative;background:#0f172a}
+.hs{position:absolute;inset:0;opacity:0;transform:scale(1.03);transition:opacity .6s ease,transform .8s ease;pointer-events:none}
+.hs.on{opacity:1;transform:none;pointer-events:auto}
+.hs video,.hs img{width:100%;height:100%;object-fit:cover;display:block}
+.hs[data-s="1"] img{object-fit:contain;background:#fff}
+.hs .hero-tag{left:16px;bottom:16px;top:auto}
+.hpills{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.hpills button{all:unset;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:99px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:14.5px;color:var(--ink2);transition:.2s}
+.hpills button:hover{border-color:#c7d2fe;color:var(--acc)}
+.hpills button[aria-selected=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.hpills button:focus-visible{outline:3px solid #a5b4fc}
+.hpills i{position:absolute;left:0;bottom:0;height:3px;width:0;background:rgba(255,255,255,.7)}
+.hpills button[aria-selected=true] i{animation:hprog var(--hdur,6s) linear forwards}
+.hpills.stop i{animation:none!important;width:0}
+@keyframes hprog{to{width:100%}}
+@media(max-width:980px){.hs .hero-tag{top:12px;bottom:auto}}

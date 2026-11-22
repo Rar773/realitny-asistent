@@ -44,9 +44,16 @@
     <div class="trust"><span>Video do 24 hodín</span><span>Bazoš cez oficiálne napojenie</span><span>Web na kľúč</span><span>Bez viazanosti</span></div>
   </div>
   <div class="hero-vis">
-    <div class="hero-vid"><video src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline aria-label="Ukážka videa – plynulá prehliadka domu"></video></div>
-    <span class="hero-tag">Ukážka prémiového videa</span>
-    <picture class="hero-app"><source srcset="img/app_prehlad.webp" type="image/webp"><img src="img/app_prehlad.jpg" alt="Aplikácia Realitný asistent – prehľad inzerátov, dopytov a úloh na dnes" width="1280" height="800" loading="lazy"></picture>
+    <div class="hero-vid hstage">
+      <div class="hs on" data-s="0"><video src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline aria-label="Ukážka videa – plynulá prehliadka domu"></video><span class="hero-tag">Ukážka prémiového videa</span></div>
+      <div class="hs" data-s="1"><picture><source srcset="img/app_prehlad.webp" type="image/webp"><img src="img/app_prehlad.jpg" alt="Aplikácia Realitný asistent – prehľad inzerátov, dopytov a úloh na dnes" width="1280" height="800" loading="lazy"></picture><span class="hero-tag">Aplikácia Realitný asistent</span></div>
+      <div class="hs" data-s="2"><img src="ukazka/nahlad.jpg" alt="Ukážka webu pre makléra" width="1280" height="800" loading="lazy"><span class="hero-tag">Ukážka webu pre makléra</span></div>
+    </div>
+    <div class="hpills" role="tablist" aria-label="Ukážky služieb">
+      <button type="button" role="tab" aria-selected="true" data-s="0"><i></i>Video</button>
+      <button type="button" role="tab" aria-selected="false" data-s="1"><i></i>Asistent</button>
+      <button type="button" role="tab" aria-selected="false" data-s="2"><i></i>Web</button>
+    </div>
   </div>
 </div></section>
 

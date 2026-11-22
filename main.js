@@ -47,3 +47,14 @@ if(!RM&&'IntersectionObserver' in window){document.documentElement.classList.add
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
  els.forEach((e,i)=>{if(e.closest('.hero'))return;e.classList.add('rv');e.style.transitionDelay=((i%3)*80)+'ms';io.observe(e)})}
 })();
+
+/* Úvodná ukážka – prepínanie */
+(function(){const st=document.querySelector('.hstage');if(!st)return;const sl=st.querySelectorAll('.hs'),pb=document.querySelectorAll('.hpills button'),box=document.querySelector('.hpills');
+let cur=0,t=null,stop=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function go(n){cur=n;sl.forEach(s=>s.classList.toggle('on',+s.dataset.s===n));pb.forEach(b=>{const on=+b.dataset.s===n;b.setAttribute('aria-selected',on);const i=b.querySelector('i');i.style.animation='none';void i.offsetWidth;i.style.animation=''});
+ const v=st.querySelector('video');if(v){n===0?v.play().catch(()=>{}):v.pause()}}
+function auto(){clearTimeout(t);if(!stop)t=setTimeout(()=>{go((cur+1)%sl.length);auto()},6000)}
+pb.forEach(b=>b.addEventListener('click',()=>{stop=true;box.classList.add('stop');clearTimeout(t);go(+b.dataset.s)}));
+if(stop)box.classList.add('stop');
+st.addEventListener('pointerenter',()=>{clearTimeout(t);box.classList.add('stop')});st.addEventListener('pointerleave',()=>{if(!stop){box.classList.remove('stop');go(cur);auto()}});
+auto()})();
