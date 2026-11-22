@@ -158,6 +158,18 @@ nav .btn{margin-left:auto;padding:10px 18px;font-size:15px}
 .sum .old{text-decoration:line-through;color:var(--muted);font-size:18px;margin-left:8px;font-weight:500}.sum .ok2{color:var(--ok);font-weight:600}
 @media(max-width:980px){.wgrid,.wbox{grid-template-columns:1fr}.sum{position:static}}
 @media(max-width:560px){.chk,.fld{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+.mnav{display:none;margin-left:auto;background:none;border:1px solid var(--line);border-radius:10px;width:42px;height:40px;padding:10px;cursor:pointer;flex-direction:column;justify-content:space-between}
+.mnav span{display:block;height:2px;background:var(--ink);border-radius:2px}
+.ctabs{display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:5px;margin-top:26px;flex-wrap:wrap}
+.ctabs button{all:unset;cursor:pointer;padding:10px 20px;border-radius:10px;font-weight:600;color:var(--ink2)}
+.ctabs button[aria-selected=true]{background:var(--acc);color:#fff}.ctabs button:focus-visible{outline:3px solid #a5b4fc}
+.cpan{margin-top:8px}
+.fg{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);margin:34px 0 0}.fg:first-child{margin-top:0}
+.wben{margin-top:28px}.wben div{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}.wben p{margin:6px 0 0;color:var(--ink2);font-size:15px}
+.lnk{font-weight:600;color:var(--acc);text-decoration:none}
+.cta-btns{display:flex;gap:10px;flex-wrap:wrap}.btn.wh{background:#fff;color:var(--acc)}.btn.wh2{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4)}
+@media(max-width:640px){.mnav{display:flex}nav .btn{display:none}.navlinks.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-bottom:1px solid var(--line);padding:8px 24px}.navlinks.open a{padding:12px 0;border-bottom:1px solid var(--line)}.ctabs{display:flex}.ctabs button{flex:1;text-align:center;padding:10px 8px}}
 .packs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
 .pack{display:flex;justify-content:space-between;align-items:center;gap:16px;background:#fff;border:1px dashed #c7d2fe;border-radius:var(--r);padding:20px 22px}
 .pack.hl{border:2px solid var(--acc);background:linear-gradient(180deg,#fff,#f5f5ff)}
@@ -200,8 +212,9 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
 <header id="hlavicka"><nav class="wrap" aria-label="Hlavná navigácia">
   <a href="#" class="logo"><img src="ikona.png" alt="" width="34" height="34">Realitný asistent</a>
-  <div class="navlinks"><a href="#videa">Videá</a><a href="#asistent">Asistent</a><a href="#weby">Weby</a><a href="#cennik">Cenník</a><a href="#odporucanie">Odporučte</a><a href="#otazky">Otázky</a></div>
-  <a class="btn" href="mailto:rarex731@gmail.com?subject=Objedn%C3%A1vka%20videa">Objednať video</a>
+  <div class="navlinks" id="navlinks"><a href="#videa">Videá</a><a href="#asistent">Asistent</a><a href="#weby">Weby</a><a href="#cennik">Cenník</a><a href="#otazky">Otázky</a></div>
+  <a class="btn" href="#kontakt">Kontaktujte nás</a>
+  <button class="mnav" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navlinks"><span></span><span></span><span></span></button>
 </nav></header>
 
 <main id="obsah">
@@ -210,12 +223,12 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
   <div>
     <p class="kicker">Pre maklérov na Slovensku</p>
     <h1>Viac pozornosti pre vaše inzeráty. <span>Menej práce okolo nich.</span></h1>
-    <p class="lead">Z fotiek inzerátu pripravíme video do inzerátu aj na sociálne siete. A Realitný asistent vo vašom počítači stráži inzeráty na Bazoši a Nehnuteľnostiach, sleduje konkurenciu a zbiera dopyty na jednom mieste.</p>
+    <p class="lead">Videá z fotiek inzerátu, aplikácia, ktorá sa stará o vaše inzeráty na Bazoši a Nehnuteľnostiach, a vlastný web na kľúč. Všetko od jedného dodávateľa a navzájom prepojené.</p>
     <div class="cta-row">
-      <a class="btn" href="#videa">Pozrieť ukážky videí</a>
-      <a class="btn sec" href="#asistent">Ako funguje asistent</a>
+      <a class="btn" href="#sluzby">Pozrieť služby</a>
+      <a class="btn sec" href="#cennik">Cenník</a>
     </div>
-    <div class="trust"><span>Video hotové do 24 hodín</span><span>Bez zmluvy</span><span>Bazoš cez oficiálne napojenie</span></div>
+    <div class="trust"><span>Video do 24 hodín</span><span>Bazoš cez oficiálne napojenie</span><span>Web na kľúč</span><span>Bez viazanosti</span></div>
   </div>
   <div class="hero-vis">
     <div class="hero-vid"><video src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline aria-label="Ukážka videa – plynulá prehliadka domu"></video></div>
@@ -227,16 +240,16 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
 <div class="portals"><div class="wrap"><span>Funguje s portálmi</span><b>Bazoš</b><b>Nehnuteľnosti.sk</b><b>Reality.sk</b><b>TopReality.sk</b></div></div>
 
 <!-- SLUZBY -->
-<section><div class="wrap">
+<section id="sluzby"><div class="wrap">
   <h2 class="sec-h">Tri služby, jeden cieľ: viac záujemcov</h2>
   <p class="lead">Môžete využiť jednu z nich alebo všetky. Video zaujme kupujúcich, asistent vám každý deň ušetrí čas a vlastný web vám prinesie klientov aj mimo portálov.</p>
   <div class="grid3" style="margin-top:36px">
     <a class="card svc" href="#videa"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="m17 10 5-3v10l-5-3"/></svg></span>
-      <h3>Video z fotiek inzerátu</h3><p class="muted" style="margin:0">Plynulé video s hudbou, popisom miestností a vaším kontaktom. Na šírku do inzerátu a na výšku pre Instagram, Facebook či TikTok.</p><span class="more">od 29 € za video →</span></a>
+      <h3>Video z fotiek inzerátu</h3><p class="muted" style="margin:0">Plynulé video s hudbou, popisom miestností a vaším kontaktom. Na šírku do inzerátu a na výšku pre Instagram, Facebook či TikTok.</p><span class="more">Videá od 29 € →</span></a>
     <a class="card svc" href="#asistent"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>
-      <h3>Realitný asistent</h3><p class="muted" style="margin:0">Aplikácia vo vašom počítači, ktorá stráži inzeráty, sleduje konkurenciu, opravuje pravopis a zbiera dopyty. Pracuje sama na pozadí.</p><span class="more">od 19 € mesačne →</span></a>
+      <h3>Realitný asistent</h3><p class="muted" style="margin:0">Aplikácia vo vašom počítači, ktorá stráži inzeráty, sleduje konkurenciu, opravuje pravopis a zbiera dopyty. Pracuje sama na pozadí.</p><span class="more">Asistent od 19 € mesačne →</span></a>
     <a class="card svc" href="#weby"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 8h20M6 5.5h.01M9 5.5h.01"/></svg></span>
-      <h3>Web pre makléra</h3><p class="muted" style="margin:0">Vlastný web s vašou ponukou, referenciami a kontaktným formulárom. Pripravíme ho na kľúč a postaráme sa o neho.</p><span class="more">od 500 € →</span></a>
+      <h3>Web pre makléra</h3><p class="muted" style="margin:0">Vlastný web s vašou ponukou, referenciami a kontaktným formulárom. Pripravíme ho na kľúč a postaráme sa o neho.</p><span class="more">Web od 500 € →</span></a>
   </div>
 </div></section>
 
@@ -298,24 +311,19 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
     <div><b>2. Prepojíte portály</b><p>Bazoš cez oficiálne napojenie (registráciu vám aplikácia pripraví), Nehnuteľnosti ako zvyčajne, Telegram na upozornenia.</p></div>
     <div><b>3. Presuniete inzeráty</b><p>Vložíte odkaz na svoj profil na Bazoši a asistent načíta vaše inzeráty. Vyberiete, ktoré prevziať – všetky alebo po jednom.</p></div>
   </div>
-  <div class="cta-row" style="margin-top:40px"><a class="btn" href="mailto:rarex731@gmail.com?subject=Realitn%C3%BD%20asistent">Chcem Realitného asistenta</a></div>
+  <div class="cta-row" style="margin-top:40px"><a class="btn" href="mailto:rarex731@gmail.com?subject=Realitn%C3%BD%20asistent">Chcem Realitného asistenta</a><a class="btn sec" href="#cennik" data-tab="asistent">Ceny asistenta</a></div>
 </div></section>
 
-<!-- CENNIK -->
 <!-- WEBY -->
 <section id="weby"><div class="wrap">
   <h2 class="sec-h">Web pre makléra</h2>
-  <p class="lead">Vlastný web, na ktorom vás klienti nájdu aj mimo portálov. Pripravíme ho na kľúč, nastavíme a ďalej sa oň staráme – vy len posielate novinky.</p>
-  <div class="wgrid">
-    <div class="card wcard"><span class="tag">WEB</span><h3 style="margin:0">Vizitka makléra</h3><div class="amt">500 € <small>jednorazovo</small></div>
-      <ul><li>Jedna prehľadná stránka: o vás, služby, referencie, kontakt</li><li>Kontaktný formulár a tlačidlá na telefón a WhatsApp</li><li>Pre mobil aj počítač</li><li>Základné nastavenie pre Google</li></ul></div>
-    <div class="card wcard hl"><span class="badge">Odporúčame</span><span class="tag">WEB</span><h3 style="margin:0">Web s ponukou nehnuteľností</h3><div class="amt">700 € <small>jednorazovo</small></div>
-      <ul><li>Všetko z Vizitky</li><li>Ponuka nehnuteľností s fotkami a detailom</li><li>Formulár dopytu pri každej nehnuteľnosti</li><li>S Realitným asistentom sa ponuka plní sama <span class="soon">pripravujeme</span></li><li>Viac podstránok (napr. predaj, prenájom, novinky)</li></ul></div>
-    <div class="card wcard"><span class="tag">WEB</span><h3 style="margin:0">Na mieru</h3><div class="amt">dohodou</div>
-      <ul><li>Pre kancelárie a tímy maklérov</li><li>Viac jazykov, blog, vlastné funkcie</li><li>Napojenie na ďalšie služby</li><li>Cenu pripravíme podľa vášho zadania</li></ul></div>
+  <p class="lead">Vlastný web, na ktorom vás klienti nájdu aj mimo portálov. Pripravíme ho na kľúč, nastavíme a ďalej sa oň staráme.</p>
+  <div class="grid3 wben">
+    <div><b>Na kľúč</b><p>Návrh, texty, fotky, doména aj nastavenie pre Google. Vy len schválite výsledok.</p></div>
+    <div><b>Postaráme sa oň</b><p>Hosting, zabezpečenie, zálohy a 12 úprav ročne v cene správy za 120 € ročne.</p></div>
+    <div><b>Prepojený s asistentom <span class="soon">pripravujeme</span></b><p>Nehnuteľnosti, ceny aj videá sa na web prenesú samy z Realitného asistenta.</p></div>
   </div>
-  <p class="note"><b>Správa webu: 120 € ročne</b> (10 € mesačne) – hosting, zabezpečenie (https), zálohy, aktualizácie a <b>12 drobných úprav ročne</b> (napr. zmena textu, ceny alebo fotky). Každá ďalšia drobná úprava 10 €. S Realitným asistentom sa nehnuteľnosti na web prenášajú samy a do úprav sa nerátajú. Doménu (napr. vasemeno.sk) platíte registrátorovi, pomôžeme vám ju vybrať a nastaviť. <b>Ak si k webu predplatíte Realitného asistenta na rok, web máte o 20&nbsp;% lacnejší.</b></p>
-
+  <p style="margin-top:18px"><a href="#cennik" data-tab="weby" class="lnk">Pozrieť ceny webov →</a></p>
   <div class="wbox">
     <form class="card konf" id="konf" onsubmit="return wOdoslat(event)">
       <h3 style="margin-top:0">Navrhnite si svoj web</h3>
@@ -336,7 +344,7 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
         <label class="opt" style="grid-column:1/-1"><input type="checkbox" name="extra" value="Ponuka sa plní sama z Realitného asistenta"><span>Ponuka sa plní sama z Realitného asistenta<small>inzeráty, ceny a videá sa na web prenesú automaticky · pripravujeme</small></span></label>
       </div></fieldset>
       <fieldset><legend>Akcia</legend><div class="opts">
-        <label class="opt"><input type="checkbox" id="wAsist" value="1"><span>Pridať Realitného asistenta na rok<small>web o 20 % lacnejší · asistent od 190 € ročne</small></span></label>
+        <label class="opt"><input type="checkbox" id="wAsist" value="1"><span>Pridať Realitného asistenta – Všetky portály na rok<small>web o 20 % lacnejší · asistent 290 € ročne (24,17 € mesačne)</small></span></label>
       </div></fieldset>
       <fieldset><legend>Kontakt</legend><div class="fld">
         <label>Meno a priezvisko<input name="meno" required autocomplete="name"></label>
@@ -354,7 +362,7 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
       <div class="big" id="wCena">500 €</div>
       <div class="muted" id="wPozn">jednorazovo za web</div>
       <div class="row2"><span>Správa webu</span><b>120 € ročne</b></div>
-      <div class="row2" id="wAsR" hidden><span>Realitný asistent na rok</span><b>od 190 € ročne</b></div>
+      <div class="row2" id="wAsR" hidden><span>Asistent – Všetky portály na rok</span><b>290 € ročne</b></div>
       <div class="row2" id="wZlR" hidden><span>Zľava na web</span><b class="ok2" id="wZl"></b></div>
       <p class="muted" style="font-size:13.5px;margin:12px 0 0">Konečnú cenu potvrdíme v ponuke podľa vášho zadania. Ceny sú konečné (nie sme platcami DPH).</p>
     </aside>
@@ -363,18 +371,33 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
 
 <section id="cennik"><div class="wrap">
   <h2 class="sec-h">Cenník</h2>
-  <p class="lead">Jednoduché ceny bez skrytých poplatkov. Uvedené ceny sú konečné (nie sme platcami DPH). Pri balíkoch videí a ročnom predplatnom asistenta ušetríte.</p>
-  <h3 class="ph">Videá</h3>
+  <p class="lead">Jednoduché ceny bez skrytých poplatkov. Uvedené ceny sú konečné (nie sme platcami DPH).</p>
+  <div class="ctabs" role="tablist" aria-label="Cenník podľa služby"><button role="tab" type="button" data-t="videa" aria-selected="true">Videá</button><button role="tab" type="button" data-t="asistent" aria-selected="false">Realitný asistent</button><button role="tab" type="button" data-t="weby" aria-selected="false">Weby</button></div>
+  <div class="cpan" data-p="videa" role="tabpanel">
   <div class="plans2"><div class="plan"><span class="tag">VIDEO</span><h3>Štandard</h3><div class="amt">29 € <small>/ video</small></div><p class="pdesc">Pohyb a plynulé prechody po fotkách inzerátu.</p><ul class="feats"><li class="ok">Video z fotiek, ktoré už máte v inzeráte</li><li class="ok">Hudba, popisky miestností a karta s vaším kontaktom</li><li class="ok">Logo kancelárie zostane viditeľné</li><li class="ok">Verzia na šírku aj na výšku (9 : 16)</li><li class="ok">Oprava chyby vo videu zadarmo</li><li class="ok">Hotové do 24 hodín</li><li class="no"><span class="sr">Nie je v cene: </span>Plynulá prehliadka celým domom</li><li class="no"><span class="sr">Nie je v cene: </span>Pohyb kamery ako pri natáčaní na mieste</li><li class="no"><span class="sr">Nie je v cene: </span>Logická trasa od vstupu cez izby po záhradu</li></ul><a class="btn sec" href="mailto:rarex731@gmail.com?subject=Objedn%C3%A1vka%20videa%20%E2%80%93%20%C5%A0tandard">Objednať Štandard</a></div><div class="plan hl"><span class="badge">Pre výnimočné nehnuteľnosti</span><span class="tag">VIDEO</span><h3>Prémiové</h3><div class="amt">89 € <small>/ video</small></div><p class="pdesc">Plynulá prehliadka celým domom – pôsobí ako natáčaná na mieste.</p><ul class="feats"><li class="ok">Video z fotiek, ktoré už máte v inzeráte</li><li class="ok">Hudba, popisky miestností a karta s vaším kontaktom</li><li class="ok">Logo kancelárie zostane viditeľné</li><li class="ok">Verzia na šírku aj na výšku (9 : 16)</li><li class="ok">Oprava chyby vo videu zadarmo</li><li class="ok">Plynulá prehliadka celým domom</li><li class="ok">Pohyb kamery ako pri natáčaní na mieste</li><li class="ok">Logická trasa od vstupu cez izby po záhradu</li><li class="ok">Dĺžka 40 – 60 sekúnd podľa počtu použiteľných fotiek</li></ul><a class="btn" href="mailto:rarex731@gmail.com?subject=Objedn%C3%A1vka%20videa%20%E2%80%93%20Pr%C3%A9miov%C3%A9">Objednať Prémiové</a></div></div>
   <div class="packs">
     <div class="pack"><div><span class="tag">BALÍK</span><h4>10 + 2 Štandard</h4><p>12 videí za cenu 10 · <b>24,17&nbsp;€</b> za video · ušetríte 58&nbsp;€</p></div><div class="pk-r"><div class="pk-amt">290 €</div><a class="btn sec" href="mailto:rarex731@gmail.com?subject=Bal%C3%ADk%2010%20%2B%202%20%C5%A0tandard">Objednať balík</a></div></div>
     <div class="pack hl"><div><span class="tag">BALÍK · NAJVÄČŠIA ÚSPORA</span><h4>10 + 3 Prémiové</h4><p>13 videí za cenu 10 · <b>68,46&nbsp;€</b> za video · ušetríte 267&nbsp;€</p></div><div class="pk-r"><div class="pk-amt">890 €</div><a class="btn" href="mailto:rarex731@gmail.com?subject=Bal%C3%ADk%2010%20%2B%203%20Pr%C3%A9miov%C3%A9">Objednať balík</a></div></div>
   </div>
   <p class="hint2">Balík zaplatíte vopred a videá čerpáte postupne na ľubovoľné vaše inzeráty počas 12 mesiacov.</p>
-  <h3 class="ph" id="cennik-asistent">Realitný asistent</h3>
+  </div>
+  <div class="cpan" data-p="asistent" role="tabpanel" hidden id="cennik-asistent">
   <div class="obd" role="group" aria-label="Spôsob platby"><button type="button" class="on" data-o="m" aria-pressed="true">Mesačne</button><button type="button" data-o="r" aria-pressed="false">Ročne <span>−17 %</span></button></div>
   <div class="plans2"><div class="plan"><span class="tag">ASISTENT</span><h3>Bazoš</h3><div class="amt" data-m="19 € <small>/ mesiac</small>" data-r="15,83 € <small>/ mesiac</small>">19 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 15,83 € mesačne" data-r="platba 190 € raz ročne · ušetríte 38 €">pri ročnej platbe len 15,83 € mesačne</div><p class="pdesc">Všetko pre inzeráty na Bazoši.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia cez Telegram, Windows a e-mail</li><li class="no"><span class="sr">Nie je v cene: </span>Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="no"><span class="sr">Nie je v cene: </span>Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="no"><span class="sr">Nie je v cene: </span>Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="no"><span class="sr">Nie je v cene: </span>Konkurencia a dopyty z Nehnuteľností</li><li class="no"><span class="sr">Nie je v cene: </span>Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn sec" href="mailto:rarex731@gmail.com?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20Bazo%C5%A1">Chcem verziu Bazoš</a></div><div class="plan hl"><span class="badge">Najviac funkcií</span><span class="tag">ASISTENT</span><h3>Všetky portály</h3><div class="amt" data-m="29 € <small>/ mesiac</small>" data-r="24,17 € <small>/ mesiac</small>">29 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 24,17 € mesačne" data-r="platba 290 € raz ročne · ušetríte 58 €">pri ročnej platbe len 24,17 € mesačne</div><p class="pdesc">Bazoš aj Nehnuteľnosti.sk s portálmi Reality.sk a TopReality.sk.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia cez Telegram, Windows a e-mail</li><li class="ok">Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="ok">Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="ok">Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="ok">Konkurencia a dopyty z Nehnuteľností</li><li class="ok">Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn" href="mailto:rarex731@gmail.com?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20v%C5%A1etky%20port%C3%A1ly">Chcem všetky portály</a></div></div>
   <p class="note">Poplatky za oficiálne napojenie na Bazoš platíte priamo Bazošu z vlastného kreditu: vloženie inzerátu 0,08 € (platí 60 dní), TOP 1,99 €. Zmena ceny a textu je zadarmo. Napr. 30 inzerátov = 2,40 € za dva mesiace.</p>
+  </div>
+  <div class="cpan" data-p="weby" role="tabpanel" hidden>
+  <div class="wgrid">
+    <div class="card wcard"><span class="tag">WEB</span><h3 style="margin:0">Vizitka makléra</h3><div class="amt">500 € <small>jednorazovo</small></div>
+      <ul><li>Jedna prehľadná stránka: o vás, služby, referencie, kontakt</li><li>Kontaktný formulár a tlačidlá na telefón a WhatsApp</li><li>Pre mobil aj počítač</li><li>Základné nastavenie pre Google</li></ul></div>
+    <div class="card wcard hl"><span class="badge">Odporúčame</span><span class="tag">WEB</span><h3 style="margin:0">Web s ponukou nehnuteľností</h3><div class="amt">700 € <small>jednorazovo</small></div>
+      <ul><li>Všetko z Vizitky</li><li>Ponuka nehnuteľností s fotkami a detailom</li><li>Formulár dopytu pri každej nehnuteľnosti</li><li>S Realitným asistentom sa ponuka plní sama <span class="soon">pripravujeme</span></li><li>Viac podstránok (napr. predaj, prenájom, novinky)</li></ul></div>
+    <div class="card wcard"><span class="tag">WEB</span><h3 style="margin:0">Na mieru</h3><div class="amt">dohodou</div>
+      <ul><li>Pre kancelárie a tímy maklérov</li><li>Viac jazykov, blog, vlastné funkcie</li><li>Napojenie na ďalšie služby</li><li>Cenu pripravíme podľa vášho zadania</li></ul></div>
+  </div>
+  <p class="note"><b>Správa webu: 120 € ročne</b> (10 € mesačne) – hosting, zabezpečenie (https), zálohy, aktualizácie a <b>12 drobných úprav ročne</b> (napr. zmena textu, ceny alebo fotky). Každá ďalšia drobná úprava 10 €. S Realitným asistentom sa nehnuteľnosti na web prenášajú samy a do úprav sa nerátajú. Doménu (napr. vasemeno.sk) platíte registrátorovi, pomôžeme vám ju vybrať a nastaviť. <b>Ak si k webu predplatíte Realitného asistenta – Všetky portály na rok, web máte o 20&nbsp;% lacnejší.</b></p>
+  <p style="margin-top:16px"><a class="btn" href="#weby">Navrhnúť svoj web</a></p>
+  </div>
 </div></section>
 
 <!-- ODPORUČANIE -->
@@ -406,36 +429,40 @@ footer a{color:var(--muted)}footer b{color:var(--ink)}
 <section id="otazky" style="padding-top:20px"><div class="wrap">
   <h2 class="sec-h">Časté otázky</h2>
   <div class="faq">
+    <h3 class="fg">Videá</h3>
     <details><summary>Musím mať pre video niečo nové nafotené?</summary><p>Nie. Video pripravíme z fotiek, ktoré už máte v inzeráte. Stačí nám odkaz.</p></details>
     <details><summary>Ako rýchlo dostanem video?</summary><p>Do 24 hodín od objednávky, často ešte v ten istý deň.</p></details>
     <details><summary>Zostane na videu logo mojej kancelárie?</summary><p>Áno. Pohyb po fotkách je nastavený tak, aby logo nezmizlo, a na konci videa je karta s vaším kontaktom.</p></details>
+    <details><summary>Aké dlhé je Prémiové video?</summary><p>Spravidla 40 až 60 sekúnd. Dĺžka závisí od toho, koľko použiteľných fotiek k nehnuteľnosti dostaneme – z troch fotiek sa 60-sekundové video urobiť nedá. Čím viac kvalitných fotiek z rôznych miestností, tým dlhšia a plynulejšia prehliadka.</p></details>
+    <details><summary>Ako fungujú balíky videí?</summary><p>Balík zaplatíte vopred: 10 + 2 Štandard za 290 € alebo 10 + 3 Prémiové za 890 €. Videá potom objednávate postupne k ľubovoľným vašim inzerátom, kedykoľvek počas 12 mesiacov.</p></details>
+    <h3 class="fg">Realitný asistent</h3>
     <details><summary>Prečo asistent používa oficiálne napojenie na Bazoš?</summary><p>Bazoš povoľuje spravovať inzeráty programom len cez svoje oficiálne rozhranie pre realitné kancelárie. Je to bezpečné a váš účet nehrozí zablokovaním. Registrácia je zadarmo – e-mail pre Bazoš vám pripraví priamo aplikácia.</p></details>
     <details><summary>Koľko stojí napojenie na Bazoš?</summary><p>Platíte priamo Bazošu z kreditu na svojom účte: 0,08 € za vloženie inzerátu (platí 60 dní), TOP 1,99 €. Zmena ceny a textu, zobrazenia aj dopyty sú zadarmo. Pred každou platenou akciou vám aplikácia ukáže sumu.</p></details>
     <details><summary>Ako dostanem do asistenta svoje existujúce inzeráty?</summary><p>V aplikácii vložíte odkaz na ktorýkoľvek svoj inzerát alebo profil na Bazoši. Asistent načíta text, cenu, lokalitu aj fotky a vy vyberiete, ktoré prevziať – všetky naraz alebo po jednom.</p></details>
     <details><summary>Kde sú moje údaje?</summary><p>Asistent beží vo vašom počítači a vaše údaje aj prístupy zostávajú v ňom. Posiela ich len portálom, s ktorými pracuje.</p></details>
     <details><summary>Musí byť počítač stále zapnutý?</summary><p>Asistent pracuje, keď je počítač zapnutý. Ak bol vypnutý, všetko dobehne hneď po zapnutí.</p></details>
     <details><summary>Funguje to na Macu alebo v mobile?</summary><p>Zatiaľ na Windows. Verziu pre Mac (aj MacBook) a mobilnú aplikáciu práve vyvíjame – budú hotové ešte pred oficiálnym spustením. Ak ich potrebujete, napíšte nám a dáme vám vedieť medzi prvými.</p></details>
-    <details><summary>Aké dlhé je Prémiové video?</summary><p>Spravidla 40 až 60 sekúnd. Dĺžka závisí od toho, koľko použiteľných fotiek k nehnuteľnosti dostaneme – z troch fotiek sa 60-sekundové video urobiť nedá. Čím viac kvalitných fotiek z rôznych miestností, tým dlhšia a plynulejšia prehliadka.</p></details>
-    <details><summary>Ako fungujú balíky videí?</summary><p>Balík zaplatíte vopred: 10 + 2 Štandard za 290 € alebo 10 + 3 Prémiové za 890 €. Videá potom objednávate postupne k ľubovoľným vašim inzerátom, kedykoľvek počas 12 mesiacov.</p></details>
-    <details><summary>Môžem odstúpiť od objednávky a dostať peniaze späť?</summary><p>Áno, do 14 dní od zaplatenia. Ak sme už niečo dodali (video, dni používania asistenta), odpočítame pomernú časť. Presné pravidlá pre jednotlivé služby nájdete v <a href="podmienky.html#odstupenie">obchodných podmienkach</a>.</p></details>
     <details><summary>Môžem asistenta zrušiť?</summary><p>Áno. Mesačné predplatné zrušíte kedykoľvek ku koncu mesiaca. Ročné predplatné je o 17 % lacnejšie (Bazoš 190 € za rok, všetky portály 290 € za rok) a platí sa vopred na 12 mesiacov.</p></details>
+    <h3 class="fg">Weby</h3>
     <details><summary>Čo zahŕňa správa webu za 120 € ročne?</summary><p>Hosting, zabezpečenie (https), pravidelné zálohy, aktualizácie a 12 drobných úprav ročne – napríklad zmenu textu alebo ceny, výmenu fotky či pridanie nehnuteľnosti. Každá ďalšia drobná úprava stojí 10 €, väčšie zmeny (nová podstránka, zmena vzhľadu) 25 € za hodinu s cenou potvrdenou vopred. Doménu platíte priamo registrátorovi – pomôžeme vám ju vybrať a nastaviť.</p></details>
     <details><summary>Musím nehnuteľnosti na web pridávať ručne?</summary><p>Nie, ak máte aj Realitného asistenta. Nehnuteľnosti, ceny, fotky aj videá sa z neho na váš web prenesú samy a každá zmena v asistentovi sa prejaví aj na webe. Túto funkciu práve pripravujeme. Bez asistenta nám zmeny pošlete e-mailom v rámci úprav v správe webu.</p></details>
-    <details><summary>Dostanem zľavu na web, keď mám aj asistenta?</summary><p>Áno. Ak si k webu predplatíte Realitného asistenta na rok, web máte o 20 % lacnejší – napríklad Vizitku za 400 € namiesto 500 €.</p></details>
+    <details><summary>Dostanem zľavu na web, keď mám aj asistenta?</summary><p>Áno. Ak si k webu predplatíte Realitného asistenta vo verzii Všetky portály na rok (290 €), web máte o 20 % lacnejší – napríklad Vizitku za 400 € namiesto 500 € alebo Web s ponukou za 560 € namiesto 700 €. Zľava neplatí pri verzii Bazoš ani pri mesačnom predplatnom.</p></details>
+    <h3 class="fg">Platby a odporúčania</h3>
+    <details><summary>Môžem odstúpiť od objednávky a dostať peniaze späť?</summary><p>Áno, do 14 dní od zaplatenia. Ak sme už niečo dodali (video, dni používania asistenta), odpočítame pomernú časť. Presné pravidlá pre jednotlivé služby nájdete v <a href="podmienky.html#odstupenie">obchodných podmienkach</a>.</p></details>
     <details><summary>Ako funguje odporúčanie kolegu?</summary><p>Pošlete kolegovi svoj kód. Keď ho uvedie pri objednávke, má zľavu 10&nbsp;% a vy 14 dní po jeho platbe dostanete video alebo mesiace asistenta zadarmo (podľa toho, čo si kolega kúpi). Odmenu si aktivujete, keď ju budete potrebovať – do 12 mesiacov. Odmeny nie sú v peniazoch.</p></details>
   </div>
 </div></section>
 
 <!-- CTA -->
-<section style="padding-top:20px"><div class="wrap"><div class="cta">
-  <div><h2>Pošlite nám odkaz na inzerát.</h2><p>Do 24 hodín máte video v dvoch verziách. O asistentovi sa radi porozprávame, keď budete chcieť.</p></div>
-  <a class="btn" href="mailto:rarex731@gmail.com?subject=Objedn%C3%A1vka%20videa">Napísať e-mail</a>
+<section id="kontakt" style="padding-top:20px"><div class="wrap"><div class="cta">
+  <div><h2>Ako vám môžeme pomôcť?</h2><p>Napíšte nám – odpovieme spravidla do 1 pracovného dňa.</p></div>
+  <div class="cta-btns"><a class="btn wh" href="mailto:rarex731@gmail.com?subject=Objedn%C3%A1vka%20videa&amp;body=Odkaz%20na%20inzer%C3%A1t%3A%20">Objednať video</a><a class="btn wh2" href="mailto:rarex731@gmail.com?subject=Realitn%C3%BD%20asistent">Chcem asistenta</a><a class="btn wh2" href="#weby">Navrhnúť web</a></div>
 </div></div></section>
 </main>
 
 <footer><div class="wrap">
   <b>Realitný asistent</b><span>Marian Márton</span><a href="mailto:rarex731@gmail.com">rarex731@gmail.com</a>
-  <a href="sukromie.html">Ochrana osobných údajov</a><a href="podmienky.html">Obchodné podmienky</a><span style="margin-left:auto">© 2026</span>
+  <a href="#odporucanie">Odporučte kolegu</a><a href="sukromie.html">Ochrana osobných údajov</a><a href="podmienky.html">Obchodné podmienky</a><span style="margin-left:auto">© 2026</span>
 </div></footer>
 
 <script>
@@ -460,9 +487,16 @@ function wStav(){const f=document.getElementById('konf');const t=f.querySelector
  if(!c){e.textContent='dohodou';p.textContent=a?'zľavu 20 % na web uplatníme aj pri webe na mieru':'pripravíme podľa zadania';return}
  const k=a?Math.round(c*0.8):c;e.innerHTML=k+' €'+(a?'<span class="old">'+c+' €</span>':'');p.textContent='jednorazovo za web';document.getElementById('wZl').textContent='−'+(c-k)+' €'}
 function wOdoslat(ev){ev.preventDefault();const f=ev.target;const d=new FormData(f);const t=f.querySelector('input[name=typ]:checked').value;const a=document.getElementById('wAsist').checked;
- const ex=d.getAll('extra');const L=['Typ webu: '+t,'Orientačná cena: '+document.getElementById('wCena').textContent.replace(/(\d) €(\d)/,'$1 € (pôvodne $2')+(a?')':''),'Správa webu: 120 € ročne','S Realitným asistentom na rok (−20 % na web): '+(a?'áno':'nie'),'Čo by som chcel: '+(ex.length?ex.join(', '):'—'),'','Meno: '+d.get('meno'),'Kancelária: '+(d.get('rk')||'—'),'E-mail: '+d.get('email'),'Telefón: '+(d.get('tel')||'—'),'Vzorový web: '+(d.get('vzor')||'—'),'','Poznámka: '+(d.get('pozn')||'—')];
+ const ex=d.getAll('extra');const L=['Typ webu: '+t,'Orientačná cena: '+document.getElementById('wCena').textContent.replace(/(\d) €(\d)/,'$1 € (pôvodne $2')+(a?')':''),'Správa webu: 120 € ročne','S Realitným asistentom – Všetky portály na rok (−20 % na web): '+(a?'áno':'nie'),'Čo by som chcel: '+(ex.length?ex.join(', '):'—'),'','Meno: '+d.get('meno'),'Kancelária: '+(d.get('rk')||'—'),'E-mail: '+d.get('email'),'Telefón: '+(d.get('tel')||'—'),'Vzorový web: '+(d.get('vzor')||'—'),'','Poznámka: '+(d.get('pozn')||'—')];
  location.href='mailto:rarex731@gmail.com?subject='+encodeURIComponent('Návrh webu – '+t)+'&body='+encodeURIComponent(L.join('\n'));return false}
 document.getElementById('konf').addEventListener('change',wStav);wStav();
+</script>
+<script>
+(function(){const b=document.querySelector('.mnav'),n=document.getElementById('navlinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',o)});n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{n.classList.remove('open');b.setAttribute('aria-expanded',false)}));
+function tab(t){document.querySelectorAll('.ctabs button').forEach(x=>x.setAttribute('aria-selected',x.dataset.t==t));document.querySelectorAll('.cpan').forEach(p=>p.hidden=p.dataset.p!=t)}
+document.querySelectorAll('.ctabs button').forEach(x=>x.addEventListener('click',()=>tab(x.dataset.t)));
+document.querySelectorAll('[data-tab]').forEach(a=>a.addEventListener('click',()=>tab(a.dataset.tab)));
+const H={'#cennik-asistent':'asistent','#cennik-weby':'weby','#cennik-videa':'videa'};if(H[location.hash]){tab(H[location.hash]);document.getElementById('cennik').scrollIntoView()}})();
 </script>
 </body>
 </html>
