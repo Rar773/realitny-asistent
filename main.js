@@ -80,3 +80,20 @@ bs.forEach(b=>b.addEventListener('click',e=>{if(e.isTrusted){stop=true;clearInte
 sh.addEventListener('pointerenter',()=>{clearInterval(t);bs.forEach(b=>b.classList.remove('run'))});
 sh.addEventListener('pointerleave',auto);
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?auto():clearInterval(t))).observe(sh);})();
+
+/* Mobil: bodky pri posúvateľných kartách, skrátené zoznamy, cena v návrhu webu */
+(function(){if(!matchMedia('(max-width:700px)').matches)return;
+document.querySelectorAll('#sluzby .grid3,.bgrid,.feat,.plans2,.wgrid,.ukz2,.steps,.start,.packs,.wben').forEach(c=>{const n=c.children.length;if(n<2)return;
+ const d=document.createElement('div');d.className='mdots';d.setAttribute('aria-hidden','true');for(let i=0;i<n;i++)d.append(document.createElement('i'));c.after(d);
+ const hl=[...c.children].findIndex(x=>x.classList.contains('hl'));
+ const upd=()=>{const i=Math.round(c.scrollLeft/(c.children[0].offsetWidth+14));[...d.children].forEach((x,j)=>x.classList.toggle('on',j===i))};
+ c.addEventListener('scroll',upd,{passive:true});
+ if(hl>0)requestAnimationFrame(()=>{c.scrollLeft=c.children[hl].offsetLeft-24;upd()});else upd()});
+document.querySelectorAll('.plan ul,.wcard ul').forEach(u=>{const li=[...u.children];if(li.length<=6)return;const hid=li.slice(5);hid.forEach(x=>x.classList.add('lhid'));
+ const b=document.createElement('button');b.type='button';b.className='lmore';b.textContent='Zobraziť všetko ('+li.length+')';u.after(b);
+ b.addEventListener('click',()=>{const o=b.dataset.o!=='1';hid.forEach(x=>x.classList.toggle('lhid',!o));b.dataset.o=o?'1':'0';b.textContent=o?'Zobraziť menej':'Zobraziť všetko ('+li.length+')'})});
+const nv=document.getElementById('navrh'),wc=document.getElementById('wCena');
+if(nv&&wc){const m=document.createElement('div');m.className='msum';m.innerHTML='<div><small>Orientačná cena</small><b></b></div><a class="btn" href="#konf">Poslať návrh</a>';document.body.append(m);
+ const b=m.querySelector('b'),s=()=>{b.textContent=wc.textContent.replace(/(\d) €(\d)/,'$1 € · pred zľavou $2')};s();new MutationObserver(s).observe(wc,{childList:true,subtree:true,characterData:true});
+ m.querySelector('a').addEventListener('click',e=>{e.preventDefault();document.querySelector('#konf button[type=submit]').scrollIntoView({behavior:'smooth',block:'center'})});
+ new IntersectionObserver(es=>es.forEach(e=>m.classList.toggle('on',e.isIntersecting))).observe(nv)}})();
