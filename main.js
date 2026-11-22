@@ -66,3 +66,17 @@ auto()})();
 (function(){const st=document.querySelector('.hstage');if(!st||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 setInterval(()=>{const s=st.querySelector('.hs.on');if(!s)return;const im=[...s.querySelectorAll('.hsi')];if(im.length<2)return;
  const i=im.findIndex(x=>x.classList.contains('on'));im[i].classList.remove('on');im[(i+1)%im.length].classList.add('on')},2000)})();
+
+/* Ukážky aplikácie – automatické prepínanie */
+(function(){const bs=[...document.querySelectorAll('.shots .tabs button')],sh=document.querySelector('.shots');if(bs.length<2||!sh)return;
+const im=document.getElementById('shotImg');let t=null,stop=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// predčítať obrázky
+bs.forEach(b=>{const x=new Image();x.src='img/app_'+b.dataset.i+'.jpg'});
+if(im){im.style.transition='opacity .35s';bs.forEach(b=>b.addEventListener('click',()=>{im.style.opacity='.25';setTimeout(()=>im.style.opacity='1',60)},true))}
+function nxt(){const i=bs.findIndex(b=>b.getAttribute('aria-selected')==='true');bs[(i+1)%bs.length].click();prog()}
+function prog(){bs.forEach(b=>b.classList.remove('run'));if(stop)return;const a=bs.find(b=>b.getAttribute('aria-selected')==='true');if(a){void a.offsetWidth;a.classList.add('run')}}
+function auto(){clearInterval(t);if(!stop){t=setInterval(nxt,5000);prog()}}
+bs.forEach(b=>b.addEventListener('click',e=>{if(e.isTrusted){stop=true;clearInterval(t);prog()}}));
+sh.addEventListener('pointerenter',()=>{clearInterval(t);bs.forEach(b=>b.classList.remove('run'))});
+sh.addEventListener('pointerleave',auto);
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?auto():clearInterval(t))).observe(sh);})();
