@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ukážka webu pre realitnú kanceláriu – Dunaj Reality</title>
+<meta name="description" content="Ukážka webu pre realitnú kanceláriu od Realitný asistent. Vymyslená kancelária a nehnuteľnosti.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1220;--bg2:#111a2e;--ink:#e8edf7;--mut:#94a3b8;--acc:#ff6b4a;--line:#1f2a44}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Sora,system-ui,sans-serif}
+a{color:inherit}img{max-width:100%;display:block}
+.demo{background:#ff6b4a;color:#1a0c07;font-size:13.5px;text-align:center;padding:8px 14px;font-weight:600}.demo a{color:#1a0c07}
+.w{max-width:1180px;margin:0 auto;padding:0 24px}
+header .w{display:flex;align-items:center;gap:30px;height:78px}
+.lg{font-weight:800;font-size:21px;text-decoration:none;letter-spacing:-.02em}.lg b{color:var(--acc)}
+nav{display:flex;gap:26px;margin-left:auto}nav a{text-decoration:none;color:var(--mut);font-size:14.5px}nav a:hover{color:#fff}
+.bt{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#1a0c07;text-decoration:none;font-weight:700;padding:13px 22px;border-radius:999px;border:0;font:inherit;font-weight:700;cursor:pointer}
+.bt.gh{background:transparent;color:#fff;border:1px solid #33415f}
+.hero{padding:40px 0 70px}.hg{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.pill{display:inline-block;border:1px solid #33415f;border-radius:99px;padding:6px 14px;font-size:13px;color:var(--mut)}
+h1{font-size:60px;line-height:1.05;letter-spacing:-.04em;margin:18px 0}h1 span{color:var(--acc)}
+.hero p{color:var(--mut);font-size:18px;max-width:480px;margin:0 0 28px}
+.search{display:flex;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:6px;max-width:520px;margin-bottom:22px}
+.search select,.search input{flex:1;background:transparent;border:0;color:#fff;font:inherit;font-size:14.5px;padding:0 14px;outline:0}.search select option{color:#000}
+.hi{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:4/4.3}.hi img{width:100%;height:100%;object-fit:cover}
+.hi .fl{position:absolute;left:18px;bottom:18px;background:rgba(11,18,32,.82);backdrop-filter:blur(8px);border:1px solid #33415f;border-radius:18px;padding:14px 18px}
+.fl b{display:block;font-size:22px}.fl span{color:var(--mut);font-size:13px}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;max-width:480px}.nums b{font-size:30px;display:block}.nums span{color:var(--mut);font-size:13px}
+section{padding:80px 0}h2{font-size:42px;letter-spacing:-.03em;margin:0 0 10px}.sub{color:var(--mut);margin:0 0 34px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.pc{background:var(--bg2);border:1px solid var(--line);border-radius:22px;overflow:hidden;text-decoration:none;transition:transform .2s,border-color .2s}.pc:hover{transform:translateY(-5px);border-color:#ff6b4a66}
+.pc .im{position:relative;aspect-ratio:4/3}.pc img{width:100%;height:100%;object-fit:cover}
+.pc .tg{position:absolute;top:12px;left:12px;background:var(--acc);color:#1a0c07;font-size:12px;font-weight:700;border-radius:99px;padding:4px 11px}
+.pc .bd{padding:18px 20px 22px}.pc h3{margin:0 0 4px;font-size:18px}.pc .lo{color:var(--mut);font-size:13.5px}
+.pc .ft{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.pc .ft b{font-size:20px;color:var(--acc)}.pc .ft span{color:var(--mut);font-size:13px}
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.sv{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:24px}
+.sv i{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#ff6b4a22;color:var(--acc);font-style:normal;font-size:20px;margin-bottom:14px}.sv h3{margin:0 0 6px;font-size:17px}.sv p{margin:0;color:var(--mut);font-size:14px}
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.tm{text-align:center;background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:26px 18px}
+.av{width:86px;height:86px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-weight:800;font-size:26px;background:linear-gradient(135deg,#ff6b4a,#f59e0b);color:#1a0c07}
+.tm h3{margin:0;font-size:16px}.tm span{color:var(--mut);font-size:13px}
+.cta{background:linear-gradient(120deg,#ff6b4a,#f59e0b);color:#1a0c07;border-radius:28px;padding:44px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.cta h2{margin:0}.cta p{margin:6px 0 0}.cta .bt{background:#0b1220;color:#fff}
+footer{border-top:1px solid var(--line);color:var(--mut);font-size:13.5px}footer .w{display:flex;gap:20px;padding:26px 24px;flex-wrap:wrap}
+@media(max-width:900px){nav{display:none}.hg,.grid,.svc,.team{grid-template-columns:1fr 1fr}h1{font-size:40px}.hg{grid-template-columns:1fr}}
+@media(max-width:560px){.grid,.svc,.team{grid-template-columns:1fr}.search{flex-direction:column;border-radius:20px}.search select,.search input{padding:10px 12px}}
+</style>
+</head>
+<body>
+<div class="demo">Toto je <b>ukážka webu pre realitnú kanceláriu</b> – kancelária, ľudia aj ceny sú vymyslené. <a href="../weby.html">← Späť na Weby pre maklérov</a></div>
+<header><div class="w"><a class="lg" href="#">dunaj<b>.</b>reality</a>
+  <nav><a href="#ponuka">Ponuka</a><a href="#sluzby">Služby</a><a href="#tim">Náš tím</a><a href="#kontakt">Kontakt</a></nav>
+  <a class="bt" href="#kontakt">Predať nehnuteľnosť</a></div></header>
+
+<div class="hero"><div class="w hg">
+  <div><span class="pill">● Bratislava · Senec · Pezinok</span>
+    <h1>Nájdeme vám <span>domov</span>, ktorý vám sadne.</h1>
+    <p>Realitná kancelária s tímom 4 maklérov. Každá nehnuteľnosť s video prehliadkou, aby ste zbytočne nechodili na obhliadky.</p>
+    <form class="search" onsubmit="location.hash='ponuka';return false"><select aria-label="Typ"><option>Byt</option><option>Dom</option><option>Pozemok</option></select><input placeholder="Lokalita, napr. Senec" aria-label="Lokalita"><button class="bt" type="submit">Hľadať</button></form>
+    <div class="nums"><div><b>340+</b><span>predaných nehnuteľností</span></div><div><b>14</b><span>rokov na trhu</span></div><div><b>4</b><span>makléri v tíme</span></div></div>
+  </div>
+  <div class="hi"><img src="../ukazka/terasa.jpg" alt="Bungalov s krytou terasou"><div class="fl"><b>249 000 €</b><span>Bungalov s terasou · Senec</span></div></div>
+</div></div>
+
+<section id="ponuka" style="background:#0e1628"><div class="w">
+  <h2>Najnovšia ponuka</h2><p class="sub">Vybrané nehnuteľnosti z našej ponuky. Pri každej nájdete video prehliadku.</p>
+  <div class="grid">
+    <a class="pc" href="#kontakt"><div class="im"><img src="../ukazka/garaz.jpg" alt="Rodinný dom s dvojgarážou" loading="lazy"><span class="tg">▶ Video</span></div><div class="bd"><h3>Rodinný dom s dvojgarážou</h3><div class="lo">Pezinok · 4 izby · 128 m²</div><div class="ft"><b>289 000 €</b><span>pozemok 520 m²</span></div></div></a>
+    <a class="pc" href="#kontakt"><div class="im"><img src="../ukazka/obyvacka.jpg" alt="3-izbový byt v novostavbe" loading="lazy"><span class="tg">Novostavba</span></div><div class="bd"><h3>3-izbový byt v novostavbe</h3><div class="lo">Bratislava – Ružinov · 84 m²</div><div class="ft"><b>259 000 €</b><span>balkón 8 m²</span></div></div></a>
+    <a class="pc" href="#kontakt"><div class="im"><img src="../ukazka/kuchyna.jpg" alt="2-izbový byt s kuchyňou na mieru" loading="lazy"><span class="tg">▶ Video</span></div><div class="bd"><h3>2-izbový byt po rekonštrukcii</h3><div class="lo">Senec · 58 m²</div><div class="ft"><b>165 000 €</b><span>3. poschodie</span></div></div></a>
+  </div>
+</div></section>
+
+<section id="sluzby"><div class="w">
+  <h2>Čo pre vás urobíme</h2><p class="sub">Od ocenenia až po odovzdanie kľúčov.</p>
+  <div class="svc">
+    <div class="sv"><i>€</i><h3>Ocenenie zadarmo</h3><p>Reálna trhová cena do 48 hodín.</p></div>
+    <div class="sv"><i>▶</i><h3>Video prehliadka</h3><p>Ku každej nehnuteľnosti na web aj sociálne siete.</p></div>
+    <div class="sv"><i>⚖</i><h3>Právny servis</h3><p>Zmluvy, kataster a úschova peňazí.</p></div>
+    <div class="sv"><i>%</i><h3>Hypotéka</h3><p>Pomôžeme vybaviť financovanie.</p></div>
+  </div>
+</div></section>
+
+<section id="tim" style="padding-top:0"><div class="w">
+  <h2>Náš tím</h2><p class="sub">Makléri, ktorí poznajú svoje lokality.</p>
+  <div class="team">
+    <div class="tm"><div class="av">MK</div><h3>Michal Kráľ</h3><span>Bratislava</span></div>
+    <div class="tm"><div class="av">ZB</div><h3>Zuzana Bieliková</h3><span>Senec</span></div>
+    <div class="tm"><div class="av">PS</div><h3>Patrik Sloboda</h3><span>Pezinok</span></div>
+    <div class="tm"><div class="av">EM</div><h3>Eva Mináriková</h3><span>Prenájmy</span></div>
+  </div>
+</div></section>
+
+<section id="kontakt" style="padding-top:0"><div class="w"><div class="cta">
+  <div><h2>Predávate nehnuteľnosť?</h2><p>Ozvite sa nám a do 48 hodín vám povieme, za koľko sa dá predať.</p></div>
+  <a class="bt" href="#" onclick="alert('Toto je len ukážka.');return false">Chcem ocenenie zadarmo</a>
+</div></div></section>
+
+<footer><div class="w"><b style="color:#fff">dunaj.reality</b><span>Ukážková realitná kancelária</span><span style="margin-left:auto">Web vytvoril Realitný asistent</span></div></footer>
+</body>
+</html>

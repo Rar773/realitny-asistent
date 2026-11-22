@@ -1,6 +1,9 @@
 const SHOTS={prehlad:['Prehľad – čo je dôležité dnes: inzeráty, nevybavené dopyty, obhliadky a upozornenia.','Prehľad: počet inzerátov, nevybavené dopyty, úlohy na dnes a posledné upozornenia'],
  inzeraty:['Inzeráty – zmena ceny zadarmo, TOP, vloženie znova po 60 dňoch a presun starých inzerátov z Bazoša.','Inzeráty na Bazoši s cenou, zobrazeniami, platnosťou a tlačidlami na zmenu ceny a TOP'],
- dopyty:['Dopyty – správy záujemcov zoradené podľa inzerátu, odpoveď priamo z aplikácie.','Dopyty od záujemcov zoradené podľa inzerátov s možnosťou odpovedať']};
+ dopyty:['Dopyty – správy záujemcov zoradené podľa inzerátu, odpoveď priamo z aplikácie.','Dopyty od záujemcov zoradené podľa inzerátov s možnosťou odpovedať'],
+ statistiky:['Štatistiky – zobrazenia, dopyty a obhliadky po týždňoch a pri každom inzeráte.','Štatistiky: dopyty a obhliadky po týždňoch a tabuľka inzerátov'],
+ klienti:['Klienti – všetci záujemcovia na jednom mieste, s poznámkami a históriou.','Zoznam klientov s kontaktmi, stavom a poznámkami'],
+ obhliadky:['Obhliadky – naplánujete jedným klikom a pridáte do Google Kalendára.','Plánovanie obhliadok s tlačidlom do Google Kalendára']};
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{const i=b.dataset.i;
  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
  document.getElementById('shotWebp').srcset='img/app_'+i+'.webp';const im=document.getElementById('shotImg');im.src='img/app_'+i+'.jpg';im.alt=SHOTS[i][1];
@@ -58,3 +61,8 @@ pb.forEach(b=>b.addEventListener('click',()=>{stop=true;box.classList.add('stop'
 if(stop)box.classList.add('stop');
 st.addEventListener('pointerenter',()=>{clearTimeout(t);box.classList.add('stop')});st.addEventListener('pointerleave',()=>{if(!stop){box.classList.remove('stop');go(cur);auto()}});
 auto()})();
+
+/* Viac ukážok v jednom okne */
+(function(){const st=document.querySelector('.hstage');if(!st||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+setInterval(()=>{const s=st.querySelector('.hs.on');if(!s)return;const im=[...s.querySelectorAll('.hsi')];if(im.length<2)return;
+ const i=im.findIndex(x=>x.classList.contains('on'));im[i].classList.remove('on');im[(i+1)%im.length].classList.add('on')},2000)})();
