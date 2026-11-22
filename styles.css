@@ -233,5 +233,10 @@ header.scrolled{background:rgba(255,255,255,.92);border-bottom-color:var(--line)
 .js-rv .rv.in{opacity:1;transform:none}
 .totop{position:fixed;right:20px;bottom:20px;width:46px;height:46px;border-radius:50%;border:0;background:var(--acc);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 10px 24px rgba(79,70,229,.35);opacity:0;transform:translateY(12px);transition:.25s;z-index:40}
 .totop.on{opacity:1;transform:none}
-details{transition:background .2s}details[open]{background:#fff;box-shadow:var(--sh)}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 22px;margin-bottom:12px;transition:border-color .2s,box-shadow .2s}
+.faq details:hover{border-color:#c7d2fe}
+.faq details[open]{border-color:#c7d2fe;box-shadow:0 12px 30px rgba(79,70,229,.10)}
+.faq summary::after{width:28px;height:28px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--acc2);font-size:18px;transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(180deg)}
+.faq .fg{margin-bottom:12px}
 @media (prefers-reduced-motion:reduce){.hero:before,.hero:after,.hero h1 span{animation:none}.js-rv .rv{opacity:1;transform:none;transition:none}.btn:after{display:none}}
