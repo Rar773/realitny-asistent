@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Realitný asistent – aplikácia pre maklérov</title>
-<meta name="description" content="Aplikácia, ktorá stráži inzeráty na Bazoši a Nehnuteľnostiach, sleduje konkurenciu, opravuje pravopis a zbiera dopyty. Od 19 € mesačne.">
+<title>Realitný asistent – aplikácia na správu inzerátov pre maklérov</title>
+<meta name="description" content="Aplikácia pre maklérov: Bazoš cez oficiálne API, Nehnuteľnosti.sk, dopyty, klienti, obhliadky, konkurencia a štatistiky. Od 19 € mesačne.">
+
 <link rel="canonical" href="https://realitnyasistent.eu/asistent.html">
 <link rel="icon" type="image/png" href="ikona.png">
 <link rel="apple-touch-icon" href="ikona.png">
@@ -12,43 +13,62 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta property="og:site_name" content="Realitný asistent">
-<meta property="og:title" content="Realitný asistent – aplikácia pre maklérov">
-<meta property="og:description" content="Aplikácia, ktorá stráži inzeráty na Bazoši a Nehnuteľnostiach, sleduje konkurenciu, opravuje pravopis a zbiera dopyty. Od 19 € mesačne.">
+<meta property="og:title" content="Realitný asistent – aplikácia na správu inzerátov pre maklérov">
+<meta property="og:description" content="Aplikácia pre maklérov: Bazoš cez oficiálne API, Nehnuteľnosti.sk, dopyty, klienti, obhliadky, konkurencia a štatistiky. Od 19 € mesačne.">
 <meta property="og:url" content="https://realitnyasistent.eu/asistent.html">
 <meta property="og:image" content="https://realitnyasistent.eu/img/og.jpg">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261123a">
-<script src="main.js?v=20261123a" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20261123s">
+<script src="main.js?v=20261123s" defer></script>
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
-<header id="hlavicka"><nav class="wrap" aria-label="Hlavná navigácia">
-  <a href="index.html" class="logo"><img src="ikona.png" alt="" width="34" height="34">Realitný asistent</a>
-  <div class="navlinks" id="navlinks"><a href="videa.html">Videá</a><a href="asistent.html" class="on" aria-current="page">Realitný asistent</a><a href="weby.html">Weby</a><a href="index.html#baliky">Balíky</a><a href="odporucanie.html">Odporučte kolegu</a></div>
-  <a class="btn" href="index.html#kontakt">Kontaktujte nás</a>
-  <button class="mnav" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navlinks"><span></span><span></span><span></span></button>
-</nav></header>
+<header class="top" id="hlavicka"><div class="wrap nav">
+  <a class="logo" href="index.html" aria-label="Realitný asistent – domov"><img src="ikona.png" alt="" width="38" height="38"><span><b>Realitný asistent</b><small>pre realitných maklérov</small></span></a>
+  <nav class="menu" id="menu" aria-label="Hlavná navigácia">
+    <div class="dd"><button type="button" aria-expanded="false" aria-controls="dd-sluzby">Služby <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="ddp" id="dd-sluzby">
+        <a href="videa.html"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></span><span><b>Videá z fotiek inzerátu</b><span>Štandard 29 € · Prémiové 89 € · do 24 hodín</span></span></a>
+        <a href="asistent.html"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span><span><b>Realitný asistent</b><span>Aplikácia, ktorá sa stará o vaše inzeráty · od 19 € mesačne</span></span></a>
+        <a href="weby.html"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg></span><span><b>Weby pre maklérov</b><span>Web na kľúč od 500 € · správa 120 € ročne</span></span></a>
+      </div>
+    </div>
+    <a href="asistent.html" aria-current="page">Aplikácia</a>
+    <a href="weby.html">Weby pre maklérov</a>
+    <a href="index.html#baliky">Balíky</a>
+    <a href="odporucanie.html">Odporučte kolegu</a>
+    <a href="#kontakt">Kontakt</a>
+    <a class="btn mcta" href="#kontakt">Objednať službu</a>
+  </nav>
+  <div class="nav-cta"><a class="btn sm" href="#kontakt">Objednať službu</a></div>
+  <button class="mnav" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+</div></header>
 <main id="obsah">
-<section id="asistent" class="dark"><div class="wrap">
-  <p class="kicker">Realitný asistent</p>
-  <h1 class="sec-h">Kým vy predávate, asistent sa stará o vaše inzeráty.</h1>
-  <p class="lead">Nainštalujete ho raz, prepojíte portály a ďalej pracuje sám na pozadí. O dôležitých veciach vám dá vedieť do mobilu.</p>
-  <div class="feat">
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l8.6-8.6a1 1 0 0 0 0-1.41z"/><circle cx="7" cy="7" r="1.5"/></svg></span><h3>Bazoš cez oficiálne napojenie</h3><p>Spravuje inzeráty cez oficiálne rozhranie Bazoša pre realitné kancelárie – bez rizika zablokovania účtu. Zmena ceny jedným klikom.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span><h3>Vráti inzerát po 60 dňoch</h3><p>Pred koncom platnosti upozorní a zmazaný inzerát vloží znova jedným klikom – text aj fotky sú v zálohe.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h3>Dopyty na jednom mieste</h3><p>Správy záujemcov z Bazoša aj Nehnuteľností zoradené podľa inzerátu. Odpoviete priamo z aplikácie.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg></span><h3>Sleduje konkurenciu</h3><p>Dá vedieť, keď sa v okolí objaví podobná ponuka lacnejšia alebo drahšia o percento, ktoré si nastavíte.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><h3>Opravuje pravopis</h3><p>Nájde skutočné chyby v nadpise aj popise a opraví ich jedným klikom. Pripraví aj text nového inzerátu.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><h3>Upozornenia do mobilu</h3><p>Cez Telegram, do Windows a pri dôležitých veciach aj e-mailom. Plus klienti, obhliadky do kalendára a štatistiky.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="m17 10 5-3v10l-5-3"/></svg></span><span class="soon">Pripravujeme</span><h3>Videá priamo v aplikácii</h3><p>Vyberiete inzerát, zvolíte video a zaplatíte bez odchodu z aplikácie. Hotové video sa samo uloží k inzerátu.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 8h20"/></svg></span><span class="soon">Pripravujeme</span><h3>Inzeráty aj na vašom webe</h3><p>Ak máte web od nás, nehnuteľnosti, ceny aj videá sa na neho prenesú samy. Zmena ceny v asistentovi = zmena na webe.</p></div>
-    <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="soon">Pripravujeme</span><h3>Váš účet na webe</h3><p>Platby kartou, faktúry, predplatné, odporúčania a odmeny na jednom mieste. Odmenu si aktivujete jedným klikom.</p></div>
+<section class="phero"><div class="wrap phero-g">
+  <div>
+    <p class="crumb"><a href="index.html">Domov</a> / Realitný asistent</p>
+    <p class="kicker">Aplikácia Realitný asistent</p>
+    <h1>Kým vy predávate, <span class="grad">asistent sa stará o vaše inzeráty.</span></h1>
+    <p class="lead">Nainštalujete ho raz, prepojíte portály a ďalej pracuje sám na pozadí. O dôležitých veciach vám dá vedieť do počítača, cez Telegram alebo e-mailom.</p>
+    <form class="card pick" id="pick" onsubmit="return false" aria-label="Vyberte verziu"><label><input type="radio" name="plan" data-s="Realitný asistent – Bazoš"><span>Bazoš</span><b>19 € <small>/ mesačne</small></b></label><label><input type="radio" name="plan" data-s="Realitný asistent – všetky portály" checked><span>Všetky portály</span><b>29 € <small>/ mesačne</small></b></label><label><input type="radio" name="plan" data-s="Realitný asistent – všetky portály – ročne"><span>Všetky portály – ročne</span><b>290 € <small>/ rok</small></b></label><a class="btn full" id="pickGo" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20v%C5%A1etky%20port%C3%A1ly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></svg>Chcem aplikáciu pre Windows</a><a class="btn sec full" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20Mac%20verzia%20na%20testovanie"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8c-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.1-1.2 2.9-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.4-1-2.4-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>Mac verzia – na testovanie</a><p class="muted" style="font-size:13.5px;margin:4px 0 0;text-align:center">Pošleme vám inštalačný súbor a pomôžeme s nastavením.</p></form>
   </div>
+  <div class="devs solo" aria-label="Ukážka aplikácie Realitný asistent">
+  <div class="laptop"><div class="lscr"><div class="lview rot"><picture class="on"><source srcset="img/app_prehlad.webp" type="image/webp"><img src="img/app_prehlad.jpg" alt="Aplikácia Realitný asistent – obrazovka Prehľad" width="1280" height="800"></picture><picture><source srcset="img/app_inzeraty.webp" type="image/webp"><img src="img/app_inzeraty.jpg" alt="Aplikácia Realitný asistent – obrazovka Inzeráty" width="1280" height="800" loading="lazy"></picture><picture><source srcset="img/app_dopyty.webp" type="image/webp"><img src="img/app_dopyty.jpg" alt="Aplikácia Realitný asistent – obrazovka Dopyty" width="1280" height="800" loading="lazy"></picture><picture><source srcset="img/app_klienti.webp" type="image/webp"><img src="img/app_klienti.jpg" alt="Aplikácia Realitný asistent – obrazovka Klienti" width="1280" height="800" loading="lazy"></picture><picture><source srcset="img/app_statistiky.webp" type="image/webp"><img src="img/app_statistiky.jpg" alt="Aplikácia Realitný asistent – obrazovka Štatistiky" width="1280" height="800" loading="lazy"></picture></div></div><div class="lbase"></div></div>
+  <div class="chip c1"><span class="dot"></span>Asistent: beží</div>
+</div>
+</div></section>
 
-  <div class="shots">
+<section id="funkcie"><div class="wrap">
+  <div class="sh c"><h2>Čo všetko v aplikácii nájdete?</h2><p>Bazoš cez oficiálne API, Nehnuteľnosti.sk s portálmi Reality.sk a TopReality.sk, dopyty, klienti, obhliadky a štatistiky na jednom mieste.</p></div>
+  <div class="fwrap"><aside class="card plist"><h3>Podporované portály</h3><div><span class="pb" style="background:#fff4e5;color:#c2410c">B</span>Bazoš.sk <small>oficiálne API</small></div><div><span class="pb">N</span>Nehnuteľnosti.sk</div><div><span class="pb">T</span>TopReality.sk</div><div><span class="pb">R</span>Reality.sk</div><p class="muted" style="font-size:13.5px;margin-top:12px">Upozornenia do počítača, cez Telegram (@RealitnyAsistent_bot) a e-mailom.</p></aside><div class="feat"><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l8.6-8.6a1 1 0 0 0 0-1.41z"/><circle cx="7" cy="7" r="1.5"/></svg></span><h3>Bazoš cez oficiálne napojenie</h3><p>Spravuje inzeráty cez oficiálne rozhranie Bazoša pre realitné kancelárie – bez rizika zablokovania účtu. Zmena ceny jedným klikom.</p></div><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span><h3>Vráti inzerát po 60 dňoch</h3><p>Pred koncom platnosti upozorní a zmazaný inzerát vloží znova jedným klikom – text aj fotky sú v zálohe.</p></div><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h3>Dopyty na jednom mieste</h3><p>Správy záujemcov z Bazoša aj Nehnuteľností zoradené podľa inzerátu. Odpoviete priamo z aplikácie.</p></div><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></svg></span><h3>Sleduje konkurenciu</h3><p>Dá vedieť, keď sa v okolí objaví podobná ponuka lacnejšia alebo drahšia o percento, ktoré si nastavíte.</p></div><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span><h3>Opravuje pravopis</h3><p>Nájde skutočné chyby v nadpise aj popise a opraví ich jedným klikom. Pripraví aj text nového inzerátu.</p></div><div><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><h3>Upozornenia do mobilu</h3><p>Do počítača, cez Telegram a pri dôležitých veciach aj e-mailom. Plus klienti, obhliadky do kalendára a štatistiky.</p></div></div></div>
+</div></section>
+
+<section id="ukazky" class="alt"><div class="wrap">
+  <div class="sh c"><h2>Pozrite sa do aplikácie</h2><p>Takto vyzerá Realitný asistent v počítači. Ukážky obsahujú vymyslené inzeráty a kontakty.</p></div>
+  <div style="max-width:980px;margin:0 auto"><div class="shots">
     <div class="tabs" role="tablist" aria-label="Ukážky aplikácie">
       <button role="tab" aria-selected="true" aria-controls="shot" data-i="prehlad">Prehľad</button>
       <button role="tab" aria-selected="false" aria-controls="shot" data-i="inzeraty">Inzeráty</button>
@@ -59,47 +79,55 @@
     </div>
     <picture class="shot" id="shot"><source id="shotWebp" srcset="img/app_prehlad.webp" type="image/webp"><img id="shotImg" src="img/app_prehlad.jpg" alt="Prehľad: počet inzerátov, nevybavené dopyty, úlohy na dnes a posledné upozornenia" width="1280" height="800" loading="lazy"></picture>
     <p class="shot-cap" id="shotCap">Prehľad – čo je dôležité dnes: inzeráty, nevybavené dopyty, obhliadky a upozornenia.</p>
-  </div>
-
-  <div class="start">
-    <div><b>1. Nainštalujete</b><p>Jeden súbor pre Windows, pár sekúnd. Pri prvom spustení vás aplikácia prevedie krátkou prehliadkou. Verzia pre Mac a mobilná aplikácia sú vo vývoji.</p></div>
-    <div><b>2. Prepojíte portály</b><p>Bazoš cez oficiálne napojenie (registráciu vám aplikácia pripraví), Nehnuteľnosti ako zvyčajne, Telegram na upozornenia.</p></div>
-    <div><b>3. Presuniete inzeráty</b><p>Vložíte odkaz na svoj profil na Bazoši a asistent načíta vaše inzeráty. Vyberiete, ktoré prevziať – všetky alebo po jednom.</p></div>
-  </div>
-  <div class="cta-row" style="margin-top:40px"><a class="btn" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent">Chcem Realitného asistenta</a><a class="btn sec" href="#cennik">Ceny asistenta</a></div>
+  </div></div>
 </div></section>
 
-<section id="cennik"><div class="wrap">
-  <h2 class="sec-h">Cenník</h2>
-  <p class="lead">Mesačne alebo ročne so zľavou 17 %. Uvedené ceny sú konečné (nie sme platcami DPH).</p>
+<section id="zaciatok"><div class="wrap">
+  <div class="sh c"><h2>Ako začať</h2><p>Nastavenie zaberie pár minút a aplikácia vás ním prevedie.</p></div>
+  <div class="steps"><div><span class="n">1</span><h3>Nainštalujete</h3><p>Jeden súbor pre Windows, pár sekúnd. Pri prvom spustení vás aplikácia prevedie krátkou prehliadkou. Verzia pre Mac je v testovaní, mobilnú aplikáciu pripravujeme.</p></div><div><span class="n">2</span><h3>Prepojíte portály</h3><p>Bazoš cez oficiálne napojenie (registráciu vám aplikácia pripraví), Nehnuteľnosti ako zvyčajne, Telegram na upozornenia.</p></div><div><span class="n">3</span><h3>Presuniete inzeráty</h3><p>Vložíte odkaz na svoj profil na Bazoši a asistent načíta vaše inzeráty. Vyberiete, ktoré prevziať – všetky alebo po jednom.</p></div></div>
+</div></section>
 
-  <div class="obd" role="group" aria-label="Spôsob platby"><button type="button" class="on" data-o="m" aria-pressed="true">Mesačne</button><button type="button" data-o="r" aria-pressed="false">Ročne <span>−17 %</span></button></div>
-  <div class="plans2"><div class="plan"><span class="tag">ASISTENT</span><h3>Bazoš</h3><div class="amt" data-m="19 € <small>/ mesiac</small>" data-r="15,83 € <small>/ mesiac</small>">19 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 15,83 € mesačne" data-r="platba 190 € raz ročne · ušetríte 38 €">pri ročnej platbe len 15,83 € mesačne</div><p class="pdesc">Všetko pre inzeráty na Bazoši.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia cez Telegram, Windows a e-mail</li><li class="no"><span class="sr">Nie je v cene: </span>Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="no"><span class="sr">Nie je v cene: </span>Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="no"><span class="sr">Nie je v cene: </span>Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="no"><span class="sr">Nie je v cene: </span>Konkurencia a dopyty z Nehnuteľností</li><li class="no"><span class="sr">Nie je v cene: </span>Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn sec" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20Bazo%C5%A1">Chcem verziu Bazoš</a></div><div class="plan hl"><span class="badge">Najviac funkcií</span><span class="tag">ASISTENT</span><h3>Všetky portály</h3><div class="amt" data-m="29 € <small>/ mesiac</small>" data-r="24,17 € <small>/ mesiac</small>">29 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 24,17 € mesačne" data-r="platba 290 € raz ročne · ušetríte 58 €">pri ročnej platbe len 24,17 € mesačne</div><p class="pdesc">Bazoš aj Nehnuteľnosti.sk s portálmi Reality.sk a TopReality.sk.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia cez Telegram, Windows a e-mail</li><li class="ok">Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="ok">Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="ok">Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="ok">Konkurencia a dopyty z Nehnuteľností</li><li class="ok">Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20v%C5%A1etky%20port%C3%A1ly">Chcem všetky portály</a></div></div>
+<section id="cennik" class="alt"><div class="wrap">
+  <div class="sh c"><h2>Cenník</h2><p>Mesačne alebo ročne so zľavou 17 %. Uvedené ceny sú konečné (nie sme platcami DPH).</p></div>
+  <div style="text-align:center"><div class="obd" role="group" aria-label="Spôsob platby"><button type="button" class="on" data-o="m" aria-pressed="true">Mesačne</button><button type="button" data-o="r" aria-pressed="false">Ročne <span>−17 %</span></button></div></div>
+  <div class="plans2"><div class="plan"><span class="tag">ASISTENT</span><h3>Bazoš</h3><div class="amt" data-m="19 € <small>/ mesiac</small>" data-r="15,83 € <small>/ mesiac</small>">19 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 15,83 € mesačne" data-r="platba 190 € raz ročne · ušetríte 38 €">pri ročnej platbe len 15,83 € mesačne</div><p class="pdesc">Všetko pre inzeráty na Bazoši.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia do počítača, cez Telegram a e-mail</li><li class="no"><span class="sr">Nie je v cene: </span>Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="no"><span class="sr">Nie je v cene: </span>Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="no"><span class="sr">Nie je v cene: </span>Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="no"><span class="sr">Nie je v cene: </span>Konkurencia a dopyty z Nehnuteľností</li><li class="no"><span class="sr">Nie je v cene: </span>Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn sec" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20Bazo%C5%A1">Chcem verziu Bazoš</a></div><div class="plan hl"><span class="badge">Najviac funkcií</span><span class="tag">ASISTENT</span><h3>Všetky portály</h3><div class="amt" data-m="29 € <small>/ mesiac</small>" data-r="24,17 € <small>/ mesiac</small>">29 € <small>/ mesiac</small></div><div class="usp" data-m="pri ročnej platbe len 24,17 € mesačne" data-r="platba 290 € raz ročne · ušetríte 58 €">pri ročnej platbe len 24,17 € mesačne</div><p class="pdesc">Bazoš aj Nehnuteľnosti.sk s portálmi Reality.sk a TopReality.sk.</p><ul class="feats"><li class="ok">Bazoš cez oficiálne napojenie (bez rizika zablokovania)</li><li class="ok">Import a presun vašich starých inzerátov z Bazoša</li><li class="ok">Zmena ceny, TOP a vloženie znova jedným klikom</li><li class="ok">Upozornenie pred koncom 60 dní a pri zmazaní inzerátu</li><li class="ok">Dopyty z Bazoša na jednom mieste</li><li class="ok">Sledovanie konkurencie na Bazoši</li><li class="ok">Kontrola a oprava pravopisu</li><li class="ok">Klienti, obhliadky do kalendára, štatistiky</li><li class="ok">Upozornenia do počítača, cez Telegram a e-mail</li><li class="ok">Nehnuteľnosti.sk, Reality.sk a TopReality.sk</li><li class="ok">Pozícia inzerátu vo výsledkoch vyhľadávania</li><li class="ok">Kontrola inzerátu (fotky, pôdorys, cena za m²)</li><li class="ok">Konkurencia a dopyty z Nehnuteľností</li><li class="ok">Týždenná záloha inzerátov z Nehnuteľností</li></ul><a class="btn" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent%20%E2%80%93%20v%C5%A1etky%20port%C3%A1ly">Chcem všetky portály</a></div></div>
+  
   <p class="note">Poplatky za oficiálne napojenie na Bazoš platíte priamo Bazošu z vlastného kreditu: vloženie inzerátu 0,08 € (platí 60 dní), TOP 1,99 €. Zmena ceny a textu je zadarmo. Napr. 30 inzerátov = 2,40 € za dva mesiace.</p>
 </div></section>
 
-<section id="otazky" style="padding-top:20px"><div class="wrap">
-  <h2 class="sec-h">Časté otázky</h2>
-  <div class="faq">
+<section id="pripravujeme"><div class="wrap">
+  <div class="soonbox"><span class="soon">Pripravujeme</span><h2 style="margin-top:14px">Pripravujeme v aplikácii</h2><p class="muted" style="margin-top:8px">Tieto funkcie zatiaľ nie sú dostupné. Dáme vám vedieť, keď budú hotové.</p><div class="soonl"><div><b>Zákaznícke účty</b>registrácia, platby kartou cez Stripe, história platieb a odmeny</div><div><b>Objednanie videa v účte</b>vložíte odkaz na inzerát a video zaplatíte online</div><div><b>Videá priamo v aplikácii</b>vyberiete inzerát, zaplatíte a video sa uloží k inzerátu</div><div><b>Inzeráty aj na vašom webe</b>nehnuteľnosti a videá sa z aplikácie prenesú na web samy</div><div><b>Chat s podporou</b>rýchla odpoveď priamo na webe</div><div><b>Mobilná aplikácia</b>upozornenia a prehľad aj v telefóne</div><div><b>Podpísaná verzia pre Mac</b>teraz je verzia pre Mac v testovaní</div><div><b>Firemná verzia</b>pre kancelárie s prehľadom pre vedúceho</div></div></div>
+</div></section>
+
+<section id="otazky" class="alt"><div class="wrap">
+  <div class="sh c"><h2>Časté otázky</h2></div>
+  <div class="faq c">
     <details><summary>Prečo asistent používa oficiálne napojenie na Bazoš?</summary><p>Bazoš povoľuje spravovať inzeráty programom len cez svoje oficiálne rozhranie pre realitné kancelárie. Je to bezpečné a váš účet nehrozí zablokovaním. Registrácia je zadarmo – e-mail pre Bazoš vám pripraví priamo aplikácia.</p></details>
     <details><summary>Koľko stojí napojenie na Bazoš?</summary><p>Platíte priamo Bazošu z kreditu na svojom účte: 0,08 € za vloženie inzerátu (platí 60 dní), TOP 1,99 €. Zmena ceny a textu, zobrazenia aj dopyty sú zadarmo. Pred každou platenou akciou vám aplikácia ukáže sumu.</p></details>
     <details><summary>Ako dostanem do asistenta svoje existujúce inzeráty?</summary><p>V aplikácii vložíte odkaz na ktorýkoľvek svoj inzerát alebo profil na Bazoši. Asistent načíta text, cenu, lokalitu aj fotky a vy vyberiete, ktoré prevziať – všetky naraz alebo po jednom.</p></details>
     <details><summary>Kde sú moje údaje?</summary><p>Asistent beží vo vašom počítači a vaše údaje aj prístupy zostávajú v ňom. Posiela ich len portálom, s ktorými pracuje.</p></details>
     <details><summary>Musí byť počítač stále zapnutý?</summary><p>Asistent pracuje, keď je počítač zapnutý. Ak bol vypnutý, všetko dobehne hneď po zapnutí.</p></details>
-    <details><summary>Funguje to na Macu alebo v mobile?</summary><p>Zatiaľ na Windows. Verziu pre Mac (aj MacBook) a mobilnú aplikáciu práve vyvíjame – budú hotové ešte pred oficiálnym spustením. Ak ich potrebujete, napíšte nám a dáme vám vedieť medzi prvými.</p></details>
+    <details><summary>Funguje to na Macu alebo v mobile?</summary><p>Aplikácia je pre Windows. Verzia pre Mac (aj MacBook) je pripravená na testovanie – ak máte Mac, napíšte nám a pošleme vám ju medzi prvými. Mobilnú aplikáciu pripravujeme.</p></details>
     <details><summary>Môžem asistenta zrušiť?</summary><p>Áno. Mesačné predplatné zrušíte kedykoľvek ku koncu mesiaca. Ročné predplatné je o 17 % lacnejšie (Bazoš 190 € za rok, všetky portály 290 € za rok) a platí sa vopred na 12 mesiacov.</p></details>
   </div>
 </div></section>
 
-<section id="kontakt" style="padding-top:20px"><div class="wrap"><div class="cta">
-  <div><h2>Chcete vyskúšať Realitného asistenta?</h2><p>Napíšte nám, pošleme vám inštalačku a pomôžeme s nastavením.</p></div>
+<section id="kontakt" class="ctasec" style="padding-top:24px"><div class="wrap"><div class="cta">
+  <div><h2>Chcete vyskúšať Realitného asistenta?</h2><p>Napíšte nám, pošleme vám inštalačný súbor a pomôžeme s nastavením.</p></div>
   <div class="cta-btns"><a class="btn wh" href="mailto:info@realitnyasistent.eu?subject=Realitn%C3%BD%20asistent">Chcem asistenta</a><a class="btn wh2" href="#cennik">Pozrieť ceny</a></div>
 </div></div></section>
 </main>
-
 <footer><div class="wrap">
-  <b>Realitný asistent</b><a href="videa.html">Videá</a><a href="asistent.html">Asistent</a><a href="weby.html">Weby</a><a href="index.html#baliky">Balíky</a><a href="odporucanie.html">Odporučte kolegu</a>
-  <a href="sukromie.html">Ochrana osobných údajov</a><a href="podmienky.html">Obchodné podmienky</a><a href="mailto:info@realitnyasistent.eu">info@realitnyasistent.eu</a><span style="margin-left:auto">© 2026 Marian Márton · Všetky práva vyhradené. Kopírovanie obsahu bez súhlasu je zakázané (<a href="podmienky.html#dusevne">viac</a>).</span>
+  <div class="fg">
+    <div>
+      <a class="logo" href="index.html"><img src="ikona.png" alt="" width="38" height="38"><span><b>Realitný asistent</b><small>pre realitných maklérov</small></span></a>
+      <p>Menej času pri inzerátoch. Viac času na klientov. Videá, aplikácia a weby pre maklérov a realitné kancelárie na Slovensku.</p>
+    </div>
+    <div><h4>Služby</h4><a href="videa.html">Videá z fotiek inzerátu</a><a href="asistent.html">Realitný asistent</a><a href="weby.html">Weby pre maklérov</a><a href="index.html#baliky">Balíky</a></div>
+    <div><h4>Informácie</h4><a href="odporucanie.html">Odporučte kolegu</a><a href="podmienky.html">Obchodné podmienky</a><a href="sukromie.html">Ochrana osobných údajov</a><a href="podmienky.html#odstupenie">Vrátenie peňazí</a></div>
+    <div><h4>Kontakt</h4><a href="mailto:info@realitnyasistent.eu">info@realitnyasistent.eu</a><p style="margin-top:6px">Odpovedáme spravidla do 1 pracovného dňa.</p></div>
+  </div>
+  <div class="fbot"><span>© 2026 Marian Márton · Všetky práva vyhradené. Kopírovanie obsahu bez súhlasu je zakázané (<a href="podmienky.html#dusevne">viac</a>).</span><span>Ceny sú konečné – nie sme platcami DPH.</span></div>
 </div></footer>
 </body>
 </html>
