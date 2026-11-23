@@ -83,7 +83,7 @@ new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?auto():clearInterval
 
 /* Mobil: bodky pri posúvateľných kartách, skrátené zoznamy, cena v návrhu webu */
 (function(){if(!matchMedia('(max-width:700px)').matches)return;
-document.querySelectorAll('#sluzby .grid3,.bgrid,.feat,.plans2,.wgrid,.ukz2,.steps,.start,.packs,.wben').forEach(c=>{const n=c.children.length;if(n<2)return;
+document.querySelectorAll('#sluzby .grid3,.bgrid,.feat,.plans2,.wgrid,.ukz2,.steps,.start,.packs,.wben,.vben').forEach(c=>{const n=c.children.length;if(n<2)return;
  const d=document.createElement('div');d.className='mdots';d.setAttribute('aria-hidden','true');for(let i=0;i<n;i++)d.append(document.createElement('i'));c.after(d);
  const hl=[...c.children].findIndex(x=>x.classList.contains('hl'));
  const upd=()=>{const i=Math.round(c.scrollLeft/(c.children[0].offsetWidth+14));[...d.children].forEach((x,j)=>x.classList.toggle('on',j===i))};

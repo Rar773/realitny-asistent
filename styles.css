@@ -274,9 +274,9 @@ img.hsi{object-fit:cover;object-position:top}
 @media(max-width:700px){
   section{padding:52px 0}
   .sec-h{font-size:30px!important}
-  #sluzby .grid3,.bgrid,.feat,.plans2,.wgrid,.ukz2,.steps,.start,.packs,.wben{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin-left:-24px!important;margin-right:-24px!important;padding:8px 24px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:stretch!important;max-width:none!important}
-  #sluzby .grid3::-webkit-scrollbar,.bgrid::-webkit-scrollbar,.feat::-webkit-scrollbar,.plans2::-webkit-scrollbar,.wgrid::-webkit-scrollbar,.ukz2::-webkit-scrollbar,.steps::-webkit-scrollbar,.start::-webkit-scrollbar,.packs::-webkit-scrollbar,.wben::-webkit-scrollbar{display:none}
-  #sluzby .grid3>*,.bgrid>*,.feat>*,.plans2>*,.wgrid>*,.ukz2>*,.steps>*,.start>*,.packs>*,.wben>*{flex:0 0 84%;scroll-snap-align:center;min-width:0;margin:0!important}
+  #sluzby .grid3,.bgrid,.feat,.plans2,.wgrid,.ukz2,.steps,.start,.packs,.wben,.vben{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin-left:-24px!important;margin-right:-24px!important;padding:8px 24px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:stretch!important;max-width:none!important}
+  #sluzby .grid3::-webkit-scrollbar,.bgrid::-webkit-scrollbar,.feat::-webkit-scrollbar,.plans2::-webkit-scrollbar,.wgrid::-webkit-scrollbar,.ukz2::-webkit-scrollbar,.steps::-webkit-scrollbar,.start::-webkit-scrollbar,.packs::-webkit-scrollbar,.wben::-webkit-scrollbar,.vben::-webkit-scrollbar{display:none}
+  #sluzby .grid3>*,.bgrid>*,.feat>*,.plans2>*,.wgrid>*,.ukz2>*,.steps>*,.start>*,.packs>*,.wben>*,.vben>*{flex:0 0 84%;scroll-snap-align:center;min-width:0;margin:0!important}
   .bcard.hl,.bcard{padding:28px 22px}.bcard:hover{transform:none}
   .mdots{display:flex;justify-content:center;gap:7px;margin-top:12px}
   .mdots i{width:7px;height:7px;border-radius:99px;background:#cbd5e1;transition:.25s}.mdots i.on{width:22px;background:var(--acc)}
@@ -295,3 +295,6 @@ img.hsi{object-fit:cover;object-position:top}
   .totop{bottom:84px}
 }
 @media(min-width:701px){.mdots,.lmore,.msum{display:none!important}}
+
+/* Videá: prečo video */
+.vben{margin-top:36px}.vben .card{gap:10px}.vben h3{margin:6px 0 0;font-size:18px}
