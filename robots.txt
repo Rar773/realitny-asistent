@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /_podklady/
+Disallow: /tools/
 Sitemap: https://realitnyasistent.eu/sitemap.xml
