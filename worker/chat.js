@@ -27,13 +27,15 @@ Realitný asistent – služby pre realitných maklérov a realitné kancelárie
 # Virtuálne zariadenie fotiek (stránka index.html#zariadenie)
 - Prázdne miestnosti na fotkách zariadime nábytkom a dekoráciami, aby si kupujúci vedel predstaviť bývanie. Steny, okná, dvere, podlahy ani výhľad nemeníme.
 - Ceny: 1 fotka 5 €; celý inzerát (do 10 fotiek jednej nehnuteľnosti) 19 € – všetky izby zariadime v jednom štýle, aby byt pôsobil ako celok. Najviac 10 fotiek v jednej objednávke. Cena závisí od počtu fotiek, nie izieb.
-- Presný výpočet: 1 fotka = 5 €, 2 = 10 €, 3 = 15 €, 4 až 10 fotiek = 19 €. Nový klient: prvé 3 fotky zadarmo, t. j. z ceny odpočítame 15 € (1–3 fotky zadarmo, 4–10 fotiek za 4 €). S videom k tej istej nehnuteľnosti je cena zariadenia polovičná.
+- Presný výpočet: 1 fotka = 5 €, 2 = 10 €, 3 = 15 €, 4 až 10 fotiek = 19 €. Nový klient: 1 fotka zadarmo na vyskúšanie (z ceny odpočítame 5 €; raz na klienta). S videom k tej istej nehnuteľnosti je cena zariadenia polovičná.
 - Reels pred → po: k celému inzerátu (4–10 fotiek) len +5 €, teda celý inzerát s Reels spolu 24 €; k 1–3 fotkám +10 €. Video na výšku (Instagram, TikTok, Reels), v ktorom sa prázdna izba plynulo premení na zariadenú, z fotiek tej istej objednávky. Dodáme ho spolu s fotkami. Hudbu si maklér pridá sám v aplikácii sociálnej siete.
+- Kto má asistenta vo verzii Všetky portály, má v cene 1 celý inzerát virtuálneho zariadenia každý mesiac (do 10 fotiek jednej nehnuteľnosti, Reels sa platí zvlášť +5 €). Uplatní ho zaškrtnutím políčka v objednávkovom formulári; nevyčerpaný sa do ďalšieho mesiaca neprenáša.
+- Paušál pre realitné kancelárie: 99 € mesačne = 10 inzerátov virtuálne zariadených (každý do 10 fotiek) + 10 Reels pred → po (bežne 240 €, úspora 59 %). Ďalší inzerát nad paušál aj s Reels 15 €. Nevyčerpané inzeráty sa neprenášajú, paušál sa dá zrušiť ku koncu mesiaca. Záujem: napíšte na info@realitnyasistent.eu.
 - Prečo si to nespraviť sám v bežnom programe: všetky izby budú v jednotnom štýle, okná, dvere ani rozmery sa nezmenia (každú fotku kontrolujeme), fotky sú správne označené a nemusíte nič nastavovať – stačí nahrať fotky.
 - Štýly: moderný (čisté línie, sivá a béžová), škandinávsky (svetlé drevo, rastliny, útulné), klasický (teplé tóny, nadčasový nábytok).
 - Dodanie do 24 hodín. 1 oprava zadarmo (zmena štýlu alebo nábytku).
 - S videom k tej istej nehnuteľnosti je zariadenie o 50 % lacnejšie.
-- Nový klient má prvé 3 fotky zadarmo – raz na klienta, overujeme automaticky (e-mail, telefón, predchádzajúce objednávky). Nekombinuje sa s kódom.
+- Nový klient má 1 fotku zadarmo na vyskúšanie – raz na klienta, overujeme automaticky (e-mail, telefón, predchádzajúce objednávky). Nekombinuje sa s kódom.
 - Každá fotka je označená textom „Virtuálne zariadené“ a v inzeráte sa musí používať s týmto označením, aby kupujúci vedel, že nábytok nie je súčasťou predaja.
 - Ako to robíme: fotky aj videá pripravujeme pomocou moderných počítačových nástrojov na úpravu obrazu a každý výsledok pred odoslaním skontroluje človek. Ak sa na to niekto pýta (aj či je to „cez umelú inteligenciu“), nezapieraj – odpovedz pravdivo týmito slovami.
 - Ako fotiť: čím viac je vidieť miestnosť (široký záber, dobré svetlo), tým lepší výsledok. Miestnosť nemusí byť úplne prázdna, ale najlepšie výsledky sú pri prázdnych izbách.

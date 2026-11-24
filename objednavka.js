@@ -34,10 +34,13 @@
     let spolu = 0;
     if (zar) {
       const n = Math.min(MAX, pocet());
+      const predpl = $('oPredpl').checked;
+      if (predpl) $('oNovy').checked = false;
       const novy = $('oNovy').checked;
-      let z = novy ? Math.max(0, cenaZar(n) - cenaZar(Math.min(n, 3))) : cenaZar(n);
+      let z = predpl ? 0 : novy ? Math.max(0, cenaZar(n) - cenaZar(Math.min(n, 1))) : cenaZar(n);
       r.push([`Virtuálne zariadenie · ${n} ${n === 1 ? 'fotka' : n > 1 && n < 5 ? 'fotky' : 'fotiek'}${n >= 4 ? ' (celý inzerát)' : ''}`, eur(cenaZar(n))]);
-      if (novy && n) r.push(['Nový klient · 3 fotky zadarmo', '−' + eur(cenaZar(n) - z)]);
+      if (predpl && n) r.push(['Inzerát z predplatného Všetky portály', '−' + eur(cenaZar(n))]);
+      if (novy && n) r.push(['Nový klient · 1 fotka zadarmo', '−' + eur(cenaZar(n) - z)]);
       if ($('oSVideom').checked) {
         const prem = val('video') === 'premiove';
         r.push(['Zľava 50 % s videom', '−' + eur(z / 2)]);
@@ -116,7 +119,7 @@
     } catch { info.hidden = true; }
   }
   ['email', 'telefon', 'meno'].forEach((n) => form[n].addEventListener('input', () => { clearTimeout(overTimer); overTimer = setTimeout(overNovy, 700); }));
-  $('oNovy').addEventListener('change', overNovy);
+  $('oNovy').addEventListener('change', () => { if ($('oNovy').checked) $('oPredpl').checked = false; overNovy(); });
   form.addEventListener('change', prepocitaj);
   form.addEventListener('input', (e) => { if (e.target.id === 'oPocet') prepocitaj(); });
 
@@ -140,7 +143,7 @@
       const fd = new FormData(form);
       fd.delete('fotky');
       fd.set('zid', ZID);
-      if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet', 'reels'].forEach((k) => fd.delete(k)); }
+      if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet', 'reels', 'predplatne'].forEach((k) => fd.delete(k)); }
       if (fotky.length) fd.delete('pocet');
       for (const f of fotky) { fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
       btn.textContent = 'Odosielame…';
@@ -150,6 +153,7 @@
       if (j.platba_url) { btn.textContent = 'Presmerúvame na platbu…'; location.href = j.platba_url; return; }
       $('oCislo').textContent = j.cislo;
       if (j.novy_zamietnuty) $('oCislo').insertAdjacentHTML('afterend', '<br><small>Zľavu pre nových klientov sme neuplatnili – už ste u nás objednávali. Cena: ' + String(j.cena).replace('.', ',') + ' €</small>');
+      if (j.predplatne_zamietnute) $('oCislo').insertAdjacentHTML('afterend', '<br><small>Inzerát z predplatného ste tento mesiac už využili, cenu sme vypočítali podľa cenníka: ' + String(j.cena).replace('.', ',') + ' €</small>');
       if (j.stav_url) $('oStavLink').href = j.stav_url; else $('oStavLink').hidden = true;
       form.hidden = true;
       const h = $('oHotovo'); h.hidden = false; h.focus();

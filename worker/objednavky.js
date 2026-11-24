@@ -27,11 +27,12 @@ export function cenaZariadenia(n) {
   if (n <= 0) return 0;
   return Math.min(5 * n, 19);
 }
-export function vypocitaj({ sluzba, pocet, sVideom, video, novy, reels }) {
+export function vypocitaj({ sluzba, pocet, sVideom, video, novy, reels, predplatne }) {
   let z = 0, v = 0, r = 0;
   if (sluzba === 'zariadenie') {
     z = cenaZariadenia(pocet);
-    if (novy) z = Math.max(0, z - cenaZariadenia(Math.min(pocet, 3))); // prvé 3 fotky zadarmo
+    if (predplatne) z = 0; // 1 inzerát mesačne v cene asistenta Všetky portály
+    else if (novy) z = Math.max(0, z - cenaZariadenia(Math.min(pocet, 1))); // nový klient: 1 fotka zadarmo
     if (sVideom && VIDEA[video]) { z = z / 2; v = VIDEA[video][1]; }
     if (reels) r = pocet >= 4 ? REELS_CENA_INZERAT : REELS_CENA;
   } else if (VIDEA[sluzba]) v = VIDEA[sluzba][1];
@@ -46,7 +47,7 @@ const teraz = () => new Date().toISOString();
 const cas = (iso) => { try { return new Date(iso).toLocaleString('sk-SK', { timeZone: 'Europe/Bratislava', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return iso; } };
 const nahodne = (n = 24) => { const a = new Uint8Array(n); crypto.getRandomValues(a); return [...a].map((b) => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join(''); };
 const popisSluzby = (o) => o.sluzba === 'zariadenie'
-  ? `Virtuálne zariadenie · ${o.pocet} ${o.pocet == 1 ? 'fotka' : o.pocet < 5 ? 'fotky' : 'fotiek'} · ${STYLY[o.styl] || ''}${o.reels ? ' + Reels pred/po' : ''}${o.s_videom && VIDEA[o.video] ? ' + ' + VIDEA[o.video][0] : ''}`
+  ? `Virtuálne zariadenie · ${o.pocet} ${o.pocet == 1 ? 'fotka' : o.pocet < 5 ? 'fotky' : 'fotiek'} · ${STYLY[o.styl] || ''}${o.predplatne ? ' (z predplatného)' : ''}${o.reels ? ' + Reels pred/po' : ''}${o.s_videom && VIDEA[o.video] ? ' + ' + VIDEA[o.video][0] : ''}`
   : (VIDEA[o.sluzba] || ['Služba'])[0];
 
 async function hmac(env, text) {
@@ -271,7 +272,7 @@ async function novaObjednavka(req, env, origin, base) {
   const meno = kratko(f.get('meno'), 120), email = kratko(f.get('email'), 160), telefon = kratko(f.get('telefon'), 40);
   const inzerat = kratko(f.get('inzerat'), 600), poznamka = kratko(f.get('poznamka'), 2000), kod = kratko(f.get('kod'), 40);
   const styl = STYLY[f.get('styl')] ? f.get('styl') : 'moderny';
-  const sVideom = f.get('s_videom') === 'ano', video = VIDEA[f.get('video')] ? f.get('video') : 'standard', novy = f.get('novy') === 'ano', reels = f.get('reels') === 'ano';
+  const sVideom = f.get('s_videom') === 'ano', video = VIDEA[f.get('video')] ? f.get('video') : 'standard', novy = f.get('novy') === 'ano', reels = f.get('reels') === 'ano', predplatne = f.get('predplatne') === 'ano';
   const zdroj = req.headers.get('X-Zdroj') === 'aplikacia' ? 'aplikácia' : 'web';
 
   if (!['zariadenie', 'standard', 'premiove'].includes(sluzba)) return json({ ok: false, chyba: 'Vyberte službu.' }, 400, origin);
@@ -298,11 +299,24 @@ async function novaObjednavka(req, env, origin, base) {
   const inzTel = novy && inzerat ? await telefonyZInzeratu(inzerat) : [];
   const stopy = [['email', emailN], ['tel', telN], ['ip', ipH], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['meno', bezDiakritiky(meno)],
     ...fotoHashe.map((h) => ['foto', h]), ...inzTel.map((t) => ['inz_tel', t])];
+  let predplOk = false, predplDovod = null;
+  if (sluzba === 'zariadenie' && predplatne) {
+    const zaciatok = new Date(); zaciatok.setUTCDate(1); zaciatok.setUTCHours(0, 0, 0, 0);
+    const uz = await env.DB.prepare("SELECT COUNT(*) n FROM objednavky WHERE predplatne = 1 AND stav != 'zrusena' AND vytvorene >= ? AND (email_n = ? OR (telefon_n != '' AND telefon_n = ?))")
+      .bind(zaciatok.toISOString(), emailN, telN || '-').first();
+    if (uz && uz.n > 0) predplDovod = 'tento mesiac už bol inzerát z predplatného využitý';
+    else predplOk = true;
+  }
   let novyOk = false, novyDovod = null;
-  if (sluzba === 'zariadenie' && novy) {
+  if (sluzba === 'zariadenie' && novy && !predplOk) {
     if (!telN) return json({ ok: false, chyba: 'Pre zľavu pre nových klientov vyplňte telefónne číslo.' }, 400, origin);
     if (kod) novyDovod = 'spolu s odporúčacím kódom (zľavy sa nespájajú)';
     else novyDovod = await uzBolKlientom(env, stopy);
+    if (!novyDovod) {
+      // strop proti hromadnému zneužitiu (veľa e-mailov / telefónov): najviac 10 skúšobných fotiek za deň spolu
+      const dnes = await env.DB.prepare('SELECT COUNT(*) n FROM objednavky WHERE novy_ok = 1 AND vytvorene > ?').bind(new Date(Date.now() - 864e5).toISOString()).first();
+      if (dnes && dnes.n >= 10) novyDovod = 'denný limit skúšobných fotiek';
+    }
     novyOk = !novyDovod;
   }
   let amb = null, ambKod = null, ambZlava = false;
@@ -315,21 +329,21 @@ async function novaObjednavka(req, env, origin, base) {
   } else if (!kod) {
     ambKod = await ambasadorKlienta(env, emailN, telN);
   }
-  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk, reels });
+  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk, reels, predplatne: predplOk });
   if (ambZlava) c.spolu = Math.round(c.spolu * (1 - pctZlava(amb)) * 100) / 100;
   const d = new Date();
   const o = {
     cislo: `RA-${d.toISOString().slice(2, 10).replace(/-/g, '')}-${nahodne(4).toUpperCase()}`,
     vytvorene: teraz(), zdroj, sluzba, pocet: sluzba === 'zariadenie' ? pocet : 0, styl: sluzba === 'zariadenie' ? styl : null,
-    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0, reels: sluzba === 'zariadenie' && reels ? 1 : 0,
+    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0, reels: sluzba === 'zariadenie' && reels ? 1 : 0, predplatne: predplOk ? 1 : 0,
     kod: ambKod || kod, meno, email, telefon, inzerat, poznamka, cena: c.spolu, token: nahodne(24),
   };
   const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && (!o.kod || jeAmbKod(o.kod)));
   o.stav = platbaKartou ? 'caka_platbu' : 'nova';
 
-  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok, reels)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0, o.reels).run();
+  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok, reels, predplatne)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0, o.reels, o.predplatne).run();
   await zapisHistoriu(env, o.cislo, `Objednávka prijatá (${zdroj})`);
   await ulozStopy(env, o.cislo, stopy);
   if (ambKod) await zapisProviziu(env, ambKod, o);
@@ -337,8 +351,10 @@ async function novaObjednavka(req, env, origin, base) {
   const riadky = [
     `🆕 <b>Nová objednávka ${o.cislo}</b> (${zdroj})`, '',
     sluzba === 'zariadenie' ? `🛋 <b>${esc(popisSluzby(o))}</b>` : `🎬 <b>${esc(popisSluzby(o))}</b>`,
-    novyOk ? '🎁 Nový klient – overený, prvé 3 fotky zadarmo' : null,
-    novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
+    predplOk ? '⭐ <b>Inzerát z predplatného Všetky portály</b> – zariadenie zadarmo. OVER, či má predplatné!' : null,
+    predplDovod ? `🚫 Žiadal inzerát z predplatného – zamietnutý (${predplDovod})` : null,
+    novyOk ? '🎁 Nový klient – overený, 1 fotka zadarmo' : null,
+    novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') || novyDovod.startsWith('denný') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
     ambKod ? `🤝 Ambasádor: <b>${esc(ambKod)}</b>${ambZlava ? ` (klient −${Math.round(pctZlava(amb) * 100)} %)` : ''}` : (kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b> (−10 % vo faktúre)` : null),
     `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`, '',
     `👤 ${esc(meno)}`, `✉️ ${esc(email)}`,
@@ -372,7 +388,7 @@ async function novaObjednavka(req, env, origin, base) {
     }
   }
   if (o.stav === 'nova') await posliEmail(env, o, 'potvrdenie', base).catch((e) => console.log('email', e.message));
-  return json({ ok: true, cislo: o.cislo, cena: o.cena, stav_url: stavUrl(base, o), platba_url, novy_zamietnuty: !!novyDovod }, 200, origin);
+  return json({ ok: true, cislo: o.cislo, cena: o.cena, stav_url: stavUrl(base, o), platba_url, novy_zamietnuty: !!novyDovod, predplatne_zamietnute: !!predplDovod }, 200, origin);
 }
 
 // ---------- vzhľad stránok ----------
@@ -509,7 +525,8 @@ async function adminDetail(env, base, cislo, sprava) {
   <div class="card"><h2>Objednávka</h2><dl>
     <dt>Služba</dt><dd><b>${esc(popisSluzby(o))}</b></dd>
     <dt>Cena</dt><dd><b>${eur(o.cena)}</b> · ${o.zaplatene ? '✓ zaplatené' : 'nezaplatené'}${o.platba ? ' · Stripe' : ''}</dd>
-    ${o.novy ? '<dt>Nový klient</dt><dd>🎁 overený automaticky – prvé 3 fotky zadarmo</dd>' : ''}
+    ${o.predplatne ? '<dt>Predplatné</dt><dd>⭐ inzerát z predplatného Všetky portály – over, či má asistenta</dd>' : ''}
+    ${o.novy ? '<dt>Nový klient</dt><dd>🎁 overený automaticky – 1 fotka zadarmo</dd>' : ''}
     ${o.kod ? `<dt>Odporúčací kód</dt><dd>${esc(o.kod)} (−10 % vo faktúre)</dd>` : ''}
     <dt>Zákazník</dt><dd>${esc(o.meno)}</dd>
     <dt>E-mail</dt><dd><a href="mailto:${esc(o.email)}">${esc(o.email)}</a></dd>

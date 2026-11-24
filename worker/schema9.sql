@@ -1,0 +1,1 @@
+ALTER TABLE objednavky ADD COLUMN predplatne INTEGER DEFAULT 0;
