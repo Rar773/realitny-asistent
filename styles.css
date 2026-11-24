@@ -1115,3 +1115,10 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .svc2-img.ba .ba-l,.svc2-img.ba .ba-r{top:8px;padding:5px 10px;font-size:12px}.svc2-img.ba .ba-l{left:8px}.svc2-img.ba .ba-r{right:8px}
 .svc2-img.ba .ba-line::after{width:36px;height:36px;margin:-18px 0 0 -18px;background-size:18px}
 @media (max-width:1100px){.svc2-img.ba{aspect-ratio:16/10}}
+
+/* ukážka Reels pred → po */
+.reels{display:grid;grid-template-columns:250px 1fr;gap:40px;align-items:center;max-width:860px;margin:40px auto 0;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px 34px;box-shadow:0 20px 50px -30px rgba(91,32,181,.35)}
+.reels-tel{aspect-ratio:9/16;background:#111;border-radius:28px;padding:7px;box-shadow:0 24px 50px -20px rgba(32,36,54,.45)}
+.reels-tel video{display:block;width:100%;height:100%;object-fit:cover;border-radius:22px;background:#111}
+.reels-txt h3{font:800 26px/1.2 var(--head);margin:6px 0 10px}.reels-txt>p{color:var(--muted);margin:0 0 14px}
+@media (max-width:760px){.reels{grid-template-columns:1fr;padding:22px 20px;gap:22px}.reels-tel{width:62%;max-width:250px;margin:0 auto}.reels-txt h3{font-size:22px}}

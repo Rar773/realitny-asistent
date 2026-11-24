@@ -183,3 +183,10 @@ document.querySelectorAll('.ba').forEach(ba => {
   }
   if (document.readyState === 'complete') setTimeout(nacitaj, 400); else window.addEventListener('load', function () { setTimeout(nacitaj, 400); });
 })();
+
+// ukážka Reels – prehrá sa, až keď je na obrazovke
+(function () {
+  var v = document.querySelector('.reels-tel video'); if (!v) return;
+  if (!('IntersectionObserver' in window)) { v.preload = 'auto'; v.play().catch(function () {}); return; }
+  new IntersectionObserver(function (z) { z.forEach(function (e) { if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.35 }).observe(v);
+})();
