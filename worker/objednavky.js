@@ -75,12 +75,13 @@ async function tgSprava(env, text, tlacidla) {
   if (tlacidla) m.append('reply_markup', JSON.stringify({ inline_keyboard: tlacidla }));
   return tg(env, 'sendMessage', m);
 }
-async function tgSubory(env, subory, popisy, prefix) {
+async function tgSubory(env, subory, popisy, prefix, _tichy) {
   // pošle do Telegramu (max 10 naraz) a vráti file_id – Telegram slúži aj ako úložisko fotiek
   const ids = [];
   for (let z = 0; z < subory.length; z += 10) {
     const g = new FormData();
     g.append('chat_id', env.TG_CHAT);
+    g.append('disable_notification', 'true');
     const kus = subory.slice(z, z + 10);
     const media = kus.map((x, i) => {
       const k = z + i;
@@ -91,6 +92,7 @@ async function tgSubory(env, subory, popisy, prefix) {
     if (media.length === 1) {
       const d = new FormData();
       d.append('chat_id', env.TG_CHAT);
+      d.append('disable_notification', 'true');
       d.append('document', kus[0], g.get('f0').name);
       d.append('caption', media[0].caption);
       const r = await tg(env, 'sendDocument', d);
@@ -249,7 +251,7 @@ async function novaObjednavka(req, env, origin, base) {
     telefon ? `📞 ${esc(telefon)}` : null,
     inzerat ? `🔗 ${esc(inzerat)}` : null,
     poznamka ? `\n📝 ${esc(poznamka)}` : null,
-    sluzba === 'zariadenie' && env.OPENAI_KEY && fotky.length ? '\n🪄 Otvor objednávku a klikni „Zariadiť všetky fotky“.' : null,
+    sluzba === 'zariadenie' && env.OPENAI_KEY ? '\n🪄 Fotky pripravím automaticky – uvidíš ich vo večernom súhrne.' : null,
   ].filter((r) => r !== null);
   const odkaz = `${base}/admin/o/${o.cislo}?s=${await hmac(env, 'o:' + o.cislo)}`;
 
@@ -328,7 +330,8 @@ const STYL_EN = {
   klasicky: 'classic timeless style with warm tones, elegant traditional furniture and soft lighting',
 };
 function promptZariadenia(o, foto, pokyn) {
-  const izba = MIESTNOST_EN[foto.popis] || 'room';
+  const bezDia = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  const izba = Object.entries(MIESTNOST_EN).find(([k]) => bezDia(k) === bezDia(foto.popis))?.[1] || 'room';
   return [
     `Virtually stage this empty ${izba} for a real estate listing.`,
     'Keep the room exactly as it is: the same walls, ceiling, floor, windows, doors, radiators, sockets and light switches, the same camera angle, perspective, framing and zoom, pixel-aligned with the original photo. Do not change the architecture, do not add or remove windows or doors, do not crop.',
@@ -383,6 +386,7 @@ async function adminZoznam(env, url) {
     .map(([k, t]) => `<a href="/admin?stav=${k}" class="${k === f ? 'on' : ''}">${t}</a>`).join('');
   const riadky = results.map((o) => `<tr class="kl" onclick="location='/admin/o/${o.cislo}'"><td><b>${o.cislo}</b><div class="mut" style="font-size:12.5px">${cas(o.vytvorene)} · ${esc(o.zdroj)}</div></td><td>${esc(o.meno)}<div class="mut hm" style="font-size:12.5px">${esc(o.email)}</div></td><td class="hm">${esc(popisSluzby(o))}</td><td>${eur(o.cena)}${o.zaplatene ? ' ✓' : ''}</td><td>${pillStav(o.stav)}</td></tr>`).join('');
   return stranka('Objednávky – Realitný asistent', `<h1>Objednávky</h1><p class="mut">Za posledných 30 dní: ${sum.n} objednávok · zaplatené ${eur(sum.z)}</p>
+  <div class="row" style="margin-top:10px"><a class="btn" href="/admin/schvalenie">✅ Schvaľovanie</a><form method="post" action="/admin/spusti" style="margin:0"><button class="btn sec">🪄 Spustiť výrobu teraz</button></form><form method="post" action="/admin/suhrn" style="margin:0"><button class="btn sec">🌙 Poslať súhrn teraz</button></form></div>
   <div class="row filt" style="margin-top:12px">${filt}</div>
   <div class="card" style="padding:6px 10px"><table><thead><tr><th>Číslo</th><th>Zákazník</th><th class="hm">Služba</th><th>Cena</th><th>Stav</th></tr></thead><tbody>${riadky || '<tr><td colspan="5" class="mut" style="padding:20px">Žiadne objednávky.</td></tr>'}</tbody></table></div>`, true);
 }
@@ -541,7 +545,256 @@ async function stripeWebhook(req, env) {
   return new Response('ok');
 }
 
+// ================= AUTOMATICKÁ VÝROBA + VEČERNÉ SCHVAĽOVANIE =================
+const BASE_URL = 'https://ra-objednavky.rarex731.workers.dev';
+const MAX_POKUSOV = 2; // koľkokrát skúsiť znova, keď kontrola nájde problém
+
+// --- stiahnutie fotiek z inzerátu (keď zákazník poslal len odkaz) ---
+function obrazkyZInzeratu(htmlText, url) {
+  const najdene = new Set();
+  const pridaj = (u) => {
+    if (!u) return;
+    u = u.replace(/&amp;/g, '&').trim();
+    if (u.startsWith('//')) u = 'https:' + u;
+    if (!/^https?:\/\//i.test(u)) { try { u = new URL(u, url).href; } catch { return; } }
+    if (/logo|icon|avatar|sprite|banner|placeholder|thumb_?s|\.svg|\.gif/i.test(u)) return;
+    najdene.add(u);
+  };
+  for (const m of htmlText.matchAll(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/gi)) pridaj(m[1]);
+  for (const m of htmlText.matchAll(/https?:\/\/[^"'\s<>()]+?\.(?:jpe?g|webp)(?:\?[^"'\s<>()]*)?/gi)) pridaj(m[0]);
+  return [...najdene];
+}
+async function stiahniFotkyZInzeratu(env, o) {
+  const r = await fetch(o.inzerat, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36', 'Accept-Language': 'sk' } });
+  if (!r.ok) throw new Error(`inzerát odpovedal ${r.status}`);
+  const kandidati = obrazkyZInzeratu(await r.text(), o.inzerat).slice(0, 40);
+  const subory = [];
+  for (const u of kandidati) {
+    if (subory.length >= Math.max(1, o.pocet || 5)) break;
+    try {
+      const f = await fetch(u);
+      if (!f.ok) continue;
+      const b = await f.blob();
+      if (b.size < 40000 || !(b.type || '').startsWith('image/')) continue; // malé obrázky = ikonky
+      subory.push(new File([b], `inzerat_${subory.length + 1}.jpg`, { type: b.type }));
+    } catch { /* ďalší */ }
+  }
+  if (!subory.length) throw new Error('v inzeráte sa nenašli fotky');
+  const ids = await tgSubory(env, subory, subory.map(() => 'Fotka z inzerátu'), o.cislo, true);
+  await env.DB.prepare('UPDATE objednavky SET fotky = ? WHERE cislo = ?').bind(JSON.stringify(ids), o.cislo).run();
+  await zapisHistoriu(env, o.cislo, `Stiahnuté fotky z inzerátu: ${ids.length}`);
+  o.fotky = ids;
+}
+
+// --- vygenerovanie jednej fotky (bez rozbaľovania base64 vo Workeri) ---
+async function generuj(env, o, i, pokyn) {
+  const foto = o.fotky[i];
+  const f = await fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/getFile?file_id=${encodeURIComponent(foto.id)}`).then((r) => r.json());
+  if (!f.ok) throw new Error('fotku sa nepodarilo načítať');
+  const obr = await fetch(`https://api.telegram.org/file/bot${env.TG_TOKEN}/${f.result.file_path}`).then((r) => r.blob());
+  const fd = new FormData();
+  fd.append('model', env.OPENAI_MODEL || 'gpt-image-2.5-sunburst');
+  fd.append('image', new File([obr], 'foto.jpg', { type: obr.type && obr.type.startsWith('image/') ? obr.type : 'image/jpeg' }));
+  fd.append('prompt', promptZariadenia(o, foto, pokyn));
+  fd.append('size', 'auto');
+  fd.append('quality', env.OPENAI_QUALITY || 'high');
+  fd.append('output_format', 'jpeg');
+  const r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: `Bearer ${env.OPENAI_KEY}` }, body: fd });
+  const t = await r.text();
+  if (!r.ok) throw new Error('OpenAI ' + r.status + ': ' + t.slice(0, 200));
+  const k = t.indexOf('"b64_json"');
+  const z = t.indexOf('"', t.indexOf(':', k) + 1) + 1;
+  const b64 = t.slice(z, t.indexOf('"', z));
+  if (k < 0 || b64.length < 1000) throw new Error('OpenAI nevrátilo obrázok');
+  return b64;
+}
+
+// --- automatická kontrola výsledku (porovnanie s originálom) ---
+async function skontroluj(env, o, i, b64) {
+  const orig = await fotoUrl(env, BASE_URL, o.fotky[i].id);
+  const zadanie = `Si prísny kontrolór kvality realitných fotiek. Prvý obrázok je originál prázdnej miestnosti, druhý je jej virtuálne zariadenie (štýl: ${STYLY[o.styl] || 'moderný'}).
+Skontroluj:
+1. Architektúra je rovnaká: steny, strop, podlaha, okná, dvere, radiátory, výhľad z okna, uhol a výrez záberu. Žiadne pridané ani zmiznuté okná či dvere.
+2. Nábytok je realistický, správnej veľkosti a mierky, nestojí v dverách ani pred oknom tak, že by blokoval prechod, nič nepláva vo vzduchu, nič nie je zdeformované ani rozmazané.
+3. Na obrázku nie sú ľudia, texty, vodoznaky ani logá.
+4. Nábytok zodpovedá miestnosti (${o.fotky[i].popis || 'miestnosť'}).
+Odpovedz IBA ako JSON: {"ok": true alebo false, "dovod": "krátko po slovensky, čo je zlé (alebo prázdny reťazec)"}. Drobné rozdiely v osvetlení nevadia.`;
+  const r = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.OPENAI_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: env.QA_MODEL || 'gpt-6.1-terra', input: [{ role: 'user', content: [
+      { type: 'input_text', text: zadanie },
+      { type: 'input_image', image_url: orig },
+      { type: 'input_image', image_url: 'data:image/jpeg;base64,' + b64 },
+    ] }] }),
+  });
+  const t = await r.text();
+  if (!r.ok) return { ok: null, dovod: 'kontrola nedostupná (' + r.status + ')' };
+  const m = t.match(/\{\s*\\?"ok\\?"\s*:\s*(true|false)\s*,\s*\\?"dovod\\?"\s*:\s*\\?"((?:[^"\\]|\\.)*?)\\?"\s*\}/);
+  if (!m) return { ok: null, dovod: 'kontrola nevrátila výsledok' };
+  let dovod = m[2];
+  try { dovod = JSON.parse('"' + dovod.replace(/\\\\/g, '\\') + '"'); } catch { /* nechaj tak */ }
+  return { ok: m[1] === 'true', dovod };
+}
+
+// --- čo ešte treba vyrobiť ---
+async function stavFotiek(env, o) {
+  const { results } = await env.DB.prepare('SELECT id, i, stav, qa, pokyn FROM vystupy WHERE cislo = ? ORDER BY id').bind(o.cislo).all();
+  return o.fotky.map((_, i) => {
+    const z = results.filter((v) => v.i === i);
+    let kolo = [];
+    for (const v of z) { if (v.stav === 'zamietnute') kolo = [v]; else kolo.push(v); }
+    const posl = z[z.length - 1];
+    const pokusy = kolo.filter((v) => v.stav !== 'zamietnute').length;
+    const pokyn = kolo[0] && kolo[0].stav === 'zamietnute' ? kolo[0].pokyn : '';
+    let treba = false;
+    if (!posl) treba = true;
+    else if (posl.stav === 'zamietnute') treba = true;
+    else if (posl.stav === 'problem' && pokusy <= MAX_POKUSOV) treba = true;
+    else if (posl.stav === 'chyba' && pokusy < 3) treba = true;
+    const hotovy = posl && ['ok', 'problem', 'schvalene'].includes(posl.stav) && !treba;
+    return { i, treba, hotovy, posl, pokyn, pokusy };
+  });
+}
+
+async function spracujFrontu(env) {
+  if (!env.OPENAI_KEY) return;
+  const { results } = await env.DB.prepare(`SELECT cislo FROM objednavky WHERE sluzba = 'zariadenie' AND stav IN ('nova','zaplatena','vo_vyrobe')
+    AND (vyroba IS NULL OR vyroba IN ('caka','hotova')) ORDER BY vytvorene LIMIT 10`).all();
+  let rozpocet = 3; // max. počet generovaní za jeden beh
+  for (const { cislo } of results) {
+    if (rozpocet <= 0) break;
+    const o = await nacitaj(env, cislo);
+    if (!o) continue;
+    try {
+      if (!o.fotky.length) {
+        if (!o.inzerat) continue;
+        await stiahniFotkyZInzeratu(env, o);
+      }
+      const st = await stavFotiek(env, o);
+      for (const s of st) {
+        if (!s.treba || rozpocet <= 0) continue;
+        rozpocet--;
+        let b64, qa, stav;
+        try {
+          b64 = await generuj(env, o, s.i, s.pokyn);
+          qa = await skontroluj(env, o, s.i, b64);
+          stav = qa.ok === false ? 'problem' : 'ok';
+        } catch (e) {
+          stav = 'chyba'; qa = { ok: false, dovod: e.message.slice(0, 300) };
+        }
+        await env.DB.prepare('INSERT INTO vystupy (cislo, i, stav, b64, qa, pokyn, vytvorene) VALUES (?, ?, ?, ?, ?, ?, ?)')
+          .bind(cislo, s.i, stav, b64 || null, JSON.stringify(qa), s.pokyn || null, teraz()).run();
+        await zapisHistoriu(env, cislo, `Výroba fotky ${s.i + 1}: ${stav === 'ok' ? 'kontrola OK' : stav === 'problem' ? 'kontrola našla problém – ' + qa.dovod : 'chyba – ' + qa.dovod}`);
+      }
+      const po = await stavFotiek(env, o);
+      const hotovo = po.every((s) => s.hotovy);
+      const nova = hotovo ? 'hotova' : 'caka';
+      if (nova !== o.vyroba || o.stav !== 'vo_vyrobe') {
+        await env.DB.prepare("UPDATE objednavky SET vyroba = ?, stav = 'vo_vyrobe', aktualizovane = ? WHERE cislo = ?").bind(nova, teraz(), cislo).run();
+      }
+    } catch (e) {
+      await env.DB.prepare("UPDATE objednavky SET vyroba = 'chyba_fotky', aktualizovane = ? WHERE cislo = ?").bind(teraz(), cislo).run();
+      await zapisHistoriu(env, cislo, 'Automatická výroba zastavená: ' + e.message);
+      await tgSprava(env, `⚠️ <b>${cislo}</b>: ${esc(e.message)}.\nNahraj fotky ručne v objednávke.`, [[{ text: '📋 Otvoriť objednávku', url: `${BASE_URL}/admin/o/${cislo}?s=${await hmac(env, 'o:' + cislo)}` }]]).catch(() => {});
+    }
+  }
+}
+
+// --- večerný súhrn a pripomienka ---
+async function prehladNaSchvalenie(env) {
+  const z = await env.DB.prepare(`SELECT cislo, sluzba, pocet, styl, s_videom, video, meno, cena, vyroba, stav FROM objednavky
+    WHERE stav IN ('nova','zaplatena','vo_vyrobe') ORDER BY vytvorene`).all();
+  const zar = z.results.filter((o) => o.sluzba === 'zariadenie');
+  const hotove = zar.filter((o) => o.vyroba === 'hotova');
+  const rozrobene = zar.filter((o) => o.vyroba !== 'hotova');
+  const videa = z.results.filter((o) => o.sluzba !== 'zariadenie' || o.s_videom);
+  const { n } = await env.DB.prepare(`SELECT COUNT(*) n FROM vystupy v JOIN objednavky o ON o.cislo = v.cislo
+    WHERE o.vyroba = 'hotova' AND o.stav = 'vo_vyrobe' AND v.stav IN ('ok','problem') AND v.id = (SELECT MAX(id) FROM vystupy w WHERE w.cislo = v.cislo AND w.i = v.i)`).first();
+  const { p } = await env.DB.prepare(`SELECT COUNT(*) p FROM vystupy v JOIN objednavky o ON o.cislo = v.cislo
+    WHERE o.vyroba = 'hotova' AND o.stav = 'vo_vyrobe' AND v.stav = 'problem' AND v.id = (SELECT MAX(id) FROM vystupy w WHERE w.cislo = v.cislo AND w.i = v.i)`).first();
+  return { hotove, rozrobene, videa, fotiek: n, problemov: p };
+}
+async function vecernySuhrn(env, pripomienka) {
+  const s = await prehladNaSchvalenie(env);
+  if (!s.hotove.length && !s.videa.length) { if (!pripomienka && s.rozrobene.length) await tgSprava(env, `🌙 Dnes ešte nič na schválenie – ${s.rozrobene.length} ${s.rozrobene.length === 1 ? 'objednávka sa' : 'objednávky sa'} ešte vyrába.`).catch(() => {}); return; }
+  const odkaz = `${BASE_URL}/admin/schvalenie?s=${await hmac(env, 'schvalenie')}`;
+  const r = [pripomienka ? '⏰ <b>Pripomienka: čaká na tvoje schválenie</b>' : '🌙 <b>Večerný súhrn</b>', ''];
+  if (s.hotove.length) r.push(`🛋 Na schválenie: <b>${s.hotove.length}</b> ${s.hotove.length === 1 ? 'objednávka' : 'objednávky'}, <b>${s.fotiek}</b> fotiek${s.problemov ? ` (⚠️ ${s.problemov} na kontrolu)` : ''}`);
+  if (s.rozrobene.length) r.push(`⏳ Ešte sa vyrába: ${s.rozrobene.length}`);
+  if (s.videa.length) r.push(`🎬 Čaká na tvoje video: ${s.videa.length} (${s.videa.map((o) => o.cislo).join(', ')})`);
+  await tgSprava(env, r.join('\n'), s.hotove.length ? [[{ text: '✅ Otvoriť schvaľovanie', url: odkaz }]] : null);
+}
+
+// --- stránka na schválenie všetkého naraz ---
+async function stranaSchvalenia(env, base) {
+  const s = await prehladNaSchvalenie(env);
+  const bloky = [];
+  for (const oz of s.hotove) {
+    const o = await nacitaj(env, oz.cislo);
+    const st = await stavFotiek(env, o);
+    const riadky = await Promise.all(st.map(async (x) => {
+      if (!x.posl || !['ok', 'problem'].includes(x.posl.stav)) return '';
+      const qa = JSON.parse(x.posl.qa || '{}');
+      return `<div class="sch ${x.posl.stav === 'problem' ? 'prob' : ''}" data-id="${x.posl.id}" data-cislo="${o.cislo}" data-nazov="${esc((o.fotky[x.i].popis || 'fotka').replace(/[^\p{L}\p{N}]+/gu, '-'))}">
+        <div class="pp"><img src="${await fotoUrl(env, base, o.fotky[x.i].id)}" alt="pred" loading="lazy"><img class="po" data-v="${x.posl.id}" alt="po"></div>
+        <div class="row" style="margin-top:6px"><label style="display:flex;gap:6px;align-items:center;font-weight:600"><input type="checkbox" class="ok" ${x.posl.stav === 'problem' ? '' : 'checked'}> ${x.i + 1}. ${esc(o.fotky[x.i].popis || 'Fotka')}</label>
+        ${x.posl.stav === 'problem' ? `<span class="pill" style="background:#B54708">⚠️ ${esc(qa.dovod || 'skontroluj')}</span>` : '<span class="pill" style="background:#12B76A">kontrola OK</span>'}</div>
+        <input type="text" class="pokyn" placeholder="Ak neschvaľuješ: čo zmeniť (napr. sedačka do L, bez TV)">
+      </div>`;
+    }));
+    bloky.push(`<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${o.cislo}</h2><a href="/admin/o/${o.cislo}" class="mut">detail</a></div>
+      <p class="mut" style="margin:4px 0 10px">${esc(o.meno)} · ${esc(popisSluzby(o))} · ${eur(o.cena)}${o.zaplatene ? ' ✓ zaplatené' : ''}</p>${riadky.join('')}</div>`);
+  }
+  const obsah = `<h1>Schvaľovanie</h1><p class="mut">Zaškrtnuté fotky sa uložia s označením „Virtuálne zariadené“ a objednávky sa zákazníkom odošlú. Odškrtnuté fotky s pokynom sa vyrobia znova.</p>
+  ${s.videa.length ? `<div class="warn">🎬 Čaká na tvoje video: ${s.videa.map((o) => `<a href="/admin/o/${o.cislo}">${o.cislo}</a>`).join(', ')}</div>` : ''}
+  ${bloky.join('') || '<div class="card">Momentálne nie je nič na schválenie.</div>'}
+  ${bloky.length ? `<div class="card" style="position:sticky;bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,.12)"><button class="btn" id="vsetko" onclick="schvalVsetko()" style="width:100%;justify-content:center;font-size:16px;padding:14px">✅ Schváliť a odoslať zákazníkom</button><div id="prieb" class="mut" style="margin-top:8px;text-align:center"></div></div>` : ''}
+  <style>.sch{border-top:1px solid #EEF0F5;padding:12px 0}.sch.prob{background:#FFFAEB;margin:0 -18px;padding:12px 18px}.pp{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pp img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:10px;background:#F4F5F9;cursor:zoom-in}.sch .pokyn{margin-top:8px}</style>
+  <script>
+  document.querySelectorAll('img.po').forEach(async im=>{const t=await fetch('/admin/v/'+im.dataset.v).then(r=>r.text());im.src='data:image/jpeg;base64,'+t});
+  document.querySelectorAll('.pp img').forEach(im=>im.onclick=()=>{const w=window.open();w.document.write('<img src="'+im.src+'" style="max-width:100%">')});
+  function oznac(src){return new Promise((ok,zle)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
+    const fs=Math.round(im.width*0.022),pad=Math.round(fs*0.6),t='Virtuálne zariadené';x.font='600 '+fs+'px Inter,Arial,sans-serif';const w=x.measureText(t).width+pad*2,h=fs+pad*1.6,mx=Math.round(im.width*0.02),y=im.height-h-mx;
+    x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect(mx,y,w,h,h/2):x.rect(mx,y,w,h);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(t,mx+pad,y+h/2);c.toBlob(b=>b?ok(b):zle(new Error('obrázok')),'image/jpeg',.92)};im.onerror=()=>zle(new Error('obrázok sa nenačítal'));im.src=src})}
+  async function schvalVsetko(){const b=document.getElementById('vsetko'),p=document.getElementById('prieb');b.disabled=true;
+    const objednavky={};document.querySelectorAll('.sch').forEach(d=>{(objednavky[d.dataset.cislo]=objednavky[d.dataset.cislo]||[]).push(d)});
+    let hotovo=0,chyby=0;for(const [cislo,fotky] of Object.entries(objednavky)){
+      const ok=fotky.filter(d=>d.querySelector('.ok').checked),nie=fotky.filter(d=>!d.querySelector('.ok').checked);
+      for(const d of nie){await fetch('/admin/v/'+d.dataset.id+'/zamietni',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pokyn:d.querySelector('.pokyn').value})})}
+      for(let k=0;k<ok.length;k++){const d=ok[k];p.textContent='Ukladám '+cislo+' – fotka '+(k+1)+' z '+ok.length+'…';
+        try{const im=d.querySelector('img.po');const blob=await oznac(im.src);const fd=new FormData();fd.append('subory',new File([blob],'zariadene_'+d.dataset.nazov+'.jpg',{type:'image/jpeg'}));
+          if(k===ok.length-1&&!nie.length)fd.append('dodat','1');
+          const r=await fetch('/admin/o/'+cislo+'/vysledky',{method:'POST',body:fd});if(!r.ok)throw 0;
+          await fetch('/admin/v/'+d.dataset.id+'/schval',{method:'POST'});d.style.opacity=.4;hotovo++}catch(e){chyby++;d.style.outline='2px solid #B42318'}}
+    }
+    p.textContent='Hotovo: '+hotovo+' fotiek schválených'+(chyby?', '+chyby+' chýb – skús znova':'')+'. Neschválené sa vyrobia znova.';b.textContent='✓ Odoslané';if(chyby)b.disabled=false}
+  </script>`;
+  return stranka('Schvaľovanie – Realitný asistent', obsah, true);
+}
+
+async function vystupAkcia(env, id, akcia, req) {
+  const v = await env.DB.prepare('SELECT id, cislo, i FROM vystupy WHERE id = ?').bind(id).first();
+  if (!v) return json({ ok: false }, 404);
+  if (akcia === 'schval') {
+    await env.DB.prepare("UPDATE vystupy SET stav = 'schvalene', b64 = NULL WHERE id = ?").bind(id).run();
+  } else if (akcia === 'zamietni') {
+    const d = await req.json().catch(() => ({}));
+    await env.DB.prepare("UPDATE vystupy SET stav = 'zamietnute', pokyn = ? WHERE id = ?").bind(kratko(d.pokyn, 500) || null, id).run();
+    await env.DB.prepare("UPDATE objednavky SET vyroba = 'caka' WHERE cislo = ?").bind(v.cislo).run();
+    await zapisHistoriu(env, v.cislo, `Fotka ${v.i + 1} vrátená do výroby${d.pokyn ? ': ' + kratko(d.pokyn, 200) : ''}`);
+  }
+  return json({ ok: true }, 200);
+}
+
 export default {
+  async scheduled(event, env) {
+    try {
+      if (event.cron === '0 18 * * *') await vecernySuhrn(env, false);
+      else if (event.cron === '0 20 * * *') await vecernySuhrn(env, true);
+      else await spracujFrontu(env);
+    } catch (e) { console.log('cron chyba', e.stack || e.message); }
+  },
   async fetch(req, env) {
     const origin = req.headers.get('Origin') || '';
     const url = new URL(req.url);
@@ -568,6 +821,9 @@ export default {
         return presmeruj(s.url);
       }
 
+      if (cesta === '/admin/schvalenie' && url.searchParams.get('s') && env.ADMIN_KEY && rovnake(url.searchParams.get('s'), await hmac(env, 'schvalenie'))) {
+        return presmeruj('/admin/schvalenie', adminCookie(env));
+      }
       if (cesta === '/admin' || cesta.startsWith('/admin/')) {
         m = cesta.match(/^\/admin\/o\/(RA-[\w-]+)(?:\/(stav|poznamka|vysledky|zariadit))?$/);
         const cislo = m && m[1];
@@ -577,6 +833,16 @@ export default {
         if (ok === 'jedna' && req.method === 'POST') return html('Pre zmeny otvor prehľad cez svoj odkaz s kľúčom.', 403);
         if (req.method === 'GET' && cesta === '/admin') return html(await adminZoznam(env, url));
         if (m && !m[2] && req.method === 'GET') return await adminDetail(env, base, cislo, url.searchParams.get('m'));
+        if (ok !== true && ok !== 'nastav') return html('Pre túto akciu otvor prehľad cez svoj odkaz s kľúčom.', 403);
+        if (req.method === 'GET' && cesta === '/admin/schvalenie') return html(await stranaSchvalenia(env, base));
+        let v;
+        if (req.method === 'GET' && (v = cesta.match(/^\/admin\/v\/(\d+)$/))) {
+          const r = await env.DB.prepare('SELECT b64 FROM vystupy WHERE id = ?').bind(+v[1]).first();
+          return new Response(r && r.b64 ? r.b64 : '', { status: r && r.b64 ? 200 : 404, headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'private, max-age=3600' } });
+        }
+        if (req.method === 'POST' && (v = cesta.match(/^\/admin\/v\/(\d+)\/(schval|zamietni)$/))) return await vystupAkcia(env, +v[1], v[2], req);
+        if (req.method === 'POST' && cesta === '/admin/spusti') { await spracujFrontu(env); return presmeruj('/admin?m=vyroba'); }
+        if (req.method === 'POST' && cesta === '/admin/suhrn') { await vecernySuhrn(env, false); return presmeruj('/admin?m=suhrn'); }
         if (m && m[2] === 'zariadit' && req.method === 'POST') {
           if (!env.OPENAI_KEY) return json({ ok: false, chyba: 'Chýba OPENAI_KEY.' }, 400);
           const o = await nacitaj(env, cislo);

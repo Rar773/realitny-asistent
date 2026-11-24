@@ -3,6 +3,10 @@ main = "objednavky.js"
 compatibility_date = "2026-11-01"
 workers_dev = true
 
+# */15 = automatická výroba, 18:00 UTC = večerný súhrn (19:00 v zime), 20:00 UTC = pripomienka
+[triggers]
+crons = ["*/15 * * * *", "0 18 * * *", "0 20 * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "ra-objednavky"
@@ -12,4 +16,6 @@ database_id = "5eb429cb-cbe2-4916-aff4-f9df5f74c644"
 #   TG_TOKEN   – token Telegram bota Realitného asistenta
 #   TG_CHAT    – chat_id, kam chodia objednávky (Marian)
 #   ADMIN_KEY  – kľúč k prehľadu objednávok (/admin)
+#   RESEND_KEY – automatické e-maily zákazníkom (potvrdenie, hotovo)
+#   OPENAI_KEY – automatické zariadenie a kontrola fotiek
 #   STRIPE_KEY, STRIPE_WEBHOOK_SECRET – po založení Stripe účtu (platba kartou sa zapne sama)
