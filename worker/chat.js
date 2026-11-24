@@ -204,8 +204,10 @@ export async function chatOdpoved(req, env, h) {
     vysl = { text: ZALOZNA, tin: 0, tout: 0 };
   }
   const { text, akcie } = vycisti(vysl.text);
-  await env.DB.prepare('INSERT INTO chat (cas, zid, ip_h, zdroj, stranka, otazka, odpoved, akcie, tok_in, tok_out, chyba) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
-    .bind(teraz(), zid, ip, zdroj, stranka, otazka, text, akcie.join(','), vysl.tin, vysl.tout, chyba).run();
+  const cf = req.cf || {};
+  const poloha = [cf.city, cf.country].filter(Boolean).join(', ');
+  await env.DB.prepare('INSERT INTO chat (cas, zid, ip_h, zdroj, stranka, otazka, odpoved, akcie, tok_in, tok_out, chyba, poloha) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+    .bind(teraz(), zid, ip, zdroj, stranka, otazka, text, akcie.join(','), vysl.tin, vysl.tout, chyba, poloha).run();
   return json({ ok: true, text, akcie }, 200, origin);
 }
 
@@ -235,10 +237,12 @@ export async function chatKontakt(req, env, h) {
 // ---------- súhrn a údržba ----------
 export async function chatSuhrn(env) {
   const od = new Date(Date.now() - 864e5).toISOString();
-  const r = await env.DB.prepare('SELECT COUNT(*) n, COUNT(DISTINCT COALESCE(NULLIF(zid,\'\'), ip_h)) l, COALESCE(SUM(tok_in),0) ti, COALESCE(SUM(tok_out),0) tt, SUM(CASE WHEN akcie LIKE \'%kontakt%\' THEN 1 ELSE 0 END) k FROM chat WHERE cas > ?').bind(od).first();
+  const bezTestov = "cas > ? AND COALESCE(zid,'') NOT LIKE 'TEST%'";
+  const r = await env.DB.prepare(`SELECT COUNT(*) n, COUNT(DISTINCT COALESCE(NULLIF(zid,''), ip_h)) l, COALESCE(SUM(tok_in),0) ti, COALESCE(SUM(tok_out),0) tt, SUM(CASE WHEN akcie LIKE '%kontakt%' THEN 1 ELSE 0 END) k, SUM(CASE WHEN zdroj = 'aplikacia' THEN 1 ELSE 0 END) a FROM chat WHERE ${bezTestov}`).bind(od).first();
   if (!r || !r.n) return '';
+  const { results: miesta } = await env.DB.prepare(`SELECT COALESCE(NULLIF(poloha,''),'neznáme') p, COUNT(DISTINCT COALESCE(NULLIF(zid,''), ip_h)) n FROM chat WHERE ${bezTestov} GROUP BY p ORDER BY n DESC LIMIT 4`).bind(od).all();
   const cena = (r.ti * 1 + r.tt * 5) / 1e6;
-  return `💬 Chat za 24 h: ${r.n} otázok od ${r.l} ľudí${r.k ? `, ${r.k}× ponúkol kontakt` : ''} (cca ${cena.toFixed(2)} $)`;
+  return `💬 Chat za 24 h: ${r.n} otázok od ${r.l} ľudí${r.a ? ` (${r.a} z aplikácie)` : ''}${r.k ? `, ${r.k}× chceli človeka` : ''} (cca ${cena.toFixed(2)} $)` + (miesta.length ? `\n📍 ${miesta.map((m) => `${m.p} ${m.n}`).join(' · ')}` : '');
 }
 export async function chatUdrzba(env) {
   const hranica = new Date(Date.now() - DNI_UCHOVANIA * 864e5).toISOString();
@@ -249,7 +253,7 @@ export async function chatUdrzba(env) {
 // ---------- /admin/chaty ----------
 export async function chatAdmin(env, stranka) {
   const od = new Date(Date.now() - 14 * 864e5).toISOString();
-  const { results } = await env.DB.prepare('SELECT cas, zid, ip_h, zdroj, stranka, otazka, odpoved, akcie, tok_in, tok_out, chyba FROM chat WHERE cas > ? ORDER BY cas DESC LIMIT 400').bind(od).all();
+  const { results } = await env.DB.prepare('SELECT cas, zid, ip_h, zdroj, stranka, otazka, odpoved, akcie, tok_in, tok_out, chyba, poloha FROM chat WHERE cas > ? ORDER BY cas DESC LIMIT 400').bind(od).all();
   const { results: kont } = await env.DB.prepare('SELECT cas, zdroj, meno, email, telefon, sprava FROM chat_kontakty WHERE cas > ? ORDER BY cas DESC LIMIT 50').bind(od).all();
   const cas = (iso) => new Date(iso).toLocaleString('sk-SK', { timeZone: 'Europe/Bratislava', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
   const skup = new Map();
@@ -258,7 +262,7 @@ export async function chatAdmin(env, stranka) {
   const rozhovory = [...skup.values()].slice(0, 60).map((rr) => {
     rr.reverse();
     const p = rr[0];
-    return `<div class="card"><div class="mut" style="font-size:12.5px">${cas(p.cas)} · ${esc(p.zdroj)}${p.stranka ? ' · ' + esc(p.stranka) : ''} · ${rr.length} ${rr.length === 1 ? 'otázka' : 'otázok'}</div>
+    return `<div class="card"><div class="mut" style="font-size:12.5px">${cas(p.cas)} · ${esc(p.zdroj)}${p.poloha ? ' · 📍 ' + esc(p.poloha) : ''}${String(p.zid || '').startsWith('TEST') ? ' · test' : ''}${p.stranka ? ' · ' + esc(p.stranka) : ''} · ${rr.length} ${rr.length === 1 ? 'otázka' : 'otázok'}</div>
       ${rr.map((r) => `<div style="margin-top:10px"><b>👤 ${esc(r.otazka)}</b><div style="white-space:pre-wrap;margin-top:4px;color:#344054">🤖 ${esc(r.odpoved)}${r.akcie ? ` <span class="pill" style="background:#7728E6">${esc(r.akcie)}</span>` : ''}${r.chyba ? ` <span class="pill" style="background:#B42318">chyba</span>` : ''}</div></div>`).join('')}</div>`;
   }).join('');
   const k = kont.map((x) => `<tr><td>${cas(x.cas)}<div class="mut" style="font-size:12px">${esc(x.zdroj)}</div></td><td>${esc(x.meno)}<div><a href="mailto:${esc(x.email)}">${esc(x.email)}</a></div>${x.telefon ? `<div class="mut">${esc(x.telefon)}</div>` : ''}</td><td style="white-space:pre-wrap">${esc(x.sprava)}</td></tr>`).join('');
