@@ -13,8 +13,8 @@
   var KLUC = 'ra_chat_v1';
   var UVOD = 'Dobrý deň! Som automatický pomocník Realitného asistenta. Poradím vám s cenami, službami a objednávkou. Na čo sa chcete opýtať?';
   var RYCHLE = C.zdroj === 'aplikacia'
-    ? ['Ako presuniem inzeráty na Bazoš API?', 'Ako objednám virtuálne zariadenie?', 'Koľko stojí video?', 'Chcem hovoriť s človekom']
-    : ['Koľko stojí video?', 'Ako funguje virtuálne zariadenie?', 'Čo obsahuje balík Profi?', 'Chcem hovoriť s človekom'];
+    ? ['Ako presuniem inzeráty na Bazoš API?', 'Ako objednám virtuálne zariadenie?', 'Koľko stojí video?']
+    : ['Koľko stojí video?', 'Ako funguje virtuálne zariadenie?', 'Čo obsahuje balík Profi?'];
 
   // ---------- štýly ----------
   var css = '' +
@@ -132,11 +132,10 @@
       '<div class="rac-m" aria-live="polite"></div>' +
       '<div class="rac-f"><div class="rac-in"><textarea rows="1" maxlength="1000" placeholder="Napíšte otázku…" aria-label="Vaša otázka"></textarea>' +
       '<button class="rac-go" type="button" aria-label="Odoslať" disabled>' + IK.send + '</button></div>' +
-      '<div class="rac-pozn">Odpovedá automatický pomocník, môže sa pomýliť. Ak treba, <a href="#" data-k>spojíme vás s nami</a>. · <a href="' + esc(C.sukromie) + '" target="_blank" rel="noopener">Ochrana údajov</a></div></div>';
+      '<div class="rac-pozn">Odpovedá automatický pomocník, môže sa pomýliť. · <a href="' + esc(C.sukromie) + '" target="_blank" rel="noopener">Ochrana údajov</a></div></div>';
     document.body.appendChild(panel);
     zoznam = panel.querySelector('.rac-m'); vstup = panel.querySelector('textarea'); posli = panel.querySelector('.rac-go');
     panel.querySelector('.rac-x').onclick = zavri;
-    panel.querySelector('[data-k]').onclick = function (e) { e.preventDefault(); ukazKontakt(); };
     vstup.addEventListener('input', function () { posli.disabled = !vstup.value.trim() || bezi; vstup.style.height = 'auto'; vstup.style.height = Math.min(vstup.scrollHeight, 110) + 'px'; });
     vstup.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); odosli(); } });
     posli.onclick = odosli;
@@ -173,7 +172,7 @@
       var ch = document.createElement('div'); ch.className = 'rac-ak rac-rychle';
       RYCHLE.forEach(function (q) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'rac-chip'; b.textContent = q;
-        b.onclick = function () { ch.remove(); if (/človekom/.test(q)) { spravy.push({ r: 'u', t: q }); uloz(); bublina({ r: 'u', t: q }); ukazKontakt(); } else odosli(q); };
+        b.onclick = function () { ch.remove(); odosli(q); };
         ch.appendChild(b);
       });
       zoznam.appendChild(ch);
@@ -203,7 +202,7 @@
       spravy.push(m); uloz(); pis.remove(); bublina(m);
     }).catch(function () {
       pis.remove();
-      var m = { r: 'a', t: 'Prepáčte, spojenie sa nepodarilo. Skúste to znova alebo nám napíšte na info@realitnyasistent.eu.', ak: ['kontakt'] };
+      var m = { r: 'a', t: 'Prepáčte, spojenie sa nepodarilo. Skúste to znova alebo nám napíšte na info@realitnyasistent.eu.', ak: [] };
       bublina(m);
     }).then(function () {
       clearTimeout(casovac); bezi = false; posli.disabled = !vstup.value.trim(); dole();
@@ -213,7 +212,7 @@
 
   function ukazKontakt() {
     if (zoznam.querySelector('.rac-k')) { zoznam.querySelector('.rac-k input').focus(); return; }
-    var posl = ''; for (var i = spravy.length - 1; i >= 0; i--) { if (spravy[i].r === 'u' && !/človekom/.test(spravy[i].t)) { posl = spravy[i].t; break; } }
+    var posl = ''; for (var i = spravy.length - 1; i >= 0; i--) { if (spravy[i].r === 'u' && !/(človek|operátor|kontakt|zavola)/i.test(spravy[i].t)) { posl = spravy[i].t; break; } }
     var f = document.createElement('form'); f.className = 'rac-k'; f.noValidate = true;
     f.innerHTML = '<b>Napíšte nám priamo</b><p>Odpovieme vám e-mailom spravidla do 1 pracovného dňa.</p>' +
       '<input name="meno" autocomplete="name" placeholder="Meno" maxlength="100">' +
