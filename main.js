@@ -139,3 +139,37 @@ document.querySelectorAll('.ba').forEach(ba => {
 
 // odkaz ambasádora (?amb=KOD) – zapamätáme na 60 dní
 (() => { try { const k = new URLSearchParams(location.search).get('amb'); if (k && /^AMB-[A-Za-z0-9]{3,20}$/.test(k)) localStorage.setItem('ra_amb', JSON.stringify({ k: k.toUpperCase(), t: Date.now() })); } catch (e) { /* nič */ } })();
+
+// balíky na mobile: posúvateľný pás s bodkami, na začiatku v strede najobľúbenejší balík
+(() => {
+  const g = document.querySelector('.bpanel .bgrid');
+  if (!g) return;
+  const karty = [...g.querySelectorAll('.bcard')];
+  if (karty.length < 2) return;
+  const dots = document.createElement('div');
+  dots.className = 'bdots';
+  dots.setAttribute('aria-label', 'Prepínanie balíkov');
+  karty.forEach((k, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Balík ' + (k.querySelector('h3') ? k.querySelector('h3').textContent : i + 1));
+    b.addEventListener('click', () => g.scrollTo({ left: k.offsetLeft - (g.clientWidth - k.offsetWidth) / 2, behavior: 'smooth' }));
+    dots.appendChild(b);
+  });
+  g.after(dots);
+  const oznac = () => {
+    const stred = g.scrollLeft + g.clientWidth / 2;
+    let naj = 0, d = Infinity;
+    karty.forEach((k, i) => { const x = Math.abs(k.offsetLeft + k.offsetWidth / 2 - stred); if (x < d) { d = x; naj = i; } });
+    dots.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === naj));
+  };
+  g.addEventListener('scroll', () => requestAnimationFrame(oznac), { passive: true });
+  const start = () => {
+    if (getComputedStyle(g).display !== 'flex') return;
+    const hl = g.querySelector('.bcard.hl') || karty[1];
+    g.scrollLeft = hl.offsetLeft - (g.clientWidth - hl.offsetWidth) / 2;
+    oznac();
+  };
+  if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
+  oznac();
+})();
