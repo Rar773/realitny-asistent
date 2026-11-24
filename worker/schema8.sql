@@ -1,0 +1,1 @@
+ALTER TABLE objednavky ADD COLUMN reels INTEGER DEFAULT 0;

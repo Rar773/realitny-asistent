@@ -20,19 +20,21 @@ const STAVY = {
 };
 
 // ---------- ceny ----------
+export const REELS_CENA = 10;
+// 1 fotka 5 €, celý inzerát (do 10 fotiek) 19 €
 export function cenaZariadenia(n) {
   if (n <= 0) return 0;
-  let c = 9 * n;
-  if (n <= 5) c = Math.min(c, 29);
-  return Math.min(c, 49);
+  return Math.min(5 * n, 19);
 }
-export function vypocitaj({ sluzba, pocet, sVideom, video, novy }) {
-  let z = 0, v = 0;
+export function vypocitaj({ sluzba, pocet, sVideom, video, novy, reels }) {
+  let z = 0, v = 0, r = 0;
   if (sluzba === 'zariadenie') {
-    z = cenaZariadenia(novy ? Math.max(0, pocet - 3) : pocet);
+    z = cenaZariadenia(pocet);
+    if (novy) z = Math.max(0, z - cenaZariadenia(Math.min(pocet, 3))); // prvé 3 fotky zadarmo
     if (sVideom && VIDEA[video]) { z = z / 2; v = VIDEA[video][1]; }
+    if (reels) r = REELS_CENA;
   } else if (VIDEA[sluzba]) v = VIDEA[sluzba][1];
-  return { zariadenie: z, video: v, spolu: z + v };
+  return { zariadenie: z, video: v, reels: r, spolu: z + v + r };
 }
 
 // ---------- pomocné ----------
@@ -43,7 +45,7 @@ const teraz = () => new Date().toISOString();
 const cas = (iso) => { try { return new Date(iso).toLocaleString('sk-SK', { timeZone: 'Europe/Bratislava', day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return iso; } };
 const nahodne = (n = 24) => { const a = new Uint8Array(n); crypto.getRandomValues(a); return [...a].map((b) => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join(''); };
 const popisSluzby = (o) => o.sluzba === 'zariadenie'
-  ? `Virtuálne zariadenie · ${o.pocet} ${o.pocet == 1 ? 'fotka' : o.pocet < 5 ? 'fotky' : 'fotiek'} · ${STYLY[o.styl] || ''}${o.s_videom && VIDEA[o.video] ? ' + ' + VIDEA[o.video][0] : ''}`
+  ? `Virtuálne zariadenie · ${o.pocet} ${o.pocet == 1 ? 'fotka' : o.pocet < 5 ? 'fotky' : 'fotiek'} · ${STYLY[o.styl] || ''}${o.reels ? ' + Reels pred/po' : ''}${o.s_videom && VIDEA[o.video] ? ' + ' + VIDEA[o.video][0] : ''}`
   : (VIDEA[o.sluzba] || ['Služba'])[0];
 
 async function hmac(env, text) {
@@ -96,13 +98,15 @@ async function tgSubory(env, subory, popisy, prefix, _tichy) {
       d.append('chat_id', env.TG_CHAT);
       d.append('disable_notification', 'true');
       d.append('document', kus[0], g.get('f0').name);
+      d.append('disable_content_type_detection', 'true');
       d.append('caption', media[0].caption);
       const r = await tg(env, 'sendDocument', d);
-      ids.push({ id: r.document.file_id, nazov: r.document.file_name, popis: popisy[z] || '' });
+      const dk = r.document || r.video || r.animation;
+      ids.push({ id: dk.file_id, nazov: dk.file_name || g.get('f0').name, popis: popisy[z] || '' });
     } else {
       g.append('media', JSON.stringify(media));
       const r = await tg(env, 'sendMediaGroup', g);
-      r.forEach((m, i) => ids.push({ id: m.document.file_id, nazov: m.document.file_name, popis: popisy[z + i] || '' }));
+      r.forEach((m, i) => { const dk = m.document || m.video || m.photo?.[0]; ids.push({ id: dk.file_id, nazov: dk.file_name || g.get('f' + i).name, popis: popisy[z + i] || '' }); });
     }
   }
   return ids;
@@ -266,7 +270,7 @@ async function novaObjednavka(req, env, origin, base) {
   const meno = kratko(f.get('meno'), 120), email = kratko(f.get('email'), 160), telefon = kratko(f.get('telefon'), 40);
   const inzerat = kratko(f.get('inzerat'), 600), poznamka = kratko(f.get('poznamka'), 2000), kod = kratko(f.get('kod'), 40);
   const styl = STYLY[f.get('styl')] ? f.get('styl') : 'moderny';
-  const sVideom = f.get('s_videom') === 'ano', video = VIDEA[f.get('video')] ? f.get('video') : 'standard', novy = f.get('novy') === 'ano';
+  const sVideom = f.get('s_videom') === 'ano', video = VIDEA[f.get('video')] ? f.get('video') : 'standard', novy = f.get('novy') === 'ano', reels = f.get('reels') === 'ano';
   const zdroj = req.headers.get('X-Zdroj') === 'aplikacia' ? 'aplikácia' : 'web';
 
   if (!['zariadenie', 'standard', 'premiove'].includes(sluzba)) return json({ ok: false, chyba: 'Vyberte službu.' }, 400, origin);
@@ -310,21 +314,21 @@ async function novaObjednavka(req, env, origin, base) {
   } else if (!kod) {
     ambKod = await ambasadorKlienta(env, emailN, telN);
   }
-  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk });
+  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk, reels });
   if (ambZlava) c.spolu = Math.round(c.spolu * (1 - pctZlava(amb)) * 100) / 100;
   const d = new Date();
   const o = {
     cislo: `RA-${d.toISOString().slice(2, 10).replace(/-/g, '')}-${nahodne(4).toUpperCase()}`,
     vytvorene: teraz(), zdroj, sluzba, pocet: sluzba === 'zariadenie' ? pocet : 0, styl: sluzba === 'zariadenie' ? styl : null,
-    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0,
+    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0, reels: sluzba === 'zariadenie' && reels ? 1 : 0,
     kod: ambKod || kod, meno, email, telefon, inzerat, poznamka, cena: c.spolu, token: nahodne(24),
   };
   const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && (!o.kod || jeAmbKod(o.kod)));
   o.stav = platbaKartou ? 'caka_platbu' : 'nova';
 
-  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0).run();
+  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok, reels)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0, o.reels).run();
   await zapisHistoriu(env, o.cislo, `Objednávka prijatá (${zdroj})`);
   await ulozStopy(env, o.cislo, stopy);
   if (ambKod) await zapisProviziu(env, ambKod, o);
@@ -535,6 +539,7 @@ async function adminDetail(env, base, cislo, sprava) {
     const res=await fetch('/admin/o/${o.cislo}/vysledky',{method:'POST',body:fd});b.textContent=res.ok?'✓ Schválené':'⚠️ Chyba, skús znova';if(!res.ok)b.disabled=false}
   async function genVsetky(){for(const r of document.querySelectorAll('.genr')){if(!GEN[r.dataset.i])await gen(+r.dataset.i)}}
   </script>` : ''}
+  ${o.reels ? await kartaReels(env, base, o) : ''}
   <div class="card"><h2>Hotové výsledky (${o.vysledky.length})</h2>${await galeria(env, base, o.vysledky)}
     <form method="post" action="/admin/o/${o.cislo}/vysledky" enctype="multipart/form-data" style="margin-top:14px">
       <input type="file" name="subory" multiple accept="image/*,video/*" required>
@@ -826,24 +831,79 @@ async function vecernySuhrn(env, pripomienka) {
   await tgSprava(env, r.join('\n'), s.hotove.length ? [[{ text: '✅ Otvoriť schvaľovanie', url: odkaz }]] : null);
 }
 
+// --- Reels pred → po (vyrába sa v prehliadači pri schvaľovaní) ---
+const REELS_JS = `async function vyrobReels(pary,stav){
+  var nac=function(src){return new Promise(function(ok,zle){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){ok(im)};im.onerror=function(){zle(new Error('obrázok sa nenačítal'))};im.src=(src instanceof Blob)?URL.createObjectURL(src):src})};
+  var ims=[];for(var q=0;q<pary.length;q++){if(stav)stav('Načítavam fotky '+(q+1)+'/'+pary.length+'…');ims.push([await nac(pary[q].pred),await nac(pary[q].po)])}
+  if(!ims.length)throw new Error('žiadne páry fotiek');
+  var W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
+  var typy=['video/mp4;codecs=avc1.42E01E','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'];
+  var typ=window.MediaRecorder?typy.find(function(t){return MediaRecorder.isTypeSupported(t)}):null;
+  if(!typ)throw new Error('tento prehliadač nevie nahrávať video – skús Chrome alebo Safari');
+  var str=c.captureStream(30),rec=new MediaRecorder(str,{mimeType:typ,videoBitsPerSecond:3500000}),kusy=[];
+  rec.ondataavailable=function(e){if(e.data&&e.data.size)kusy.push(e.data)};
+  var T=3.4,spolu=T*ims.length+0.3;
+  function pill(t,px,py,bg,zarovnaj){x.font='700 46px Inter,Arial,sans-serif';var w=x.measureText(t).width+56,h=78,X=zarovnaj==='r'?px-w:px;x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(X,py,w,h,39):x.rect(X,py,w,h);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(t,X+28,py+h/2+2)}
+  function obraz(im,u){var k=H/im.height,iw=im.width*k;if(iw<W){k=W/im.width;iw=W}var ih=im.height*k,rozsah=iw-W,pos=rozsah*(0.22+0.56*Math.min(1,u/T));x.drawImage(im,-pos,(H-ih)/2,iw,ih)}
+  function kresli(t){var i=Math.min(ims.length-1,Math.floor(t/T)),u=t-i*T,a=ims[i][0],b=ims[i][1];
+    x.fillStyle='#111';x.fillRect(0,0,W,H);obraz(a,u);
+    var p=Math.max(0,Math.min(1,(u-0.8)/1.4)),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,lx=W*e;
+    if(lx>0){x.save();x.beginPath();x.rect(0,0,lx,H);x.clip();obraz(b,u);x.restore()}
+    if(p>0&&p<1){x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=18;x.fillRect(lx-4,0,8,H);x.shadowBlur=0}
+    if(p<1)pill('Pred',W-60,120,'rgba(32,36,54,.78)','r');
+    if(p>0)pill('Po',60,120,'#7728E6','l');
+    if(p>0){x.font='600 34px Inter,Arial,sans-serif';var tt='Virtuálne zariadené',w=x.measureText(tt).width+44;x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect((W-w)/2,H-170,w,62,31):x.rect((W-w)/2,H-170,w,62);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(tt,(W-w)/2+22,H-139)}
+    var f=Math.min(1,u/0.25);if(f<1){x.fillStyle='rgba(0,0,0,'+(1-f)+')';x.fillRect(0,0,W,H)}}
+  kresli(0);rec.start(250);var t0=performance.now();
+  await new Promise(function(ok){function krok(){var t=(performance.now()-t0)/1000;if(t>=spolu){kresli(spolu-0.31);ok();return}kresli(Math.min(t,spolu-0.31));if(stav)stav('Nahrávam Reels… '+Math.round(t/spolu*100)+' %');requestAnimationFrame(krok)}requestAnimationFrame(krok)});
+  await new Promise(function(ok){rec.onstop=ok;rec.stop()});str.getTracks().forEach(function(tr){tr.stop()});
+  var cist=typ.split(';')[0];return new File([new Blob(kusy,{type:cist})],'reels_pred_po.'+(cist.indexOf('mp4')>=0?'mp4':'webm'),{type:cist});
+}
+async function nahrajReels(cislo,pary,stav){var f=await vyrobReels(pary,stav);if(stav)stav('Ukladám Reels ('+Math.round(f.size/1e6*10)/10+' MB)…');var fd=new FormData();fd.append('subory',f);fd.append('dodat','1');var r=await fetch('/admin/o/'+cislo+'/vysledky',{method:'POST',body:fd});if(!r.ok)throw new Error('uloženie zlyhalo ('+r.status+')');return f}
+`;
+async function paryReels(env, base, o) {
+  const hotove = o.vysledky.filter((v) => /\.(jpe?g|png|webp)$/i.test(v.nazov || '') && /zariaden/i.test(v.nazov || ''));
+  const podlaI = {}, bez = [];
+  for (const v of hotove) { const m = (v.nazov || '').match(/zariadene_(\d+)_/); if (m) podlaI[+m[1] - 1] = v; else bez.push(v); }
+  const pary = [];
+  for (let i = 0; i < o.fotky.length; i++) {
+    const v = podlaI[i] || bez.shift();
+    pary.push({ i, pred: await fotoUrl(env, base, o.fotky[i].id), po: v ? await fotoUrl(env, base, v.id) : null });
+  }
+  return { pary };
+}
+async function kartaReels(env, base, o) {
+  const data = await paryReels(env, base, o);
+  const ma = o.vysledky.some((v) => /reels/i.test(v.nazov || ''));
+  const n = data.pary.filter((x) => x.po).length;
+  return `<div class="card"><h2>🎬 Reels pred → po</h2>
+    <p class="mut" style="margin-top:0">${ma ? 'Reels už je medzi výsledkami. Môžeš ho vyrobiť znova.' : 'Zákazník objednal Reels.'} Pripravených párov fotiek: <b>${n}</b> z ${data.pary.length}. Počas výroby nechaj stránku otvorenú.</p>
+    <button class="btn" id="rBtn" ${n ? '' : 'disabled'} onclick="spustiReels()">🎬 Vyrobiť Reels a dodať</button> <span id="rStav" class="mut"></span>
+    <script>const RD=${JSON.stringify(data).replace(/</g, '\\u003c')};${REELS_JS}
+    async function spustiReels(){const b=document.getElementById('rBtn'),s=document.getElementById('rStav');b.disabled=true;
+      try{await nahrajReels('${o.cislo}',RD.pary.filter(x=>x.po),t=>s.textContent=t);s.textContent='✓ Hotovo';setTimeout(()=>location.href='/admin/o/${o.cislo}?m='+encodeURIComponent('Reels je nahraté a objednávka dodaná.'),600)}
+      catch(e){s.textContent='⚠️ '+e.message;b.disabled=false}}</script></div>`;
+}
+
 // --- stránka na schválenie všetkého naraz ---
 async function stranaSchvalenia(env, base) {
   const s = await prehladNaSchvalenie(env);
-  const bloky = [];
+  const bloky = [], reelsData = {};
   for (const oz of s.hotove) {
     const o = await nacitaj(env, oz.cislo);
     const st = await stavFotiek(env, o);
     const riadky = await Promise.all(st.map(async (x) => {
       if (!x.posl || !['ok', 'problem'].includes(x.posl.stav)) return '';
       const qa = JSON.parse(x.posl.qa || '{}');
-      return `<div class="sch ${x.posl.stav === 'problem' ? 'prob' : ''}" data-id="${x.posl.id}" data-cislo="${o.cislo}" data-nazov="${esc((o.fotky[x.i].popis || 'fotka').replace(/[^\p{L}\p{N}]+/gu, '-'))}">
+      return `<div class="sch ${x.posl.stav === 'problem' ? 'prob' : ''}" data-id="${x.posl.id}" data-i="${x.i}" data-cislo="${o.cislo}" data-nazov="${esc((o.fotky[x.i].popis || 'fotka').replace(/[^\p{L}\p{N}]+/gu, '-'))}">
         <div class="pp"><img src="${await fotoUrl(env, base, o.fotky[x.i].id)}" alt="pred" loading="lazy"><img class="po" data-v="${x.posl.id}" alt="po"></div>
         <div class="row" style="margin-top:6px"><label style="display:flex;gap:6px;align-items:center;font-weight:600"><input type="checkbox" class="ok" ${x.posl.stav === 'problem' ? '' : 'checked'}> ${x.i + 1}. ${esc(o.fotky[x.i].popis || 'Fotka')}</label>
         ${x.posl.stav === 'problem' ? `<span class="pill" style="background:#B54708">⚠️ ${esc(qa.dovod || 'skontroluj')}</span>` : '<span class="pill" style="background:#12B76A">kontrola OK</span>'}</div>
         <input type="text" class="pokyn" placeholder="Ak neschvaľuješ: čo zmeniť (napr. sedačka do L, bez TV)">
       </div>`;
     }));
-    bloky.push(`<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${o.cislo}</h2><a href="/admin/o/${o.cislo}" class="mut">detail</a></div>
+    if (o.reels) reelsData[o.cislo] = await paryReels(env, base, o);
+    bloky.push(`<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${o.cislo}${o.reels ? ' <span class="pill" style="background:#7728E6">+ Reels</span>' : ''}</h2><a href="/admin/o/${o.cislo}" class="mut">detail</a></div>
       <p class="mut" style="margin:4px 0 10px">${esc(o.meno)} · ${esc(popisSluzby(o))} · ${eur(o.cena)}${o.zaplatene ? ' ✓ zaplatené' : ''}</p>${riadky.join('')}</div>`);
   }
   const obsah = `<h1>Schvaľovanie</h1><p class="mut">Zaškrtnuté fotky sa uložia s označením „Virtuálne zariadené“ a objednávky sa zákazníkom odošlú. Odškrtnuté fotky s pokynom sa vyrobia znova.</p>
@@ -852,6 +912,8 @@ async function stranaSchvalenia(env, base) {
   ${bloky.length ? `<div class="card" style="position:sticky;bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,.12)"><button class="btn" id="vsetko" onclick="schvalVsetko()" style="width:100%;justify-content:center;font-size:16px;padding:14px">✅ Schváliť a odoslať zákazníkom</button><div id="prieb" class="mut" style="margin-top:8px;text-align:center"></div></div>` : ''}
   <style>.sch{border-top:1px solid #EEF0F5;padding:12px 0}.sch.prob{background:#FFFAEB;margin:0 -18px;padding:12px 18px}.pp{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pp img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:10px;background:#F4F5F9;cursor:zoom-in}.sch .pokyn{margin-top:8px}</style>
   <script>
+  const REELS=${JSON.stringify(reelsData).replace(/</g, '\\u003c')};
+  ${REELS_JS}
   document.querySelectorAll('img.po').forEach(async im=>{const t=await fetch('/admin/v/'+im.dataset.v).then(r=>r.text());im.src='data:image/jpeg;base64,'+t});
   document.querySelectorAll('.pp img').forEach(im=>im.onclick=()=>{const w=window.open();w.document.write('<img src="'+im.src+'" style="max-width:100%">')});
   function oznac(src){return new Promise((ok,zle)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
@@ -859,16 +921,20 @@ async function stranaSchvalenia(env, base) {
     x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect(mx,y,w,h,h/2):x.rect(mx,y,w,h);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(t,mx+pad,y+h/2);c.toBlob(b=>b?ok(b):zle(new Error('obrázok')),'image/jpeg',.92)};im.onerror=()=>zle(new Error('obrázok sa nenačítal'));im.src=src})}
   async function schvalVsetko(){const b=document.getElementById('vsetko'),p=document.getElementById('prieb');b.disabled=true;
     const objednavky={};document.querySelectorAll('.sch').forEach(d=>{(objednavky[d.dataset.cislo]=objednavky[d.dataset.cislo]||[]).push(d)});
-    let hotovo=0,chyby=0;for(const [cislo,fotky] of Object.entries(objednavky)){
+    let hotovo=0,chyby=0,reelsOk=0;for(const [cislo,fotky] of Object.entries(objednavky)){
       const ok=fotky.filter(d=>d.querySelector('.ok').checked),nie=fotky.filter(d=>!d.querySelector('.ok').checked);
       for(const d of nie){await fetch('/admin/v/'+d.dataset.id+'/zamietni',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pokyn:d.querySelector('.pokyn').value})})}
       for(let k=0;k<ok.length;k++){const d=ok[k];p.textContent='Ukladám '+cislo+' – fotka '+(k+1)+' z '+ok.length+'…';
-        try{const im=d.querySelector('img.po');const blob=await oznac(im.src);const fd=new FormData();fd.append('subory',new File([blob],'zariadene_'+d.dataset.nazov+'.jpg',{type:'image/jpeg'}));
-          if(k===ok.length-1&&!nie.length)fd.append('dodat','1');
+        try{const im=d.querySelector('img.po');const blob=await oznac(im.src);const fd=new FormData();fd.append('subory',new File([blob],'zariadene_'+(+d.dataset.i+1)+'_'+d.dataset.nazov+'.jpg',{type:'image/jpeg'}));
+          if(REELS[cislo])(REELS[cislo].nove=REELS[cislo].nove||{})[d.dataset.i]=blob;
+          if(k===ok.length-1&&!nie.length&&!REELS[cislo])fd.append('dodat','1');
           const r=await fetch('/admin/o/'+cislo+'/vysledky',{method:'POST',body:fd});if(!r.ok)throw 0;
           await fetch('/admin/v/'+d.dataset.id+'/schval',{method:'POST'});d.style.opacity=.4;hotovo++}catch(e){chyby++;d.style.outline='2px solid #B42318'}}
+      const R=REELS[cislo];
+      if(R&&!nie.length&&ok.length){try{const pary=R.pary.map(x=>({pred:x.pred,po:(R.nove&&R.nove[x.i])||x.po})).filter(x=>x.po);
+          await nahrajReels(cislo,pary,t=>p.textContent=cislo+': '+t);reelsOk++}catch(e){chyby++;p.textContent='';alert('Reels pre '+cislo+' sa nepodarilo vyrobiť ('+e.message+'). Fotky sú uložené – v detaile objednávky klikni Vyrobiť Reels.')}}
     }
-    p.textContent='Hotovo: '+hotovo+' fotiek schválených'+(chyby?', '+chyby+' chýb – skús znova':'')+'. Neschválené sa vyrobia znova.';b.textContent='✓ Odoslané';if(chyby)b.disabled=false}
+    p.textContent='Hotovo: '+hotovo+' fotiek schválených'+(reelsOk?', '+reelsOk+'× Reels':'')+(chyby?', '+chyby+' chýb – skús znova':'')+'. Neschválené sa vyrobia znova.';b.textContent='✓ Odoslané';if(chyby)b.disabled=false}
   </script>`;
   return stranka('Schvaľovanie – Realitný asistent', obsah, true);
 }

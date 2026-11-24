@@ -74,7 +74,7 @@ if len(vsetky) > 1:
 
 # 6) kľúčové ceny musia na webe ostať
 spolu = ' '.join(text(s) for s in pages.values()).replace('\xa0', ' ')
-for c in ['29 €', '89 €', '19 €', '290 €', '500 €', '700 €', '120 €', '790 €', '990 €', '1 390 €', '49 €']:
+for c in ['29 €', '89 €', '19 €', '290 €', '500 €', '700 €', '120 €', '790 €', '990 €', '1 390 €']:
     if c not in spolu:
         chyby.append(f'na webe chýba cena {c}')
 

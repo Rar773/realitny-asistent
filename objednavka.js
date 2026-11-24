@@ -16,7 +16,7 @@
   if (!ZID) { const m = document.cookie.match(/ra_zid=([^;]+)/); ZID = m ? m[1] : (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)); }
   document.cookie = 'ra_zid=' + ZID + '; max-age=63072000; path=/; SameSite=Lax; Secure';
 
-  const cenaZar = (n) => { if (n <= 0) return 0; let c = 9 * n; if (n <= 5) c = Math.min(c, 29); return Math.min(c, 49); };
+  const cenaZar = (n) => (n <= 0 ? 0 : Math.min(5 * n, 19)); // 1 fotka 5 €, celý inzerát (do 10 fotiek) 19 €
   const eur = (x) => (Number.isInteger(x) ? String(x) : x.toFixed(2).replace('.', ',')) + ' €';
   const val = (n) => (form.querySelector(`[name="${n}"]:checked`) || {}).value;
 
@@ -35,8 +35,8 @@
     if (zar) {
       const n = Math.min(MAX, pocet());
       const novy = $('oNovy').checked;
-      let z = cenaZar(novy ? Math.max(0, n - 3) : n);
-      r.push([`Virtuálne zariadenie · ${n} ${n === 1 ? 'fotka' : n > 1 && n < 5 ? 'fotky' : 'fotiek'}`, eur(cenaZar(n))]);
+      let z = novy ? Math.max(0, cenaZar(n) - cenaZar(Math.min(n, 3))) : cenaZar(n);
+      r.push([`Virtuálne zariadenie · ${n} ${n === 1 ? 'fotka' : n > 1 && n < 5 ? 'fotky' : 'fotiek'}${n >= 4 ? ' (celý inzerát)' : ''}`, eur(cenaZar(n))]);
       if (novy && n) r.push(['Nový klient · 3 fotky zadarmo', '−' + eur(cenaZar(n) - z)]);
       if ($('oSVideom').checked) {
         const prem = val('video') === 'premiove';
@@ -46,6 +46,7 @@
         spolu += prem ? 89 : 29;
       }
       spolu += z;
+      if ($('oReels').checked) { r.push(['Reels pred → po', eur(10)]); spolu += 10; }
     } else {
       const prem = sluzba === 'premiove';
       r.push([prem ? 'Video Prémiové' : 'Video Štandard', eur(prem ? 89 : 29)]);
@@ -139,7 +140,7 @@
       const fd = new FormData(form);
       fd.delete('fotky');
       fd.set('zid', ZID);
-      if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet'].forEach((k) => fd.delete(k)); }
+      if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet', 'reels'].forEach((k) => fd.delete(k)); }
       if (fotky.length) fd.delete('pocet');
       for (const f of fotky) { fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
       btn.textContent = 'Odosielame…';
