@@ -249,6 +249,7 @@ async function novaObjednavka(req, env, origin, base) {
     telefon ? `📞 ${esc(telefon)}` : null,
     inzerat ? `🔗 ${esc(inzerat)}` : null,
     poznamka ? `\n📝 ${esc(poznamka)}` : null,
+    sluzba === 'zariadenie' && env.OPENAI_KEY && fotky.length ? '\n🪄 Otvor objednávku a klikni „Zariadiť všetky fotky“.' : null,
   ].filter((r) => r !== null);
   const odkaz = `${base}/admin/o/${o.cislo}?s=${await hmac(env, 'o:' + o.cislo)}`;
 
@@ -319,6 +320,43 @@ async function galeria(env, base, zoznam) {
   return `<div class="grid">${p.join('')}</div>`;
 }
 
+// ---------- automatické zariadenie (OpenAI) ----------
+const MIESTNOST_EN = { 'Obývačka': 'living room', 'Spálňa': 'bedroom', 'Kuchyňa': 'kitchen', 'Jedáleň': 'dining room', 'Detská izba': "children's room", 'Pracovňa': 'home office', 'Kúpeľňa': 'bathroom' };
+const STYL_EN = {
+  moderny: 'modern style with clean lines, light grey and beige tones, a comfortable sofa or bed, simple wooden accents',
+  skandinavsky: 'warm Scandinavian style with light wood, linen textiles, green plants and soft neutral colours',
+  klasicky: 'classic timeless style with warm tones, elegant traditional furniture and soft lighting',
+};
+function promptZariadenia(o, foto, pokyn) {
+  const izba = MIESTNOST_EN[foto.popis] || 'room';
+  return [
+    `Virtually stage this empty ${izba} for a real estate listing.`,
+    'Keep the room exactly as it is: the same walls, ceiling, floor, windows, doors, radiators, sockets and light switches, the same camera angle, perspective, framing and zoom, pixel-aligned with the original photo. Do not change the architecture, do not add or remove windows or doors, do not crop.',
+    `Add realistic furniture and decor suitable for a ${izba} in a ${STYL_EN[o.styl] || STYL_EN.moderny}.`,
+    'Natural soft daylight, realistic shadows and reflections on the floor. Photorealistic high-end real estate photography. No people, no text, no watermark, no logos.',
+    pokyn ? `Additional instructions from the client: ${pokyn}` : '',
+    o.poznamka ? `Client note: ${o.poznamka}` : '',
+  ].filter(Boolean).join('\n');
+}
+async function zariadFotku(env, o, i, pokyn) {
+  const foto = o.fotky[i];
+  if (!foto) return json({ ok: false, chyba: 'Fotka neexistuje.' }, 400);
+  const f = await fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/getFile?file_id=${encodeURIComponent(foto.id)}`).then((r) => r.json());
+  if (!f.ok) return json({ ok: false, chyba: 'Fotku sa nepodarilo načítať z úložiska.' }, 502);
+  const obr = await fetch(`https://api.telegram.org/file/bot${env.TG_TOKEN}/${f.result.file_path}`).then((r) => r.blob());
+  const fd = new FormData();
+  fd.append('model', env.OPENAI_MODEL || 'gpt-image-2.5-sunburst');
+  fd.append('image', new File([obr], 'foto.jpg', { type: obr.type && obr.type.startsWith('image/') ? obr.type : 'image/jpeg' }));
+  fd.append('prompt', promptZariadenia(o, foto, pokyn));
+  fd.append('size', 'auto');
+  fd.append('quality', env.OPENAI_QUALITY || 'high');
+  fd.append('output_format', 'jpeg');
+  const r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: `Bearer ${env.OPENAI_KEY}` }, body: fd });
+  await zapisHistoriu(env, o.cislo, r.ok ? `Automatické zariadenie fotky ${i + 1} (${foto.popis || ''})${pokyn ? ' s pokynom' : ''}` : `OpenAI chyba pri fotke ${i + 1}: ${r.status}`);
+  // odpoveď (base64 obrázok) posielame priamo do prehliadača – Worker ju nerozbaľuje
+  return new Response(r.body, { status: r.status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
+}
+
 // ---------- admin ----------
 async function jeAdmin(req, env, url, cislo) {
   if (!env.ADMIN_KEY) return false;
@@ -380,6 +418,30 @@ async function adminDetail(env, base, cislo, sprava) {
     <dt>Pre zákazníka</dt><dd><a href="${su}" target="_blank" rel="noopener">stránka so stavom objednávky</a></dd>
   </dl></div>
   <div class="card"><h2>Fotky od zákazníka (${o.fotky.length})</h2>${await galeria(env, base, o.fotky)}</div>
+  ${o.sluzba === 'zariadenie' && env.OPENAI_KEY && o.fotky.length ? `<div class="card" id="gen"><h2>🪄 Automatické zariadenie</h2>
+    <p class="mut" style="margin-top:0">Štýl: <b>${esc(STYLY[o.styl] || '')}</b>. Každú fotku vygenerujeme, ty ju skontroluješ a schváliš. Schválená fotka dostane označenie „Virtuálne zariadené“ a uloží sa do Hotových výsledkov.</p>
+    <button class="btn" onclick="genVsetky()">🪄 Zariadiť všetky fotky</button>
+    <div id="genZoz" style="margin-top:14px">${(await Promise.all(o.fotky.map(async (x, i) => `<div class="genr" data-i="${i}" style="border-top:1px solid #EEF0F5;padding:12px 0">
+      <b>${i + 1}. ${esc(x.popis || 'Fotka')}</b>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px"><img src="${await fotoUrl(env, base, x.id)}" style="width:100%;border-radius:10px;aspect-ratio:4/3;object-fit:cover" alt="pred"><div class="gout" style="border:2px dashed #E6E8EF;border-radius:10px;display:grid;place-items:center;aspect-ratio:4/3;color:#667085;font-size:13px;overflow:hidden">ešte nevygenerované</div></div>
+      <div class="row" style="margin-top:8px"><input type="text" class="gpok" placeholder="Pokyn navyše (nepovinné), napr. sedačka do L" style="flex:1;min-width:200px"><button class="btn sec sm" onclick="gen(${i})">Vygenerovať</button><button class="btn sm gok" onclick="genOk(${i})" disabled>✅ Schváliť</button></div>
+    </div>`))).join('')}</div>
+  </div>
+  <script>
+  const GEN={};
+  async function gen(i){const r=document.querySelector('.genr[data-i="'+i+'"]');const out=r.querySelector('.gout');out.innerHTML='⏳ generujem… (30–90 s)';r.querySelector('.gok').disabled=true;
+    try{const res=await fetch('/admin/o/${o.cislo}/zariadit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({i,pokyn:r.querySelector('.gpok').value})});
+      const j=await res.json();if(!res.ok||!j.data||!j.data[0]){throw new Error((j.error&&j.error.message)||j.chyba||('chyba '+res.status))}
+      const blob=await oznac('data:image/jpeg;base64,'+j.data[0].b64_json);GEN[i]=blob;out.innerHTML='';const im=new Image();im.src=URL.createObjectURL(blob);im.style.cssText='width:100%;height:100%;object-fit:contain;background:#F4F5F9;cursor:zoom-in';im.onclick=()=>window.open(im.src);out.appendChild(im);out.style.borderStyle='solid';r.querySelector('.gok').disabled=false;r.querySelector('.btn.sec').textContent='🔁 Znova'}
+    catch(e){out.textContent='⚠️ '+e.message}}
+  function oznac(src){return new Promise((ok,zle)=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
+    const fs=Math.round(im.width*0.022),pad=Math.round(fs*0.6),t='Virtuálne zariadené';x.font='600 '+fs+'px Inter,Arial,sans-serif';const w=x.measureText(t).width+pad*2,h=fs+pad*1.6,mx=Math.round(im.width*0.02),y=im.height-h-mx;
+    x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect(mx,y,w,h,h/2):x.rect(mx,y,w,h);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(t,mx+pad,y+h/2);c.toBlob(b=>b?ok(b):zle(new Error('obrázok')), 'image/jpeg',.92)};im.onerror=()=>zle(new Error('obrázok sa nenačítal'));im.src=src})}
+  async function genOk(i){const r=document.querySelector('.genr[data-i="'+i+'"]');const b=r.querySelector('.gok');if(!GEN[i])return;b.disabled=true;b.textContent='Ukladám…';
+    const fd=new FormData();fd.append('subory',new File([GEN[i]],'zariadene_'+(i+1)+'_'+(r.querySelector('b').textContent.replace(/^\\d+\\.\\s*/,'')||'fotka')+'.jpg',{type:'image/jpeg'}));
+    const res=await fetch('/admin/o/${o.cislo}/vysledky',{method:'POST',body:fd});b.textContent=res.ok?'✓ Schválené':'⚠️ Chyba, skús znova';if(!res.ok)b.disabled=false}
+  async function genVsetky(){for(const r of document.querySelectorAll('.genr')){if(!GEN[r.dataset.i])await gen(+r.dataset.i)}}
+  </script>` : ''}
   <div class="card"><h2>Hotové výsledky (${o.vysledky.length})</h2>${await galeria(env, base, o.vysledky)}
     <form method="post" action="/admin/o/${o.cislo}/vysledky" enctype="multipart/form-data" style="margin-top:14px">
       <input type="file" name="subory" multiple accept="image/*,video/*" required>
@@ -507,7 +569,7 @@ export default {
       }
 
       if (cesta === '/admin' || cesta.startsWith('/admin/')) {
-        m = cesta.match(/^\/admin\/o\/(RA-[\w-]+)(?:\/(stav|poznamka|vysledky))?$/);
+        m = cesta.match(/^\/admin\/o\/(RA-[\w-]+)(?:\/(stav|poznamka|vysledky|zariadit))?$/);
         const cislo = m && m[1];
         const ok = await jeAdmin(req, env, url, cislo);
         if (!ok) return html(stranka('Prístup zamietnutý', '<h1>Prístup zamietnutý</h1><p class="mut">Otvor prehľad cez svoj odkaz s kľúčom.</p>', true), 403);
@@ -515,6 +577,13 @@ export default {
         if (ok === 'jedna' && req.method === 'POST') return html('Pre zmeny otvor prehľad cez svoj odkaz s kľúčom.', 403);
         if (req.method === 'GET' && cesta === '/admin') return html(await adminZoznam(env, url));
         if (m && !m[2] && req.method === 'GET') return await adminDetail(env, base, cislo, url.searchParams.get('m'));
+        if (m && m[2] === 'zariadit' && req.method === 'POST') {
+          if (!env.OPENAI_KEY) return json({ ok: false, chyba: 'Chýba OPENAI_KEY.' }, 400);
+          const o = await nacitaj(env, cislo);
+          if (!o) return json({ ok: false, chyba: 'Objednávka neexistuje.' }, 404);
+          const d = await req.json().catch(() => ({}));
+          return await zariadFotku(env, o, +d.i || 0, kratko(d.pokyn, 500));
+        }
         if (m && m[2] && req.method === 'POST') return await adminAkcia(req, env, base, cislo, m[2]);
       }
       return json({ ok: false, chyba: 'Nenájdené' }, 404, origin);
