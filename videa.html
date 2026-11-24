@@ -21,8 +21,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261124a">
-<script src="main.js?v=20261124a" defer></script>
+<link rel="stylesheet" href="styles.css?v=20261124b">
+<script src="main.js?v=20261124b" defer></script>
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -46,7 +46,7 @@
   <div class="nav-cta"><a class="btn sm" href="#kontakt">Objednať službu</a></div>
   <button class="mnav" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
 </div></header>
-<main id="obsah">
+<main id="obsah" class="video-page">
 <section class="phero"><div class="wrap phero-g side">
   <div>
     <p class="crumb"><a href="index.html">Domov</a> / Služby / Videá z fotiek inzerátu</p>
@@ -54,19 +54,29 @@
     <p class="lead">Z vašich fotografií pripravíme profesionálne video, ktoré zaujme viac záujemcov. Bez natáčania, bez kameramana a hotové do 24 hodín.</p>
     <div class="cta-row"><a class="btn" href="mailto:info@realitnyasistent.eu?subject=Objedn%C3%A1vka%20videa&amp;body=Dobr%C3%BD%20de%C5%88%2C%0A%0Am%C3%A1m%20z%C3%A1ujem%20o%20video%20%28%C5%A0tandard%20/%20Pr%C3%A9miov%C3%A9%29%20k%20inzer%C3%A1tu%3A%0A">Objednať video <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn sec" href="#cennik">Cenník a balíky</a></div>
   </div>
-  <aside class="card asidecheck"><ul class="chk" style="margin:0"><li>Stačia fotografie z vášho inzerátu</li><li>Hotové do 24 hodín</li><li>Vždy dve verzie – na šírku aj na výšku</li><li>S vaším logom a kontaktnými údajmi</li><li>Pre byty, domy aj pozemky s fotkami</li></ul></aside>
+  <aside class="card vidhero">
+    <div class="vidhero-media">
+      <video controls preload="none" poster="media/prehliadka.jpg" src="media/prehliadka.mp4" aria-label="Prémiové video z fotografií nehnuteľnosti – ukážka"></video>
+      <span class="vidhero-format">Prémiová ukážka · 51 s</span>
+    </div>
+    <div class="vidhero-points">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Vychádzame z fotografií v inzeráte</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Hudba, popisky a logo kancelárie</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Na šírku aj na výšku 9 : 16</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Hotové do 24 hodín</span>
+    </div>
+  </aside>
 </div></section>
 
-<section id="videa" style="padding-top:56px"><div class="wrap">
-  <div class="vids">
-    <figure class="vbox"><video controls preload="none" poster="media/prehliadka.jpg" src="media/prehliadka.mp4"></video>
-      <figcaption class="cap"><b>Prémiové video – verzia na šírku (16 : 9)</b><span>do inzerátu, na web a YouTube · 51 s</span></figcaption></figure>
+<section id="videa" class="alt"><div class="wrap">
+  <div class="sh c"><h2>Ďalšie ukážky videí</h2><p>Pozrite si aj výstup na výšku pre sociálne siete a štandardné video z fotografií inzerátu.</p></div>
+  <div class="vids vids-secondary">
+    <figure class="vbox"><video controls preload="none" poster="media/standard.jpg" src="media/standard.mp4"></video>
+      <figcaption class="cap"><b>Štandardné video z fotiek inzerátu</b><span>na šírku · 47 s</span></figcaption></figure>
     <figure class="vbox vert"><video controls preload="none" poster="media/vertikal.jpg" src="media/vertikal.mp4"></video>
       <figcaption class="cap"><b>Verzia na výšku (9 : 16)</b><span>Instagram, Facebook, TikTok</span></figcaption></figure>
   </div>
-  <figure class="vbox vstd"><video controls preload="none" poster="media/standard.jpg" src="media/standard.mp4"></video>
-    <figcaption class="cap"><b>Štandardné video z fotiek inzerátu</b><span>na šírku · 47 s</span></figcaption></figure>
-  <p class="note">Ukážky z reálnych inzerátov.</p>
+  <p class="note">Prémiovú ukážku na šírku nájdete priamo v úvodnej sekcii.</p>
 </div></section>
 
 <section id="cennik" class="alt"><div class="wrap">
