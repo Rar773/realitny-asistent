@@ -855,7 +855,7 @@ const REELS_JS = `async function vyrobReels(pary,stav){
     if(p>0&&p<1){x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=18;x.fillRect(lx-4,0,8,H);x.shadowBlur=0}
     if(p<1)pill('Pred',W-60,120,'rgba(32,36,54,.78)','r');
     if(p>0)pill('Po',60,120,'#7728E6','l');
-    if(p>0){x.font='600 34px Inter,Arial,sans-serif';var tt='Virtuálne zariadené',w=x.measureText(tt).width+44;x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect((W-w)/2,H-170,w,62,31):x.rect((W-w)/2,H-170,w,62);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(tt,(W-w)/2+22,H-139)}
+    if(p>0){x.font='600 34px Inter,Arial,sans-serif';var tt='Virtuálne zariadené',w=x.measureText(tt).width+44;x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect((W-w)/2,128,w,62,31):x.rect((W-w)/2,128,w,62);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(tt,(W-w)/2+22,159)}
     var f=Math.min(1,u/0.25);if(f<1){x.fillStyle='rgba(0,0,0,'+(1-f)+')';x.fillRect(0,0,W,H)}}
   kresli(0);rec.start(250);var t0=performance.now();
   await new Promise(function(ok){function krok(){var t=(performance.now()-t0)/1000;if(t>=spolu){kresli(spolu-0.31);ok();return}kresli(Math.min(t,spolu-0.31));if(stav)stav('Nahrávam Reels… '+Math.round(t/spolu*100)+' %');requestAnimationFrame(krok)}requestAnimationFrame(krok)});
