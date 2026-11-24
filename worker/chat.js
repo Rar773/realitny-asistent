@@ -248,6 +248,7 @@ export async function chatUdrzba(env) {
   const hranica = new Date(Date.now() - DNI_UCHOVANIA * 864e5).toISOString();
   await env.DB.prepare('DELETE FROM chat WHERE cas < ?').bind(hranica).run();
   await env.DB.prepare('DELETE FROM chat_kontakty WHERE cas < ?').bind(hranica).run();
+  await env.DB.prepare('DELETE FROM lv_log WHERE cas < ?').bind(new Date(Date.now() - 2 * 864e5).toISOString()).run().catch(() => {});
 }
 
 // ---------- /admin/chaty ----------

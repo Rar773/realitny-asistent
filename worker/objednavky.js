@@ -3,6 +3,8 @@
 // Platba kartou cez Stripe sa zapne sama, keď sú nastavené STRIPE_KEY a STRIPE_WEBHOOK_SECRET.
 
 import { chatOdpoved, chatKontakt, chatSuhrn, chatUdrzba, chatAdmin } from './chat.js';
+import { citajLV } from './lv.js';
+import { zmluvaOnline, zmluvyOnlineUdrzba } from './zmluva_online.js';
 
 const WEB = 'https://realitnyasistent.eu';
 const POVOLENE = [WEB, 'https://www.realitnyasistent.eu', 'http://localhost:8765', 'http://127.0.0.1:8765'];
@@ -1194,7 +1196,7 @@ async function adminAmbAkcia(req, env, id, akcia) {
 export default {
   async scheduled(event, env) {
     try {
-      if (event.cron === '0 18 * * *') { await vecernySuhrn(env, false); await chatUdrzba(env).catch((e) => console.log('chat udrzba', e.message)); }
+      if (event.cron === '0 18 * * *') { await vecernySuhrn(env, false); await chatUdrzba(env).catch((e) => console.log('chat udrzba', e.message)); await zmluvyOnlineUdrzba(env).catch((e) => console.log('zmluvy udrzba', e.message)); }
       else if (event.cron === '0 20 * * *') await vecernySuhrn(env, true);
       else await spracujFrontu(env);
     } catch (e) { console.log('cron chyba', e.stack || e.message); }
@@ -1224,6 +1226,14 @@ export default {
       if (req.method === 'POST' && cesta === '/novy-klient') {
         if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
         return await overNovehoKlienta(req, env, origin);
+      }
+      if (req.method === 'POST' && (cesta.startsWith('/zmluva-online/') || ['/z/nacitaj', '/z/kod', '/z/potvrd'].includes(cesta))) {
+        return await zmluvaOnline(req, env, { json, origin, ipHash, hmac, emailHtml }, cesta);
+      }
+      if (req.method === 'POST' && cesta === '/lv') {
+        // len z aplikácie (posiela app.py, bez prehliadača)
+        if (origin || req.headers.get('X-Zdroj') !== 'aplikacia') return json({ ok: false }, 403, origin);
+        return await citajLV(req, env, { json, origin, ipHash });
       }
       if (req.method === 'POST' && (cesta === '/chat' || cesta === '/chat/kontakt')) {
         if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
