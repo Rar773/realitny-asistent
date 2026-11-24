@@ -21,9 +21,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261124h">
-<script src="main.js?v=20261124h" defer></script>
-<script src="objednavka.js?v=20261124h" defer></script>
+<link rel="stylesheet" href="styles.css?v=20261124j">
+<script src="main.js?v=20261124j" defer></script>
+<script src="objednavka.js?v=20261124j" defer></script>
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -87,7 +87,8 @@
         <label class="ochk"><input type="radio" name="video" value="standard" checked><span>Video Štandard – 29 €</span></label>
         <label class="ochk"><input type="radio" name="video" value="premiove"><span>Video Prémiové – 89 €</span></label>
       </div>
-      <label class="ochk"><input type="checkbox" name="novy" value="ano" id="oNovy"><span>Som nový klient – <b>prvé 3 fotky zadarmo</b></span></label>
+      <label class="ochk"><input type="checkbox" name="novy" value="ano" id="oNovy"><span>Som nový klient – <b>prvé 3 fotky zadarmo</b> <small style="color:var(--muted)">(raz na klienta, overujeme podľa e-mailu a telefónu)</small></span></label>
+      <p class="ochyba" id="oNovyInfo" hidden style="margin-top:8px"></p>
     </fieldset>
 
     <fieldset class="okrok"><legend><span id="oKrokKontakt">4</span> Kontakt</legend>

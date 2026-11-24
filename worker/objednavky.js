@@ -195,6 +195,65 @@ async function stripeOverPodpis(env, telo, hlavicka) {
   return (hlavicka.match(/v1=([0-9a-f]+)/g) || []).some((v) => rovnake(v.slice(3), hex));
 }
 
+// ---------- ochrana zľavy pre nových klientov ----------
+function normEmail(e) {
+  let [m, d] = String(e || '').trim().toLowerCase().split('@');
+  if (!m || !d) return '';
+  m = m.split('+')[0];
+  if (d === 'gmail.com' || d === 'googlemail.com') { m = m.replace(/\./g, ''); d = 'gmail.com'; }
+  return `${m}@${d}`;
+}
+function normTelefon(t) {
+  const c = String(t || '').replace(/\D/g, '');
+  return c.length >= 9 ? c.slice(-9) : '';
+}
+async function ipHash(env, req) {
+  const ip = req.headers.get('CF-Connecting-IP') || '';
+  return ip ? hmac(env, 'ip:' + ip) : '';
+}
+const bezDiakritiky = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/).filter((x) => x.length > 1).sort().join(' ');
+async function hashSuboru(x) {
+  const d = await crypto.subtle.digest('SHA-256', await x.arrayBuffer());
+  return [...new Uint8Array(d)].slice(0, 16).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+async function telefonyZInzeratu(url) {
+  try {
+    const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36' }, signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return [];
+    const t = (await r.text()).slice(0, 800000);
+    return [...new Set((t.match(/(?:\+421|00421|\b0)\s?9\d{2}[\s\/-]?\d{3}[\s\/-]?\d{3}\b/g) || []).map(normTelefon).filter(Boolean))].slice(0, 5);
+  } catch { return []; }
+}
+const POPIS_STOPY = { email: 'na tento e-mail', tel: 'na toto telefónne číslo', ip: 'z tohto pripojenia', zid: 'z tohto zariadenia', foto: 's týmito fotkami', inz_tel: 'pre makléra s týmto inzerátom', meno: 'na toto meno' };
+// stopy = [[druh, hodnota], ...] – vráti null = nový klient, inak dôvod
+async function uzBolKlientom(env, stopy) {
+  const st = stopy.filter(([, h]) => h);
+  if (!st.length) return null;
+  const polrok = new Date(Date.now() - 182 * 864e5).toISOString();
+  const podm = st.map(() => "(s.druh = ? AND s.hodnota = ? AND (s.druh != 'ip' OR s.vytvorene > ?))").join(' OR ');
+  const par = st.flatMap(([d, h]) => [d === 'inz_tel' ? 'tel' : d, h, polrok]);
+  // telefón z inzerátu porovnáme s telefónmi zákazníkov aj s telefónmi z ich inzerátov
+  const extra = st.filter(([d]) => d === 'inz_tel' || d === 'tel').map(() => "(s.druh IN ('tel','inz_tel') AND s.hodnota = ?)").join(' OR ');
+  const parExtra = st.filter(([d]) => d === 'inz_tel' || d === 'tel').map(([, h]) => h);
+  const r = await env.DB.prepare(`SELECT s.druh FROM stopy s JOIN objednavky o ON o.cislo = s.cislo
+    WHERE o.stav != 'zrusena' AND (${podm}${extra ? ' OR ' + extra : ''}) LIMIT 1`).bind(...par, ...parExtra).first();
+  return r ? (POPIS_STOPY[r.druh] || 'z vašich údajov') : null;
+}
+async function ulozStopy(env, cislo, stopy) {
+  const t = teraz();
+  const st = stopy.filter(([, h]) => h);
+  if (st.length) await env.DB.batch(st.map(([d, h]) => env.DB.prepare('INSERT INTO stopy (cislo, druh, hodnota, vytvorene) VALUES (?, ?, ?, ?)').bind(cislo, d, h, t)));
+}
+async function overNovehoKlienta(req, env, origin) {
+  let d = {};
+  try { d = await req.json(); } catch { /* prázdne */ }
+  const emailN = normEmail(d.email), telN = normTelefon(d.telefon);
+  if (!emailN) return json({ ok: true, novy: null }, 200, origin);
+  const zid = String(d.zid || '').slice(0, 80);
+  const dovod = await uzBolKlientom(env, [['email', emailN], ['tel', telN], ['ip', await ipHash(env, req)], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['meno', bezDiakritiky(d.meno)]]);
+  return json({ ok: true, novy: !dovod, sprava: dovod ? `Zľavu pre nových klientov už nemôžeme uplatniť – ${dovod} sme už objednávku prijali. Ak ste u nás ešte neobjednávali, napíšte nám na info@realitnyasistent.eu a overíme to.` : '' }, 200, origin);
+}
+
 // ---------- nová objednávka ----------
 async function novaObjednavka(req, env, origin, base) {
   let f;
@@ -225,26 +284,42 @@ async function novaObjednavka(req, env, origin, base) {
   if (sluzba === 'zariadenie' && !pocet) return json({ ok: false, chyba: 'Nahrajte fotky alebo uveďte počet fotiek z inzerátu.' }, 400, origin);
   if (!fotky.length && !inzerat) return json({ ok: false, chyba: 'Vložte odkaz na inzerát alebo nahrajte fotky.' }, 400, origin);
 
-  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy });
+  const emailN = normEmail(email), telN = normTelefon(telefon), ipH = await ipHash(env, req);
+  const zid = kratko(f.get('zid'), 80);
+  const fotoHashe = [];
+  for (const x of fotky) fotoHashe.push(await hashSuboru(x));
+  const inzTel = novy && inzerat ? await telefonyZInzeratu(inzerat) : [];
+  const stopy = [['email', emailN], ['tel', telN], ['ip', ipH], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['meno', bezDiakritiky(meno)],
+    ...fotoHashe.map((h) => ['foto', h]), ...inzTel.map((t) => ['inz_tel', t])];
+  let novyOk = false, novyDovod = null;
+  if (sluzba === 'zariadenie' && novy) {
+    if (!telN) return json({ ok: false, chyba: 'Pre zľavu pre nových klientov vyplňte telefónne číslo.' }, 400, origin);
+    if (kod) novyDovod = 'spolu s odporúčacím kódom (zľavy sa nespájajú)';
+    else novyDovod = await uzBolKlientom(env, stopy);
+    novyOk = !novyDovod;
+  }
+  const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk });
   const d = new Date();
   const o = {
     cislo: `RA-${d.toISOString().slice(2, 10).replace(/-/g, '')}-${nahodne(4).toUpperCase()}`,
     vytvorene: teraz(), zdroj, sluzba, pocet: sluzba === 'zariadenie' ? pocet : 0, styl: sluzba === 'zariadenie' ? styl : null,
-    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: sluzba === 'zariadenie' && novy ? 1 : 0,
+    s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0,
     kod, meno, email, telefon, inzerat, poznamka, cena: c.spolu, token: nahodne(24),
   };
-  const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && !o.novy && !o.kod);
+  const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && !o.kod);
   o.stav = platbaKartou ? 'caka_platbu' : 'nova';
 
-  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token).run();
+  await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0).run();
   await zapisHistoriu(env, o.cislo, `Objednávka prijatá (${zdroj})`);
+  await ulozStopy(env, o.cislo, stopy);
 
   const riadky = [
     `🆕 <b>Nová objednávka ${o.cislo}</b> (${zdroj})`, '',
     sluzba === 'zariadenie' ? `🛋 <b>${esc(popisSluzby(o))}</b>` : `🎬 <b>${esc(popisSluzby(o))}</b>`,
-    o.novy ? '🎁 Nový klient – žiada prvé 3 fotky zadarmo (over!)' : null,
+    novyOk ? '🎁 Nový klient – overený, prvé 3 fotky zadarmo' : null,
+    novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
     kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b>` : null,
     `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`, '',
     `👤 ${esc(meno)}`, `✉️ ${esc(email)}`,
@@ -278,7 +353,7 @@ async function novaObjednavka(req, env, origin, base) {
     }
   }
   if (o.stav === 'nova') await posliEmail(env, o, 'potvrdenie', base).catch((e) => console.log('email', e.message));
-  return json({ ok: true, cislo: o.cislo, cena: o.cena, stav_url: stavUrl(base, o), platba_url }, 200, origin);
+  return json({ ok: true, cislo: o.cislo, cena: o.cena, stav_url: stavUrl(base, o), platba_url, novy_zamietnuty: !!novyDovod }, 200, origin);
 }
 
 // ---------- vzhľad stránok ----------
@@ -412,7 +487,7 @@ async function adminDetail(env, base, cislo, sprava) {
   <div class="card"><h2>Objednávka</h2><dl>
     <dt>Služba</dt><dd><b>${esc(popisSluzby(o))}</b></dd>
     <dt>Cena</dt><dd><b>${eur(o.cena)}</b> · ${o.zaplatene ? '✓ zaplatené' : 'nezaplatené'}${o.platba ? ' · Stripe' : ''}</dd>
-    ${o.novy ? '<dt>Nový klient</dt><dd>🎁 žiada prvé 3 fotky zadarmo – over, či je naozaj nový</dd>' : ''}
+    ${o.novy ? '<dt>Nový klient</dt><dd>🎁 overený automaticky – prvé 3 fotky zadarmo</dd>' : ''}
     ${o.kod ? `<dt>Odporúčací kód</dt><dd>${esc(o.kod)} (−10 % vo faktúre)</dd>` : ''}
     <dt>Zákazník</dt><dd>${esc(o.meno)}</dd>
     <dt>E-mail</dt><dd><a href="mailto:${esc(o.email)}">${esc(o.email)}</a></dd>
@@ -809,6 +884,10 @@ export default {
         return await novaObjednavka(req, env, origin, base);
       }
       if (req.method === 'POST' && cesta === '/stripe') return await stripeWebhook(req, env);
+      if (req.method === 'POST' && cesta === '/novy-klient') {
+        if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
+        return await overNovehoKlienta(req, env, origin);
+      }
 
       let m;
       if (req.method === 'GET' && (m = cesta.match(/^\/f\/(.+)$/))) return await subor(env, decodeURIComponent(m[1]), url);

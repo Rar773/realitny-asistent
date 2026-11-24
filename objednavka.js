@@ -10,6 +10,11 @@
   if (!form) return;
 
   let fotky = []; // {subor, nahlad, miestnost}
+  // trvalé id prehliadača (ochrana zľavy pre nových klientov)
+  let ZID = '';
+  try { ZID = localStorage.getItem('ra_zid') || ''; if (!ZID) { ZID = crypto.randomUUID(); localStorage.setItem('ra_zid', ZID); } } catch { ZID = ''; }
+  if (!ZID) { const m = document.cookie.match(/ra_zid=([^;]+)/); ZID = m ? m[1] : (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)); }
+  document.cookie = 'ra_zid=' + ZID + '; max-age=63072000; path=/; SameSite=Lax; Secure';
 
   const cenaZar = (n) => { if (n <= 0) return 0; let c = 9 * n; if (n <= 5) c = Math.min(c, 29); return Math.min(c, 49); };
   const eur = (x) => (Number.isInteger(x) ? String(x) : x.toFixed(2).replace('.', ',')) + ' €';
@@ -95,6 +100,22 @@
   ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('nad'); }));
   ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('nad')));
   drop.addEventListener('drop', (e) => { e.preventDefault(); pridaj(e.dataTransfer.files); });
+  // overenie nároku na zľavu pre nových klientov
+  const NOVY_API = API.replace(/\/objednavka$/, '/novy-klient');
+  let overTimer;
+  async function overNovy() {
+    const info = $('oNovyInfo');
+    if (!$('oNovy').checked) { info.hidden = true; return; }
+    if (!form.telefon.value.trim()) { info.textContent = 'Pre zľavu pre nových klientov vyplňte aj telefón.'; info.hidden = false; return; }
+    if (!form.email.value.includes('@')) { info.hidden = true; return; }
+    try {
+      const r = await fetch(NOVY_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, telefon: form.telefon.value, meno: form.meno.value, zid: ZID }) }).then((x) => x.json());
+      if (r.novy === false) { $('oNovy').checked = false; info.textContent = r.sprava; info.hidden = false; prepocitaj(); }
+      else info.hidden = true;
+    } catch { info.hidden = true; }
+  }
+  ['email', 'telefon', 'meno'].forEach((n) => form[n].addEventListener('input', () => { clearTimeout(overTimer); overTimer = setTimeout(overNovy, 700); }));
+  $('oNovy').addEventListener('change', overNovy);
   form.addEventListener('change', prepocitaj);
   form.addEventListener('input', (e) => { if (e.target.id === 'oPocet') prepocitaj(); });
 
@@ -107,6 +128,7 @@
     if (!form.email.checkValidity() || !form.email.value) return chyba('Vyplňte platný e-mail.'), form.email.focus();
     if (inz && !/^https?:\/\//i.test(inz)) return chyba('Odkaz na inzerát musí začínať https://'), form.inzerat.focus();
     if (!fotky.length && !inz) return chyba('Nahrajte fotky alebo vložte odkaz na inzerát.');
+    if ($('oNovy').checked && sluzba === 'zariadenie' && !form.telefon.value.trim()) return chyba('Pre zľavu pre nových klientov vyplňte telefónne číslo.'), form.telefon.focus();
     if (!form.suhlas.checked) return chyba('Potvrďte súhlas s obchodnými podmienkami.');
 
     const btn = $('oOdoslat');
@@ -115,6 +137,7 @@
     try {
       const fd = new FormData(form);
       fd.delete('fotky');
+      fd.set('zid', ZID);
       if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet'].forEach((k) => fd.delete(k)); }
       if (fotky.length) fd.delete('pocet');
       for (const f of fotky) { fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
@@ -124,6 +147,7 @@
       if (!r.ok || !j.ok) throw new Error(j.chyba || 'Objednávku sa nepodarilo odoslať.');
       if (j.platba_url) { btn.textContent = 'Presmerúvame na platbu…'; location.href = j.platba_url; return; }
       $('oCislo').textContent = j.cislo;
+      if (j.novy_zamietnuty) $('oCislo').insertAdjacentHTML('afterend', '<br><small>Zľavu pre nových klientov sme neuplatnili – už ste u nás objednávali. Cena: ' + String(j.cena).replace('.', ',') + ' €</small>');
       if (j.stav_url) $('oStavLink').href = j.stav_url; else $('oStavLink').hidden = true;
       form.hidden = true;
       const h = $('oHotovo'); h.hidden = false; h.focus();

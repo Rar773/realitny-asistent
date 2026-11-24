@@ -100,7 +100,7 @@ v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ost
 | kúpi balík Štart, Profi alebo Premium | 1 video Prémiové + 3 mesiace asistenta | 1 video Štandard navyše (namiesto −10 %) |
 
 - Odmena sa pripíše 14 dní po platbe kolegu, ak neodstúpi od zmluvy.
-- Odmeny nikdy v peniazoch, neprenosné, aktivovať do 12 mesiacov, najviac 12 mesiacov asistenta zadarmo za rok.
+- Odmeny sú služby (videá, mesiace asistenta, fotky) – o peniazoch na webe nepíš (peňažné odmeny budú len v schválenom ambasádorskom programe), neprenosné, aktivovať do 12 mesiacov, najviac 12 mesiacov asistenta zadarmo za rok.
 - Kód nemožno použiť na vlastné objednávky; pri zneužití môžeme odmenu odobrať.
 - Položka „Odporučte kolegu“ musí ostať v hlavnom menu aj v pätičke.
 
