@@ -76,7 +76,7 @@ Riaď sa `_podklady/ZADANIE.md` a obrázkami v `_podklady/` (koncept A je hlavn�
 | Web na mieru | dohodou |
 | Správa webu | 120 € / rok (12 malých úprav), ďalšia úprava 10 €, väčšie práce 25 €/h, expres +10 € |
 | Zľava na web | 20 % pri ročnom asistentovi Všetky portály |
-| Virtuálne zariadenie fotiek | 1 fotka 5 €, celý inzerát (do 10 fotiek, jeden štýl) 19 €; Reels pred → po +10 €, k celému inzerátu (4–10 fotiek) +5 € = spolu 24 €; s videom k tej istej nehnuteľnosti −50 % na zariadenie; nový klient 1 fotka zadarmo (−5 €, raz, najviac 10 za deň spolu); dodanie do 24 h, 1 oprava v cene; asistent Všetky portály = 1 inzerát mesačne zadarmo; paušál pre kancelárie 99 €/mes = 10 inzerátov + 10 Reels, ďalší inzerát s Reels 15 € |
+| Virtuálne zariadenie fotiek | 1 fotka 5 €, celý inzerát (do 10 fotiek, jeden štýl) 19 €; Reels pred → po +10 €, k celému inzerátu (4–10 fotiek) +5 € = spolu 24 €; s videom k tej istej nehnuteľnosti −50 % na zariadenie; nový klient 1 fotka zadarmo (−5 €, raz); dodanie do 24 h, 1 oprava v cene; asistent Všetky portály = 1 inzerát mesačne zadarmo; paušál pre kancelárie 99 €/mes = 10 inzerátov + 10 Reels, ďalší inzerát s Reels 15 € |
 | Balík Štart | 790 € jednorazovo (úspora 17 %) |
 | Balík Profi | 990 € jednorazovo (úspora 21 %), obsahuje aj 3 virtuálne zariadené fotky |
 | Balík Premium | 1 390 € jednorazovo (úspora 25 %), obsahuje aj 10 virtuálne zariadených fotiek |

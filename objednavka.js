@@ -113,7 +113,7 @@
     if (!form.telefon.value.trim()) { info.textContent = 'Pre zľavu pre nových klientov vyplňte aj telefón.'; info.hidden = false; return; }
     if (!form.email.value.includes('@')) { info.hidden = true; return; }
     try {
-      const r = await fetch(NOVY_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, telefon: form.telefon.value, meno: form.meno.value, zid: ZID }) }).then((x) => x.json());
+      const r = await fetch(NOVY_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, telefon: form.telefon.value, meno: form.meno.value, zid: ZID, fp: FP }) }).then((x) => x.json());
       if (r.novy === false) { $('oNovy').checked = false; info.textContent = r.sprava; info.hidden = false; prepocitaj(); }
       else info.hidden = true;
     } catch { info.hidden = true; }
@@ -122,6 +122,47 @@
   $('oNovy').addEventListener('change', () => { if ($('oNovy').checked) $('oPredpl').checked = false; overNovy(); });
   form.addEventListener('change', prepocitaj);
   form.addEventListener('input', (e) => { if (e.target.id === 'oPocet') prepocitaj(); });
+
+
+  // odtlačok zariadenia (ochrana zliav)
+  let FP = '';
+  (async () => {
+    try {
+      const c = document.createElement('canvas'); c.width = 240; c.height = 60; const x = c.getContext('2d');
+      x.textBaseline = 'top'; x.font = '16px Arial'; x.fillStyle = '#f60'; x.fillRect(100, 1, 62, 20); x.fillStyle = '#069'; x.fillText('Realitný asistent ✓ 1.0', 2, 15); x.fillStyle = 'rgba(102,204,0,.7)'; x.fillText('Realitný asistent ✓ 1.0', 4, 17);
+      const d = [navigator.userAgent, navigator.language, (navigator.languages || []).join(','), Intl.DateTimeFormat().resolvedOptions().timeZone, screen.width + 'x' + screen.height + 'x' + screen.colorDepth, navigator.hardwareConcurrency, navigator.deviceMemory, navigator.platform, navigator.maxTouchPoints, c.toDataURL()].join('|');
+      const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(d));
+      FP = [...new Uint8Array(h)].slice(0, 16).map((b) => b.toString(16).padStart(2, '0')).join('');
+    } catch { FP = ''; }
+  })();
+  // podobnosť fotiek (dHash 8x8)
+  async function dHash(s) {
+    try {
+      const b = await createImageBitmap(s); const c = document.createElement('canvas'); c.width = 9; c.height = 8;
+      const x = c.getContext('2d'); x.drawImage(b, 0, 0, 9, 8); const d = x.getImageData(0, 0, 9, 8).data; let h = '';
+      for (let y = 0; y < 8; y++) { let n = 0; for (let i = 0; i < 8; i++) { const p = (y * 9 + i) * 4, q = p + 4; const a = d[p] * 0.3 + d[p + 1] * 0.59 + d[p + 2] * 0.11, z = d[q] * 0.3 + d[q + 1] * 0.59 + d[q + 2] * 0.11; n = (n << 1) | (a > z ? 1 : 0); } h += n.toString(16).padStart(2, '0'); }
+      return h;
+    } catch { return ''; }
+  }
+  // „nie som robot“ – len pri objednávkach zadarmo
+  const TS_KLUC = '0x4AAAAAAGQzRVHjw4Z2OR71';
+  let tsToken = '', tsId = null, tsNac = null;
+  const zadarmo = () => val('sluzba') === 'zariadenie' && ($('oNovy').checked || $('oPredpl').checked);
+  function nacitajTs() {
+    if (!tsNac) tsNac = new Promise((ok, zle) => { const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = ok; sc.onerror = zle; document.head.appendChild(sc); });
+    return tsNac;
+  }
+  async function robot() {
+    const box = $('oTs');
+    if (!zadarmo()) { box.hidden = true; return; }
+    box.hidden = false;
+    if (tsId !== null) return;
+    tsId = -1;
+    try { await nacitajTs(); tsId = window.turnstile.render(box, { sitekey: TS_KLUC, language: 'sk', callback: (t) => { tsToken = t; chyba(''); }, 'expired-callback': () => { tsToken = ''; }, 'error-callback': () => { tsToken = ''; } }); }
+    catch { box.textContent = 'Overenie sa nepodarilo načítať. Obnovte stránku.'; tsId = null; }
+  }
+  function resetRobot() { tsToken = ''; try { if (tsId !== null && tsId !== -1 && window.turnstile) window.turnstile.reset(tsId); } catch { /* nič */ } }
+  form.addEventListener('change', robot);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -135,6 +176,7 @@
     if ($('oNovy').checked && sluzba === 'zariadenie' && !form.telefon.value.trim()) return chyba('Pre zľavu pre nových klientov vyplňte telefónne číslo.'), form.telefon.focus();
     if (form.kod.value.trim() && $('oNovy').checked) { $('oNovy').checked = false; prepocitaj(); }
     if (!form.suhlas.checked) return chyba('Potvrďte súhlas s obchodnými podmienkami.');
+    if (zadarmo() && !tsToken) { robot(); return chyba('Potvrďte, prosím, že nie ste robot (políčko nad tlačidlom).'); }
 
     const btn = $('oOdoslat');
     btn.disabled = true;
@@ -143,12 +185,15 @@
       const fd = new FormData(form);
       fd.delete('fotky');
       fd.set('zid', ZID);
+      if (FP) fd.set('fp', FP);
+      if (zadarmo()) fd.set('ts', tsToken);
       if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet', 'reels', 'predplatne'].forEach((k) => fd.delete(k)); }
       if (fotky.length) fd.delete('pocet');
-      for (const f of fotky) { fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
+      for (const f of fotky) { const ph = await dHash(f.subor); if (ph) fd.append('ph', ph); fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
       btn.textContent = 'Odosielame…';
       const r = await fetch(API, { method: 'POST', body: fd });
       const j = await r.json().catch(() => ({}));
+      resetRobot();
       if (!r.ok || !j.ok) throw new Error(j.chyba || 'Objednávku sa nepodarilo odoslať.');
       if (j.platba_url) { btn.textContent = 'Presmerúvame na platbu…'; location.href = j.platba_url; return; }
       $('oCislo').textContent = j.cislo;

@@ -232,14 +232,52 @@ async function telefonyZInzeratu(url) {
     return [...new Set((t.match(/(?:\+421|00421|\b0)\s?9\d{2}[\s\/-]?\d{3}[\s\/-]?\d{3}\b/g) || []).map(normTelefon).filter(Boolean))].slice(0, 5);
   } catch { return []; }
 }
-const POPIS_STOPY = { email: 'na tento e-mail', tel: 'na toto telefónne číslo', ip: 'z tohto pripojenia', zid: 'z tohto zariadenia', foto: 's týmito fotkami', inz_tel: 'pre makléra s týmto inzerátom', meno: 'na toto meno' };
+const POPIS_STOPY = { email: 'na tento e-mail', tel: 'na toto telefónne číslo', ip: 'z tohto pripojenia', ipnet: 'zo siete toho istého pripojenia', zid: 'z tohto zariadenia', fp: 'z tohto zariadenia (odtlačok)', foto: 's týmito fotkami', phash: 's podobnými fotkami', inz: 'k tomuto inzerátu', inz_tel: 'pre makléra s týmto inzerátom', meno: 'na toto meno' };
+const ZAMIETNUTE = 'Zľavu pre nových klientov už nemôžeme uplatniť – podľa našich záznamov ste u nás už objednávali. Ak ide o omyl, napíšte nám na info@realitnyasistent.eu.';
+// jednorazové e-mailové schránky
+const JEDNORAZOVE = new Set(['mailinator.com','10minutemail.com','10minutemail.net','guerrillamail.com','guerrillamail.net','guerrillamail.org','sharklasers.com','grr.la','yopmail.com','yopmail.fr','yopmail.net','temp-mail.org','tempmail.com','tempmail.net','temp-mail.io','tempmailo.com','tempr.email','tmpmail.org','tmpmail.net','dispostable.com','trashmail.com','trashmail.de','getnada.com','nada.email','maildrop.cc','mailnesia.com','mintemail.com','throwawaymail.com','fakeinbox.com','emailondeck.com','mohmal.com','moakt.com','emailfake.com','fakemail.net','burnermail.io','mail.tm','mail.gw','inboxkitten.com','spamgourmet.com','mytemp.email','tempinbox.com','discard.email','33mail.com','anonaddy.me','simplelogin.com','duck.com','harakirimail.com','mailcatch.com','spambox.us','tempail.com','minuteinbox.com','emailtemporanea.net','1secmail.com','1secmail.net','1secmail.org','byom.de','wegwerfmail.de','einrot.com','trash-mail.com']);
+async function emailPodozrivy(email) {
+  const d = String(email || '').split('@')[1]?.toLowerCase().trim();
+  if (!d) return 'bez domény';
+  if (JEDNORAZOVE.has(d) || /(^|\.)(temp|trash|throwaway|disposable|fake|spam|wegwerf)[a-z0-9-]*\./.test(d)) return 'jednorazový e-mail';
+  try {
+    const r = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(d)}&type=MX`, { headers: { accept: 'application/dns-json' }, signal: AbortSignal.timeout(3000) }).then((x) => x.json());
+    if (!r.Answer || !r.Answer.length) return 'e-mailová doména neprijíma poštu';
+  } catch { /* DNS nedostupné – nerozhodujeme */ }
+  return null;
+}
+// poloha a typ pripojenia (Cloudflare) – VPN a serverové siete
+const SERVER_SIETE = /hosting|host|server|cloud|vpn|proxy|datacenter|data center|colo|m247|ovh|digitalocean|amazon|aws|google llc|microsoft|azure|hetzner|leaseweb|choopa|vultr|linode|akamai|contabo|datacamp|cdn77|proton|nord|express|surfshark|mullvad|private internet|ipvanish|cyberghost|hide\.me|windscribe|tor |scaleway|ionos|oracle|alibaba|tencent|g-core|gcore|zenlayer|psychz|quadranet|hostinger|hostwinds|ramnode|kamatera|upcloud|netcup|webglobe|forpsi|wedos|websupport/i;
+function polohaZ(req) {
+  const c = req.cf || {};
+  const isp = String(c.asOrganization || '');
+  return { krajina: c.country || '', mesto: c.city || '', isp, server: SERVER_SIETE.test(isp) };
+}
+const textPolohy = (p) => [p.mesto, p.krajina].filter(Boolean).join(', ') + (p.isp ? ` · ${p.isp}` : '') + (p.server ? ' ⚠️ VPN/server' : '');
+async function ipSiet(env, req) {
+  const ip = req.headers.get('CF-Connecting-IP') || '';
+  if (!ip) return '';
+  const pre = ip.includes(':') ? ip.split(':').slice(0, 3).join(':') : ip.split('.').slice(0, 3).join('.');
+  return hmac(env, 'net:' + pre);
+}
+function normInzerat(u) {
+  try { const x = new URL(u); return (x.hostname.replace(/^www\./, '') + x.pathname.replace(/\/+$/, '')).toLowerCase(); } catch { return ''; }
+}
+async function overTurnstile(env, token, req) {
+  if (!env.TURNSTILE_SECRET) return 'nenastavene';
+  if (!token) return false;
+  const fd = new FormData();
+  fd.append('secret', env.TURNSTILE_SECRET); fd.append('response', String(token).slice(0, 2048));
+  const ip = req.headers.get('CF-Connecting-IP'); if (ip) fd.append('remoteip', ip);
+  try { const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: fd }).then((x) => x.json()); return !!r.success; } catch { return false; }
+}
 // stopy = [[druh, hodnota], ...] – vráti null = nový klient, inak dôvod
 async function uzBolKlientom(env, stopy) {
   const st = stopy.filter(([, h]) => h);
   if (!st.length) return null;
-  const polrok = new Date(Date.now() - 182 * 864e5).toISOString();
-  const podm = st.map(() => "(s.druh = ? AND s.hodnota = ? AND (s.druh != 'ip' OR s.vytvorene > ?))").join(' OR ');
-  const par = st.flatMap(([d, h]) => [d === 'inz_tel' ? 'tel' : d, h, polrok]);
+  const polrok = new Date(Date.now() - 182 * 864e5).toISOString(), tyzden = new Date(Date.now() - 7 * 864e5).toISOString();
+  const podm = st.map(() => '(s.druh = ? AND s.hodnota = ? AND s.vytvorene > ?)').join(' OR ');
+  const par = st.flatMap(([d, h]) => [d === 'inz_tel' ? 'tel' : d, h, d === 'ip' ? polrok : d === 'ipnet' ? tyzden : '0']);
   // telefón z inzerátu porovnáme s telefónmi zákazníkov aj s telefónmi z ich inzerátov
   const extra = st.filter(([d]) => d === 'inz_tel' || d === 'tel').map(() => "(s.druh IN ('tel','inz_tel') AND s.hodnota = ?)").join(' OR ');
   const parExtra = st.filter(([d]) => d === 'inz_tel' || d === 'tel').map(([, h]) => h);
@@ -258,8 +296,10 @@ async function overNovehoKlienta(req, env, origin) {
   const emailN = normEmail(d.email), telN = normTelefon(d.telefon);
   if (!emailN) return json({ ok: true, novy: null }, 200, origin);
   const zid = String(d.zid || '').slice(0, 80);
-  const dovod = await uzBolKlientom(env, [['email', emailN], ['tel', telN], ['ip', await ipHash(env, req)], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['meno', bezDiakritiky(d.meno)]]);
-  return json({ ok: true, novy: !dovod, sprava: dovod ? `Zľavu pre nových klientov už nemôžeme uplatniť – ${dovod} sme už objednávku prijali. Ak ste u nás ešte neobjednávali, napíšte nám na info@realitnyasistent.eu a overíme to.` : '' }, 200, origin);
+  const fp = String(d.fp || '').slice(0, 80);
+  const dovod = await uzBolKlientom(env, [['email', emailN], ['tel', telN], ['ip', await ipHash(env, req)], ['ipnet', await ipSiet(env, req)], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['fp', fp ? await hmac(env, 'fp:' + fp) : ''], ['meno', bezDiakritiky(d.meno)]])
+    || await emailPodozrivy(emailN) || (polohaZ(req).server ? 'vpn' : null);
+  return json({ ok: true, novy: !dovod, sprava: dovod ? ZAMIETNUTE : '' }, 200, origin);
 }
 
 // ---------- nová objednávka ----------
@@ -297,14 +337,24 @@ async function novaObjednavka(req, env, origin, base) {
   const fotoHashe = [];
   for (const x of fotky) fotoHashe.push(await hashSuboru(x));
   const inzTel = novy && inzerat ? await telefonyZInzeratu(inzerat) : [];
-  const stopy = [['email', emailN], ['tel', telN], ['ip', ipH], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['meno', bezDiakritiky(meno)],
-    ...fotoHashe.map((h) => ['foto', h]), ...inzTel.map((t) => ['inz_tel', t])];
+  const fpK = kratko(f.get('fp'), 80), inzN = normInzerat(inzerat);
+  const pHashe = f.getAll('ph').map((x) => String(x).toLowerCase()).filter((x) => /^[0-9a-f]{16}$/.test(x) && x !== '0000000000000000' && x !== 'ffffffffffffffff').slice(0, 10);
+  const stopy = [['email', emailN], ['tel', telN], ['ip', ipH], ['ipnet', await ipSiet(env, req)], ['zid', zid ? await hmac(env, 'z:' + zid) : ''], ['fp', fpK ? await hmac(env, 'fp:' + fpK) : ''], ['meno', bezDiakritiky(meno)],
+    ['inz', inzN ? await hmac(env, 'inz:' + inzN) : ''], ...fotoHashe.map((h) => ['foto', h]), ...pHashe.map((h) => ['phash', h]), ...inzTel.map((t) => ['inz_tel', t])];
+  const poloha = polohaZ(req);
+  // objednávky zadarmo len s potvrdením „nie som robot“
+  let robot = null;
+  if (sluzba === 'zariadenie' && (novy || predplatne)) {
+    robot = await overTurnstile(env, f.get('ts'), req);
+    if (robot === false) return json({ ok: false, chyba: 'Potvrďte, prosím, že nie ste robot (políčko nad tlačidlom Odoslať).' }, 400, origin);
+  }
   let predplOk = false, predplDovod = null;
   if (sluzba === 'zariadenie' && predplatne) {
     const zaciatok = new Date(); zaciatok.setUTCDate(1); zaciatok.setUTCHours(0, 0, 0, 0);
     const uz = await env.DB.prepare("SELECT COUNT(*) n FROM objednavky WHERE predplatne = 1 AND stav != 'zrusena' AND vytvorene >= ? AND (email_n = ? OR (telefon_n != '' AND telefon_n = ?))")
       .bind(zaciatok.toISOString(), emailN, telN || '-').first();
     if (uz && uz.n > 0) predplDovod = 'tento mesiac už bol inzerát z predplatného využitý';
+    else if (poloha.server) predplDovod = 'pripojenie cez VPN/server';
     else predplOk = true;
   }
   let novyOk = false, novyDovod = null;
@@ -312,6 +362,8 @@ async function novaObjednavka(req, env, origin, base) {
     if (!telN) return json({ ok: false, chyba: 'Pre zľavu pre nových klientov vyplňte telefónne číslo.' }, 400, origin);
     if (kod) novyDovod = 'spolu s odporúčacím kódom (zľavy sa nespájajú)';
     else novyDovod = await uzBolKlientom(env, stopy);
+    if (!novyDovod) novyDovod = await emailPodozrivy(emailN);
+    if (!novyDovod && poloha.server) novyDovod = 'pripojenie cez VPN/server';
     if (!novyDovod) {
       // strop proti hromadnému zneužitiu (veľa e-mailov / telefónov): najviac 10 skúšobných fotiek za deň spolu
       const dnes = await env.DB.prepare('SELECT COUNT(*) n FROM objednavky WHERE novy_ok = 1 AND vytvorene > ?').bind(new Date(Date.now() - 864e5).toISOString()).first();
@@ -345,6 +397,7 @@ async function novaObjednavka(req, env, origin, base) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0, o.reels, o.predplatne).run();
   await zapisHistoriu(env, o.cislo, `Objednávka prijatá (${zdroj})`);
+  await zapisHistoriu(env, o.cislo, `Pripojenie: ${textPolohy(poloha) || 'neznáme'}`);
   await ulozStopy(env, o.cislo, stopy);
   if (ambKod) await zapisProviziu(env, ambKod, o);
 
@@ -354,9 +407,11 @@ async function novaObjednavka(req, env, origin, base) {
     predplOk ? '⭐ <b>Inzerát z predplatného Všetky portály</b> – zariadenie zadarmo. OVER, či má predplatné!' : null,
     predplDovod ? `🚫 Žiadal inzerát z predplatného – zamietnutý (${predplDovod})` : null,
     novyOk ? '🎁 Nový klient – overený, 1 fotka zadarmo' : null,
-    novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') || novyDovod.startsWith('denný') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
+    novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${/^(spolu|denný|jednorazový|e-mailová|pripojenie|bez)/.test(novyDovod) ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
     ambKod ? `🤝 Ambasádor: <b>${esc(ambKod)}</b>${ambZlava ? ` (klient −${Math.round(pctZlava(amb) * 100)} %)` : ''}` : (kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b> (−10 % vo faktúre)` : null),
-    `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`, '',
+    `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`,
+    `📍 ${esc(textPolohy(poloha)) || 'poloha neznáma'}`,
+    robot === 'nenastavene' ? '⚠️ „Nie som robot“ ešte nie je zapnuté (chýba TURNSTILE_SECRET)' : null, '',
     `👤 ${esc(meno)}`, `✉️ ${esc(email)}`,
     telefon ? `📞 ${esc(telefon)}` : null,
     inzerat ? `🔗 ${esc(inzerat)}` : null,

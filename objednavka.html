@@ -21,9 +21,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261124t">
-<script src="main.js?v=20261124t" defer></script>
-<script src="objednavka.js?v=20261124t" defer></script>
+<link rel="stylesheet" href="styles.css?v=20261124u">
+<script src="main.js?v=20261124u" defer></script>
+<script src="objednavka.js?v=20261124u" defer></script>
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -88,8 +88,8 @@
         <label class="ochk"><input type="radio" name="video" value="standard" checked><span>Video Štandard – 29 €</span></label>
         <label class="ochk"><input type="radio" name="video" value="premiove"><span>Video Prémiové – 89 €</span></label>
       </div>
-      <label class="ochk"><input type="checkbox" name="predplatne" value="ano" id="oPredpl"><span>Mám Realitného asistenta <b>Všetky portály</b> – uplatňujem <b>inzerát zadarmo</b> na tento mesiac <small style="color:var(--muted)">(1× mesačne, overujeme)</small></span></label>
-      <label class="ochk"><input type="checkbox" name="novy" value="ano" id="oNovy"><span>Som nový klient – <b>1 fotka zadarmo na vyskúšanie</b> <small style="color:var(--muted)">(raz na klienta, overujeme podľa e-mailu a telefónu)</small></span></label>
+      <label class="ochk"><input type="checkbox" name="predplatne" value="ano" id="oPredpl"><span>Mám Realitného asistenta <b>Všetky portály</b> – uplatňujem <b>inzerát zadarmo</b> na tento mesiac <small style="color:var(--muted)">(1× mesačne)</small></span></label>
+      <label class="ochk"><input type="checkbox" name="novy" value="ano" id="oNovy"><span>Som nový klient – <b>1 fotka zadarmo na vyskúšanie</b> <small style="color:var(--muted)">(raz na klienta)</small></span></label>
       <p class="ochyba" id="oNovyInfo" hidden style="margin-top:8px"></p>
     </fieldset>
 
@@ -111,6 +111,7 @@
     <div class="osum-r" id="oSuhrn"></div>
     <div class="osum-t"><span>Spolu</span><b id="oCena">0 €</b></div>
     <p class="osum-p">Ceny sú konečné, nie sme platcami DPH. Faktúru pošleme e-mailom, platíte až po potvrdení objednávky. Zľavu za odporúčací kód uplatníme vo faktúre.</p>
+    <div id="oTs" hidden style="margin:4px 0 12px;min-height:65px"></div>
     <button class="btn obtn" type="submit" id="oOdoslat">Odoslať objednávku</button>
     <p class="ochyba" id="oChyba" role="alert" hidden></p>
   </aside>
@@ -145,5 +146,6 @@
   </div>
   <div class="fbot"><span>© 2026 Marian Márton · Všetky práva vyhradené. Kopírovanie obsahu bez súhlasu je zakázané (<a href="podmienky.html#dusevne">viac</a>).</span><span>Ceny sú konečné – nie sme platcami DPH.</span></div>
 </div></footer>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "353fe732265c45b597ddd3a05a173ef3"}'></script>
 </body>
 </html>
