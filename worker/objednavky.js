@@ -309,7 +309,7 @@ async function novaObjednavka(req, env, origin, base) {
     ambKod = await ambasadorKlienta(env, emailN, telN);
   }
   const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk });
-  if (ambZlava) c.spolu = Math.round(c.spolu * (1 - AMB.zlava) * 100) / 100;
+  if (ambZlava) c.spolu = Math.round(c.spolu * (1 - pctZlava(amb)) * 100) / 100;
   const d = new Date();
   const o = {
     cislo: `RA-${d.toISOString().slice(2, 10).replace(/-/g, '')}-${nahodne(4).toUpperCase()}`,
@@ -332,7 +332,7 @@ async function novaObjednavka(req, env, origin, base) {
     sluzba === 'zariadenie' ? `🛋 <b>${esc(popisSluzby(o))}</b>` : `🎬 <b>${esc(popisSluzby(o))}</b>`,
     novyOk ? '🎁 Nový klient – overený, prvé 3 fotky zadarmo' : null,
     novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
-    ambKod ? `🤝 Ambasádor: <b>${esc(ambKod)}</b>${ambZlava ? ' (klient −10 %)' : ''}` : (kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b> (−10 % vo faktúre)` : null),
+    ambKod ? `🤝 Ambasádor: <b>${esc(ambKod)}</b>${ambZlava ? ` (klient −${Math.round(pctZlava(amb) * 100)} %)` : ''}` : (kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b> (−10 % vo faktúre)` : null),
     `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`, '',
     `👤 ${esc(meno)}`, `✉️ ${esc(email)}`,
     telefon ? `📞 ${esc(telefon)}` : null,
@@ -878,7 +878,9 @@ async function vystupAkcia(env, id, akcia, req) {
 }
 
 // ================= AMBASÁDORSKÝ PROGRAM =================
-const AMB = { provizia: 0.20, zlava: 0.10, dni: 365, minVyplata: 50, lehota: 14 };
+const AMB = { provizia: 0.15, zlava: 0.10, dni: 365, minVyplata: 50, lehota: 14, bonusKlientov: 50 };
+const pctProv = (a) => (a && a.provizia_pct != null ? a.provizia_pct / 100 : AMB.provizia);
+const pctZlava = (a) => (a && a.zlava_pct != null ? a.zlava_pct / 100 : AMB.zlava);
 const jeAmbKod = (k) => /^AMB-[A-Z0-9]{3,20}$/.test(String(k || '').toUpperCase());
 
 async function ambasadorPodlaKodu(env, kod) {
@@ -896,12 +898,27 @@ async function zapisProviziu(env, kod, o) {
   if (!kod || !(o.cena > 0)) return;
   const uz = await env.DB.prepare('SELECT 1 FROM provizie WHERE cislo = ?').bind(o.cislo).first();
   if (uz) return;
+  const am = await env.DB.prepare('SELECT provizia_pct FROM ambasadori WHERE kod = ?').bind(kod).first();
   await env.DB.prepare('INSERT INTO provizie (kod, cislo, suma, provizia, stav, vytvorene) VALUES (?, ?, ?, ?, ?, ?)')
-    .bind(kod, o.cislo, o.cena, Math.round(o.cena * AMB.provizia * 100) / 100, 'caka', teraz()).run();
+    .bind(kod, o.cislo, o.cena, Math.round(o.cena * pctProv(am) * 100) / 100, 'caka', teraz()).run();
 }
 async function potvrdProviziu(env, cislo) {
   const splatne = new Date(Date.now() + AMB.lehota * 864e5).toISOString();
   await env.DB.prepare("UPDATE provizie SET stav = 'potvrdena', splatne = ? WHERE cislo = ? AND stav = 'caka'").bind(splatne, cislo).run();
+  const p = await env.DB.prepare('SELECT kod FROM provizie WHERE cislo = ?').bind(cislo).first();
+  if (!p) return;
+  const a = await env.DB.prepare('SELECT id, meno, bonus FROM ambasadori WHERE kod = ?').bind(p.kod).first();
+  const n = await pocetKlientov(env, p.kod);
+  if (a && !a.bonus && n >= AMB.bonusKlientov) {
+    await env.DB.prepare('UPDATE ambasadori SET bonus = ? WHERE id = ?').bind(teraz(), a.id).run();
+    await tgSprava(env, `🏆 <b>${esc(a.meno)}</b> (${p.kod}) priviedol ${n} platiacich klientov!\nNárok na bonus: web s ponukou nehnuteľností + 12 mesiacov asistenta Všetky portály zadarmo.`,
+      [[{ text: '👀 Otvoriť ambasádora', url: `${BASE_URL}/admin/ambasadori/${a.id}?s=${await hmac(env, 'amb:' + a.id)}` }]]).catch(() => {});
+  }
+}
+async function pocetKlientov(env, kod) {
+  const r = await env.DB.prepare(`SELECT COUNT(DISTINCT COALESCE(NULLIF(o.email_n,''), o.cislo)) n FROM provizie p JOIN objednavky o ON o.cislo = p.cislo
+    WHERE p.kod = ? AND p.stav IN ('potvrdena','vyplatena')`).bind(kod).first();
+  return r ? r.n : 0;
 }
 
 // --- registrácia ---
@@ -952,7 +969,7 @@ async function adminAmbasadori(env) {
     <td class="hm">${esc(a.siet || '')}</td><td>${esc(a.kod || '–')}</td><td>${a.n || 0} obj.<div class="mut" style="font-size:12.5px">k výplate ${eur(a.k_vyplate)}</div></td>
     <td><span class="pill" style="background:${(pill[a.stav] || ['', '#667085'])[1]}">${(pill[a.stav] || [a.stav])[0]}</span></td></tr>`).join('');
   return stranka('Ambasádori', `<p><a href="/admin">← Objednávky</a></p><h1>Ambasádori</h1>
-    <p class="mut">Provízia ${AMB.provizia * 100} % z objednávok klientov počas ${AMB.dni / 30 | 0} mesiacov · klient −${AMB.zlava * 100} % · výplata po ${AMB.lehota} dňoch, min. ${AMB.minVyplata} €. Peniaze posielaš ty – systém len počíta.</p>
+    <p class="mut">Štandard: provízia ${AMB.provizia * 100} % počas ${AMB.dni / 30 | 0} mesiacov · klient −${AMB.zlava * 100} % · výplata po ${AMB.lehota} dňoch, min. ${AMB.minVyplata} € · bonus za ${AMB.bonusKlientov} klientov: web s ponukou + rok asistenta. Peniaze posielaš ty – systém len počíta.</p>
     <div class="card" style="padding:6px 10px"><table><thead><tr><th>Meno</th><th class="hm">Sieť maklérov</th><th>Kód</th><th>Provízie</th><th>Stav</th></tr></thead>
     <tbody>${riadky || '<tr><td colspan="5" class="mut" style="padding:20px">Zatiaľ žiadne prihlášky.</td></tr>'}</tbody></table></div>`, true);
 }
@@ -963,7 +980,7 @@ async function adminAmbasador(env, id, sprava) {
   const sum = (s) => prov.filter((p) => p.stav === s).reduce((x, p) => x + p.provizia, 0);
   const odkaz = a.kod ? `${WEB}/?amb=${a.kod}` : '';
   const telo = a.stav === 'schvaleny'
-    ? `Dobrý deň${a.meno ? ', ' + a.meno.split(' ')[0] : ''},\n\nvítame vás medzi ambasádormi Realitného asistenta.\n\nVáš kód: ${a.kod}\nVáš odkaz: ${odkaz}\n\nKolegovia, ktorí objednajú cez váš odkaz alebo s vaším kódom, majú zľavu ${AMB.zlava * 100} % na prvú objednávku. Vy dostanete ${AMB.provizia * 100} % z každej ich zaplatenej objednávky počas ${AMB.dni / 30 | 0} mesiacov. Prehľad a výplatu vám posielame raz mesačne.\n\nS pozdravom\nRealitný asistent\ninfo@realitnyasistent.eu`
+    ? `Dobrý deň${a.meno ? ', ' + a.meno.split(' ')[0] : ''},\n\nvítame vás medzi ambasádormi Realitného asistenta.\n\nVáš kód: ${a.kod}\nVáš odkaz: ${odkaz}\n\nKolegovia, ktorí objednajú cez váš odkaz alebo s vaším kódom, majú zľavu ${Math.round(pctZlava(a) * 100)} % na prvú objednávku. Vy dostanete ${Math.round(pctProv(a) * 100)} % z každej ich zaplatenej objednávky počas ${AMB.dni / 30 | 0} mesiacov. Keď k nám privediete ${AMB.bonusKlientov} platiacich klientov, dostanete navyše web s ponukou nehnuteľností a rok Realitného asistenta zadarmo. Prehľad a výplatu vám posielame raz mesačne.\n\nS pozdravom\nRealitný asistent\ninfo@realitnyasistent.eu`
     : `Dobrý deň${a.meno ? ', ' + a.meno.split(' ')[0] : ''},\n\nďakujeme za prihlášku do ambasádorského programu. Momentálne ju nemôžeme prijať. Ak sa niečo zmení, radi sa vám ozveme.\n\nS pozdravom\nRealitný asistent`;
   const mailto = `mailto:${encodeURIComponent(a.email)}?subject=${encodeURIComponent('Ambasádorský program Realitného asistenta')}&body=${encodeURIComponent(telo)}`;
   const r = (t, v, link) => v ? `<dt>${t}</dt><dd>${link ? `<a href="${esc(/^https?:/.test(v) ? v : 'https://' + v)}" target="_blank" rel="noopener">${esc(v)}</a>` : esc(v)}</dd>` : '';
@@ -980,6 +997,13 @@ async function adminAmbasador(env, id, sprava) {
       <h3 style="margin:14px 0 4px;font-size:15px">Ako by nás odporúčal</h3><p style="white-space:pre-wrap;margin:0">${esc(a.ako)}</p>
       ${a.skusenosti ? `<h3 style="margin:14px 0 4px;font-size:15px">Skúsenosti, poznámka</h3><p style="white-space:pre-wrap;margin:0">${esc(a.skusenosti)}</p>` : ''}
       <dl style="margin-top:12px"><dt>Kontakt</dt><dd><a href="mailto:${esc(a.email)}">${esc(a.email)}</a> · <a href="tel:${esc(a.telefon)}">${esc(a.telefon)}</a></dd></dl></div>
+    <div class="card"><h2>Podmienky ambasádora</h2>
+      <p style="margin-top:0">Klientov s províziou: <b>${a.kod ? await pocetKlientov(env, a.kod) : 0} / ${AMB.bonusKlientov}</b>${a.bonus ? ' · 🏆 bonus splnený ' + cas(a.bonus).split(' ')[0] : ''}</p>
+      <form method="post" action="/admin/ambasadori/${a.id}/podmienky" class="row">
+        <label>Provízia % <input type="text" name="provizia_pct" value="${a.provizia_pct ?? ''}" placeholder="${AMB.provizia * 100}" style="width:80px"></label>
+        <label>Zľava klienta % <input type="text" name="zlava_pct" value="${a.zlava_pct ?? ''}" placeholder="${AMB.zlava * 100}" style="width:80px"></label>
+        <button class="btn sec sm">Uložiť individuálne podmienky</button></form>
+      <p class="mut" style="font-size:13px;margin-bottom:0">Prázdne = štandard (${AMB.provizia * 100} % / ${AMB.zlava * 100} %). Zmena platí pre nové objednávky.</p></div>
     ${a.kod ? `<div class="card"><h2>Provízie</h2><p>Čaká na platbu klienta: <b>${eur(sum('caka'))}</b> · Potvrdené: <b>${eur(sum('potvrdena'))}</b> · Vyplatené: <b>${eur(sum('vyplatena'))}</b></p>
       <table><thead><tr><th>Objednávka</th><th>Suma</th><th>Provízia</th><th>Stav</th></tr></thead><tbody>${prov.map((p) => `<tr><td><a href="/admin/o/${p.cislo}">${p.cislo}</a><div class="mut" style="font-size:12.5px">${cas(p.vytvorene)}</div></td><td>${eur(p.suma)}</td><td>${eur(p.provizia)}</td><td>${esc(p.stav)}${p.splatne && p.stav === 'potvrdena' ? '<div class="mut" style="font-size:12.5px">od ' + cas(p.splatne).split(' ')[0] + '</div>' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="mut">Zatiaľ nič.</td></tr>'}</tbody></table>
       ${sum('potvrdena') >= AMB.minVyplata ? `<form method="post" action="/admin/ambasadori/${a.id}/vyplatene" style="margin-top:12px"><button class="btn sec sm">💶 Označiť potvrdené provízie ako vyplatené (${eur(sum('potvrdena'))})</button></form>` : `<p class="mut" style="font-size:13px">Výplata od ${AMB.minVyplata} € potvrdených provízií.</p>`}</div>` : ''}
@@ -1004,6 +1028,10 @@ async function adminAmbAkcia(req, env, id, akcia) {
   } else if (akcia === 'poznamka') {
     await env.DB.prepare('UPDATE ambasadori SET interna = ? WHERE id = ?').bind(kratko(f.get('interna'), 4000), id).run();
     m = 'Poznámka uložená.';
+  } else if (akcia === 'podmienky') {
+    const cislo = (v) => { const x = parseFloat(String(v || '').replace(',', '.')); return Number.isFinite(x) && x >= 0 && x <= 60 ? x : null; };
+    await env.DB.prepare('UPDATE ambasadori SET provizia_pct = ?, zlava_pct = ? WHERE id = ?').bind(cislo(f.get('provizia_pct')), cislo(f.get('zlava_pct')), id).run();
+    m = 'Individuálne podmienky uložené.';
   } else if (akcia === 'vyplatene') {
     await env.DB.prepare("UPDATE provizie SET stav = 'vyplatena' WHERE kod = ? AND stav = 'potvrdena'").bind(a.kod).run();
     m = 'Provízie označené ako vyplatené.';
@@ -1074,7 +1102,7 @@ export default {
         if (req.method === 'GET' && cesta === '/admin/ambasadori') return html(await adminAmbasadori(env));
         let am;
         if (req.method === 'GET' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)$/))) return await adminAmbasador(env, +am[1], url.searchParams.get('m'));
-        if (req.method === 'POST' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)\/(stav|poznamka|vyplatene)$/))) return await adminAmbAkcia(req, env, +am[1], am[2]);
+        if (req.method === 'POST' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)\/(stav|poznamka|vyplatene|podmienky)$/))) return await adminAmbAkcia(req, env, +am[1], am[2]);
         let v;
         if (req.method === 'GET' && (v = cesta.match(/^\/admin\/v\/(\d+)$/))) {
           const r = await env.DB.prepare('SELECT b64 FROM vystupy WHERE id = ?').bind(+v[1]).first();

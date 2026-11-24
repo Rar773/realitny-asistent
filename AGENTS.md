@@ -95,6 +95,7 @@ v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ost
 |---|---|---|
 | objedná prvé video | 1 video Štandard zadarmo | −10 % |
 | kúpi balík videí | 1 video Prémiové zadarmo | −10 % |
+| objedná virtuálne zariadenie fotiek | 3 fotky virtuálne zariadené zadarmo | −10 % |
 | predplatí asistenta mesačne | 1 mesiac asistenta zadarmo | −10 % na 1. mesiac |
 | predplatí asistenta na rok | 3 mesiace asistenta zadarmo | −10 % na ročnú platbu |
 | kúpi balík Štart, Profi alebo Premium | 1 video Prémiové + 3 mesiace asistenta | 1 video Štandard navyše (namiesto −10 %) |
@@ -103,6 +104,13 @@ v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ost
 - Odmeny sú služby (videá, mesiace asistenta, fotky) – o peniazoch na webe nepíš (peňažné odmeny budú len v schválenom ambasádorskom programe), neprenosné, aktivovať do 12 mesiacov, najviac 12 mesiacov asistenta zadarmo za rok.
 - Kód nemožno použiť na vlastné objednávky; pri zneužití môžeme odmenu odobrať.
 - Položka „Odporučte kolegu“ musí ostať v hlavnom menu aj v pätičke.
+
+## 5b. Ambasádorský program – platné pravidlá (nemeniť bez súhlasu Mariana)
+
+- Stránka `ambasador.html`, podmienky `podmienky.html#ambasador` (časť 8a). Prihlášky spracúva server `worker/objednavky.js` (`/ambasador`), schvaľuje Marian.
+- Štandard: ambasádor **15 %** z ceny zaplatenej klientom, počas **12 mesiacov** od prvej objednávky s kódom; klient **−10 %** na prvú objednávku.
+- Bonus: **50 nových platiacich klientov** → web s ponukou nehnuteľností + 12 mesiacov asistenta Všetky portály zadarmo.
+- Výplata mesačne, provízia 14 dní po platbe, minimum 50 €. Individuálne podmienky nastavuje Marian v prehľade.
 
 ## 6. Kontrola
 
