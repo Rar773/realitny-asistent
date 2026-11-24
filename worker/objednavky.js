@@ -845,17 +845,15 @@ const REELS_JS = `async function vyrobReels(pary,stav){
   if(!typ)throw new Error('tento prehliadač nevie nahrávať video – skús Chrome alebo Safari');
   var str=c.captureStream(30),rec=new MediaRecorder(str,{mimeType:typ,videoBitsPerSecond:3500000}),kusy=[];
   rec.ondataavailable=function(e){if(e.data&&e.data.size)kusy.push(e.data)};
-  var T=3.4,spolu=T*ims.length+0.3;
+  var T=3.6,spolu=T*ims.length+0.3;
   function pill(t,px,py,bg,zarovnaj){x.font='700 46px Inter,Arial,sans-serif';var w=x.measureText(t).width+56,h=78,X=zarovnaj==='r'?px-w:px;x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(X,py,w,h,39):x.rect(X,py,w,h);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(t,X+28,py+h/2+2)}
   function obraz(im,u){var k=H/im.height,iw=im.width*k;if(iw<W){k=W/im.width;iw=W}var ih=im.height*k,rozsah=iw-W,pos=rozsah*(0.22+0.56*Math.min(1,u/T));x.drawImage(im,-pos,(H-ih)/2,iw,ih)}
+  function stitok(){x.font='600 34px Inter,Arial,sans-serif';var tt='Virtuálne zariadené',w=x.measureText(tt).width+44;x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect((W-w)/2,128,w,62,31):x.rect((W-w)/2,128,w,62);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(tt,(W-w)/2+22,159)}
   function kresli(t){var i=Math.min(ims.length-1,Math.floor(t/T)),u=t-i*T,a=ims[i][0],b=ims[i][1];
-    x.fillStyle='#111';x.fillRect(0,0,W,H);obraz(a,u);
+    x.fillStyle='#111';x.fillRect(0,0,W,H);obraz(a,u);pill('Pred',W-60,120,'rgba(32,36,54,.78)','r');
     var p=Math.max(0,Math.min(1,(u-0.8)/1.4)),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,lx=W*e;
-    if(lx>0){x.save();x.beginPath();x.rect(0,0,lx,H);x.clip();obraz(b,u);x.restore()}
+    if(lx>0){x.save();x.beginPath();x.rect(0,0,lx,H);x.clip();obraz(b,u);pill('Po',60,120,'#7728E6','l');stitok();x.restore()}
     if(p>0&&p<1){x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=18;x.fillRect(lx-4,0,8,H);x.shadowBlur=0}
-    if(p<1)pill('Pred',W-60,120,'rgba(32,36,54,.78)','r');
-    if(p>0)pill('Po',60,120,'#7728E6','l');
-    if(p>0){x.font='600 34px Inter,Arial,sans-serif';var tt='Virtuálne zariadené',w=x.measureText(tt).width+44;x.fillStyle='rgba(32,36,54,.72)';x.beginPath();x.roundRect?x.roundRect((W-w)/2,128,w,62,31):x.rect((W-w)/2,128,w,62);x.fill();x.fillStyle='#fff';x.textBaseline='middle';x.fillText(tt,(W-w)/2+22,159)}
     var f=Math.min(1,u/0.25);if(f<1){x.fillStyle='rgba(0,0,0,'+(1-f)+')';x.fillRect(0,0,W,H)}}
   kresli(0);rec.start(250);var t0=performance.now();
   await new Promise(function(ok){function krok(){var t=(performance.now()-t0)/1000;if(t>=spolu){kresli(spolu-0.31);ok();return}kresli(Math.min(t,spolu-0.31));if(stav)stav('Nahrávam Reels… '+Math.round(t/spolu*100)+' %');requestAnimationFrame(krok)}requestAnimationFrame(krok)});
