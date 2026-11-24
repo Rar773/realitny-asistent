@@ -20,7 +20,8 @@ const STAVY = {
 };
 
 // ---------- ceny ----------
-export const REELS_CENA = 10;
+export const REELS_CENA = 10;        // Reels k 1–3 fotkám
+export const REELS_CENA_INZERAT = 5; // Reels k celému inzerátu (4–10 fotiek) – spolu 24 €
 // 1 fotka 5 €, celý inzerát (do 10 fotiek) 19 €
 export function cenaZariadenia(n) {
   if (n <= 0) return 0;
@@ -32,7 +33,7 @@ export function vypocitaj({ sluzba, pocet, sVideom, video, novy, reels }) {
     z = cenaZariadenia(pocet);
     if (novy) z = Math.max(0, z - cenaZariadenia(Math.min(pocet, 3))); // prvé 3 fotky zadarmo
     if (sVideom && VIDEA[video]) { z = z / 2; v = VIDEA[video][1]; }
-    if (reels) r = REELS_CENA;
+    if (reels) r = pocet >= 4 ? REELS_CENA_INZERAT : REELS_CENA;
   } else if (VIDEA[sluzba]) v = VIDEA[sluzba][1];
   return { zariadenie: z, video: v, reels: r, spolu: z + v + r };
 }

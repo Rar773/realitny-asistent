@@ -46,7 +46,7 @@
         spolu += prem ? 89 : 29;
       }
       spolu += z;
-      if ($('oReels').checked) { r.push(['Reels pred → po', eur(10)]); spolu += 10; }
+      if ($('oReels').checked) { const rc = n >= 4 ? 5 : 10; r.push([n >= 4 ? 'Reels pred → po (zvýhodnené k inzerátu)' : 'Reels pred → po', eur(rc)]); spolu += rc; }
     } else {
       const prem = sluzba === 'premiove';
       r.push([prem ? 'Video Prémiové' : 'Video Štandard', eur(prem ? 89 : 29)]);
