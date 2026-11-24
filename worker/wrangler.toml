@@ -3,6 +3,13 @@ main = "objednavky.js"
 compatibility_date = "2026-11-01"
 workers_dev = true
 
-# Tajné premenné (nastavujú sa mimo repa):
-#   TG_TOKEN – token Telegram bota Realitného asistenta
-#   TG_CHAT  – chat_id, kam chodia objednávky (Marian)
+[[d1_databases]]
+binding = "DB"
+database_name = "ra-objednavky"
+database_id = "5eb429cb-cbe2-4916-aff4-f9df5f74c644"
+
+# Tajné premenné (nastavujú sa mimo repa, v Cloudflare):
+#   TG_TOKEN   – token Telegram bota Realitného asistenta
+#   TG_CHAT    – chat_id, kam chodia objednávky (Marian)
+#   ADMIN_KEY  – kľúč k prehľadu objednávok (/admin)
+#   STRIPE_KEY, STRIPE_WEBHOOK_SECRET – po založení Stripe účtu (platba kartou sa zapne sama)

@@ -122,7 +122,9 @@
       const r = await fetch(API, { method: 'POST', body: fd });
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.ok) throw new Error(j.chyba || 'Objednávku sa nepodarilo odoslať.');
+      if (j.platba_url) { btn.textContent = 'Presmerúvame na platbu…'; location.href = j.platba_url; return; }
       $('oCislo').textContent = j.cislo;
+      if (j.stav_url) $('oStavLink').href = j.stav_url; else $('oStavLink').hidden = true;
       form.hidden = true;
       const h = $('oHotovo'); h.hidden = false; h.focus();
       h.scrollIntoView({ behavior: 'smooth', block: 'center' });
