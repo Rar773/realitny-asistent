@@ -430,7 +430,8 @@ function promptZariadenia(o, foto, pokyn) {
     'Keep the room exactly as it is: the same walls, ceiling, floor, windows, doors, radiators, sockets and light switches, the same camera angle, perspective, framing and zoom, pixel-aligned with the original photo. Do not change the architecture, do not add or remove windows or doors, do not crop.',
     `Add realistic furniture and decor suitable for a ${izba} in a ${STYL_EN[o.styl] || STYL_EN.moderny}.`,
     'Lighting fixtures are decor, not architecture: replace every bare light bulb, socket or exposed electrical cable hanging from the ceiling (or sticking out of a wall where a lamp belongs) with a finished, stylish ceiling light or pendant lamp that matches the style, mounted at the same spot. Nothing unfinished may remain visible on the ceiling.',
-    'Natural soft daylight, realistic shadows and reflections on the floor. Photorealistic high-end real estate photography. No people, no text, no watermark, no logos.',
+    'Natural soft daylight, realistic shadows and reflections on the floor. Photorealistic high-end real estate photography. No people. Do not add any new text, watermark or logo.',
+    'If the original photo has a watermark or agency logo, keep it exactly as it is: the same position, size, shape, letters, colour and transparency, sharp and undistorted, drawn on top of everything (furniture must not cover it). Do not remove, move, redraw or blur it.',
     pokyn ? `Additional instructions from the client: ${pokyn}` : '',
     o.poznamka ? `Client note: ${o.poznamka}` : '',
   ].filter(Boolean).join('\n');
@@ -714,7 +715,7 @@ async function skontroluj(env, o, i, b64) {
 Skontroluj:
 1. Architektúra je rovnaká: steny, strop, podlaha, okná, dvere, radiátory, výhľad z okna, uhol a výrez záberu. Žiadne pridané ani zmiznuté okná či dvere.
 2. Nábytok je realistický, správnej veľkosti a mierky, nestojí v dverách ani pred oknom tak, že by blokoval prechod, nič nepláva vo vzduchu, nič nie je zdeformované ani rozmazané.
-3. Na obrázku nie sú ľudia, texty, vodoznaky ani logá.
+3. Na obrázku nie sú ľudia a nepribudli žiadne nové texty ani logá. Ak má originál vodoznak alebo logo realitky, musí byť na zariadenej fotke zachované na rovnakom mieste, celé, čitateľné a nepokrivené (pokrivené, rozmazané alebo chýbajúce logo = ok false).
 4. Nábytok zodpovedá miestnosti (${o.fotky[i].popis || 'miestnosť'}).
 5. Na strope ani na stenách nevisí holá žiarovka ani trčiaci elektrický kábel – musia byť nahradené hotovým svietidlom.
 Odpovedz IBA ako JSON: {"ok": true alebo false, "dovod": "krátko po slovensky, čo je zlé (alebo prázdny reťazec)"}. Drobné rozdiely v osvetlení nevadia.`;
