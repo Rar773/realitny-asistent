@@ -82,6 +82,25 @@ Riaď sa `_podklady/ZADANIE.md` a obrázkami v `_podklady/` (koncept A je hlavn�
 
 Ceny sú konečné – prevádzkovateľ nie je platcom DPH. Balíky sú vždy **jednorazová platba**.
 
+
+## 5a. Odporúčací program – platné pravidlá (nemeniť bez súhlasu Mariana)
+
+Ak sa `_podklady/ZADANIE.md` s týmto líši, **platí táto časť**. Texty na `odporucanie.html`,
+v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ostať v tomto znení obsahu:
+
+| Keď kolega… | Odporúčajúci dostane | Kolega |
+|---|---|---|
+| objedná prvé video | 1 video Štandard zadarmo | −10 % |
+| kúpi balík videí | 1 video Prémiové zadarmo | −10 % |
+| predplatí asistenta mesačne | 1 mesiac asistenta zadarmo | −10 % na 1. mesiac |
+| predplatí asistenta na rok | 3 mesiace asistenta zadarmo | −10 % na ročnú platbu |
+| kúpi balík Štart, Profi alebo Premium | 1 video Prémiové + 3 mesiace asistenta | 1 video Štandard navyše (namiesto −10 %) |
+
+- Odmena sa pripíše 14 dní po platbe kolegu, ak neodstúpi od zmluvy.
+- Odmeny nikdy v peniazoch, neprenosné, aktivovať do 12 mesiacov, najviac 12 mesiacov asistenta zadarmo za rok.
+- Kód nemožno použiť na vlastné objednávky; pri zneužití môžeme odmenu odobrať.
+- Položka „Odporučte kolegu“ musí ostať v hlavnom menu aj v pätičke.
+
 ## 6. Kontrola
 
 ```

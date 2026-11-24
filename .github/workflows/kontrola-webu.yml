@@ -1,0 +1,27 @@
+name: Kontrola webu
+
+on:
+  push:
+    branches:
+      - "chatgpt/**"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kontrola:
+    name: Kontrola obsahu a odkazov
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stiahnuť repozitár
+        uses: actions/checkout@v4
+      - name: Nastaviť Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Spustiť kontrolu webu
+        run: python tools/kontrola.py

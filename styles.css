@@ -667,3 +667,109 @@ header.top{background:rgba(255,255,255,.95)}
 @media (max-width:980px){.hero-bg{width:100%;top:auto;height:52%;}.hero-bg::after{background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.55) 35%,rgba(255,255,255,.1) 100%)}.svc2-b{grid-template-columns:1fr}.svc2-img{max-width:360px}.ctaband{flex-wrap:wrap}.ctaband .cb-photo{display:none}}
 @media (max-width:640px){.logo .lg-t b{font-size:19px}.logo .lg-ic{width:38px;height:36px}.nav{height:66px}.menu.open{top:66px}.bpanel{padding:18px;border-radius:20px}.ctaband{padding:28px 22px}.ctaband .cb-ic{display:none}.ctaband .cb-btns .btn{flex:1 1 100%}.svc2{padding:20px}.svc2-h h3{font-size:19px}}
 .svc2-b{grid-template-columns:1fr 38%;gap:12px}.svc2-b .chk li{font-size:14px;padding-left:25px}.svc2-b .chk li::before{width:16px;height:16px;top:3px}.svc2-img{aspect-ratio:3/4}@media (max-width:1100px){.svc2-b{grid-template-columns:1fr}.svc2-img{aspect-ratio:16/10;max-width:100%}}
+
+
+/* =========================================================
+   Redizajn 2026 – jednotný vizuál podľa konceptu A
+   Spoločný systém pre domov, služby, balíky a kontakt.
+   ========================================================= */
+:root{
+  --brand:#7728E6;
+  --brand-h:#5B20B5;
+  --brand-50:#F1EAFE;
+  --brand-100:#E9DDFD;
+  --brand-200:#D5C0FA;
+  --bg:#F4F5F9;
+  --card:#FFFFFF;
+  --ink:#202436;
+  --ink2:#334155;
+  --muted:#667085;
+  --line:#E6E8EF;
+  --line2:#F1F2F7;
+  --r:18px;
+  --rb:11px;
+}
+html{scroll-padding-top:92px}
+body{background:var(--bg);color:var(--ink)}
+header.top{background:rgba(255,255,255,.96);border-bottom:1px solid rgba(230,232,239,.9);box-shadow:0 2px 14px rgba(32,36,54,.035)}
+.nav{height:76px}
+.menu>a,.menu .dd>button{font-weight:600}
+.menu>a[aria-current=page]{background:var(--brand-50);color:var(--brand)}
+section{scroll-margin-top:88px}
+.hero{padding-top:64px;background:#fff}
+.hero-bg{width:64%}
+.hero-bg::after{background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.94) 18%,rgba(255,255,255,.42) 54%,rgba(255,255,255,.08) 100%)}
+.hero-g{grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:42px}
+.hero h1{max-width:620px}
+.hero .lead{max-width:560px}
+.phero{background:linear-gradient(135deg,#fff 0%,#fbfaff 58%,#f3edff 100%);border-bottom:1px solid var(--line)}
+.phero-g{align-items:center}
+.phero .lead{max-width:680px}
+.card,.svc2,.vbox,.ukc,.wcard,.bcard,.ref,.faq{border-radius:18px}
+.card{border-color:var(--line);box-shadow:0 2px 8px rgba(32,36,54,.045)}
+.card:hover,.vbox:hover,.ukc:hover{border-color:var(--brand-200);box-shadow:0 12px 30px rgba(91,32,181,.09)}
+.btn{border-radius:11px;font-weight:700}
+.btn:not(.sec):hover{box-shadow:0 8px 20px rgba(119,40,230,.22)}
+.btn.sec{border:1.5px solid var(--brand);color:var(--brand);background:#fff}
+.ic{background:var(--brand-50);color:var(--brand)}
+.kicker{color:var(--ink)}
+.sh h2{letter-spacing:-.035em}
+.alt{background:#fff}
+.svc2{min-height:100%;box-shadow:0 2px 7px rgba(32,36,54,.045),0 12px 28px rgba(32,36,54,.045)}
+.svc2 .btn{margin-top:auto}
+.bpanel{box-shadow:0 12px 34px rgba(91,32,181,.065)}
+.bcard{background:#fff}
+.bcard.hl{box-shadow:0 12px 30px rgba(91,32,181,.12)}
+.asidecheck{background:#fff;border:1px solid var(--line);box-shadow:0 12px 32px rgba(32,36,54,.07)}
+.vidhero{padding:14px;display:grid;gap:14px;background:#fff}
+.vidhero-media{position:relative;overflow:hidden;border-radius:13px;background:#17172f;aspect-ratio:16/9}
+.vidhero-media video{width:100%;height:100%;object-fit:cover}
+.vidhero-media .vidhero-format{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.94);color:var(--ink);font-size:12px;font-weight:700;border-radius:8px;padding:6px 9px}
+.vidhero-points{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding:2px 5px 4px}
+.vidhero-points span{display:flex;gap:8px;align-items:flex-start;color:var(--ink2);font-size:13.5px;font-weight:600;line-height:1.4}
+.vidhero-points svg{width:17px;height:17px;flex:none;color:var(--brand)}
+.webhero{padding:14px;display:grid;gap:13px;background:#fff}
+.webhero-preview{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#f7f7fb}
+.webhero-preview img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:top}
+.webhero-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.webhero-prices>div{padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#faf9fd}
+.webhero-prices span{display:block;color:var(--muted);font-size:12.5px}
+.webhero-prices b{display:block;color:var(--brand);font:800 21px var(--head)}
+.webhero-note{font-size:13px;color:var(--muted);padding:0 3px}
+.rtab{border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:13px}
+.rtab th{background:#f4efff;color:var(--ink);border-bottom:1px solid var(--brand-100)}
+.rtab td{background:#fff}
+.rtab tr:nth-child(even) td{background:#fbfaff}
+.rsteps{counter-reset:steps;display:grid;gap:12px}
+.rsteps li{border:1px solid var(--line);background:#fff;border-radius:13px;padding:15px 17px}
+.rsteps li::before{background:var(--brand-50);color:var(--brand);border:1px solid var(--brand-100)}
+.ctaband{border-radius:22px}
+footer{background:#fff;border-top:1px solid var(--line)}
+.fbot{border-top:1px solid var(--line)}
+@media(max-width:1100px){
+  .hero-g{grid-template-columns:1fr 1fr;gap:26px}
+  .hero-bg{width:66%}
+}
+@media(max-width:980px){
+  .hero-g{grid-template-columns:1fr;gap:30px}
+  .hero-bg{width:100%;height:58%;top:auto}
+  .vidhero-points{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .nav{height:66px}
+  .hero{padding:38px 0 48px}
+  .hero-bg{height:42%;opacity:.78}
+  .hero-bg::after{background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.78) 48%,rgba(255,255,255,.15) 100%)}
+  .phero{padding:42px 0}
+  .vidhero-points,.webhero-prices{grid-template-columns:1fr}
+  .bpanel{padding:20px}
+  .ctaband{border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* oprava: cisla krokov odporucania neprekryvaju text */
+.rsteps li{position:relative;padding:16px 18px 16px 64px}
+.rsteps li::before{left:16px;top:14px}
