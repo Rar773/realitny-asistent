@@ -11,8 +11,9 @@ const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- Menu (mobil) a rozbaľovacie Služby ---------- */
 (function () {
   const b = document.querySelector('.mnav'), m = document.getElementById('menu'); if (!b || !m) return;
-  const close = () => { m.classList.remove('open'); b.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; };
-  b.addEventListener('click', () => { const o = m.classList.toggle('open'); b.setAttribute('aria-expanded', o); document.body.style.overflow = o ? 'hidden' : ''; });
+  const close = () => { m.classList.remove('open'); const h2 = document.getElementById('hlavicka'); if (h2) h2.classList.remove('menu-otvorene'); b.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; };
+  const hd = document.getElementById('hlavicka');
+  b.addEventListener('click', () => { const o = m.classList.toggle('open'); b.setAttribute('aria-expanded', o); document.body.style.overflow = o ? 'hidden' : ''; if (hd) { hd.classList.toggle('menu-otvorene', o); document.documentElement.style.setProperty('--hh', hd.getBoundingClientRect().height + 'px'); } });
   m.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
   addEventListener('keydown', e => { if (e.key === 'Escape') { close(); document.querySelectorAll('.dd.open').forEach(d => { d.classList.remove('open'); d.querySelector('button').setAttribute('aria-expanded', 'false'); }); } });
   document.querySelectorAll('.dd').forEach(d => {
