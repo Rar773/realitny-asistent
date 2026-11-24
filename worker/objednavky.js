@@ -298,15 +298,26 @@ async function novaObjednavka(req, env, origin, base) {
     else novyDovod = await uzBolKlientom(env, stopy);
     novyOk = !novyDovod;
   }
+  let amb = null, ambKod = null, ambZlava = false;
+  if (jeAmbKod(kod)) {
+    amb = await ambasadorPodlaKodu(env, kod);
+    if (!amb) return json({ ok: false, chyba: 'Tento kód ambasádora nepoznáme. Skontrolujte ho alebo pole nechajte prázdne.' }, 400, origin);
+    if (amb.email_n === emailN || (telN && amb.telefon_n === telN) || (amb.zid_h && stopy.some(([d, h]) => d === 'zid' && h === amb.zid_h))) return json({ ok: false, chyba: 'Vlastný kód ambasádora nie je možné použiť na vlastnú objednávku.' }, 400, origin);
+    ambKod = amb.kod;
+    ambZlava = !(await uzBolKlientom(env, stopy.filter(([d]) => ['email', 'tel', 'zid'].includes(d))));
+  } else if (!kod) {
+    ambKod = await ambasadorKlienta(env, emailN, telN);
+  }
   const c = vypocitaj({ sluzba, pocet, sVideom, video, novy: novyOk });
+  if (ambZlava) c.spolu = Math.round(c.spolu * (1 - AMB.zlava) * 100) / 100;
   const d = new Date();
   const o = {
     cislo: `RA-${d.toISOString().slice(2, 10).replace(/-/g, '')}-${nahodne(4).toUpperCase()}`,
     vytvorene: teraz(), zdroj, sluzba, pocet: sluzba === 'zariadenie' ? pocet : 0, styl: sluzba === 'zariadenie' ? styl : null,
     s_videom: sluzba === 'zariadenie' && sVideom ? 1 : 0, video: sluzba === 'zariadenie' && sVideom ? video : null, novy: novyOk ? 1 : 0,
-    kod, meno, email, telefon, inzerat, poznamka, cena: c.spolu, token: nahodne(24),
+    kod: ambKod || kod, meno, email, telefon, inzerat, poznamka, cena: c.spolu, token: nahodne(24),
   };
-  const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && !o.kod);
+  const platbaKartou = !!(env.STRIPE_KEY && env.STRIPE_WEBHOOK_SECRET && o.cena > 0 && (!o.kod || jeAmbKod(o.kod)));
   o.stav = platbaKartou ? 'caka_platbu' : 'nova';
 
   await env.DB.prepare(`INSERT INTO objednavky (cislo, vytvorene, aktualizovane, zdroj, sluzba, pocet, styl, s_videom, video, novy, kod, meno, email, telefon, inzerat, poznamka, cena, stav, token, email_n, telefon_n, ip_h, novy_ok)
@@ -314,13 +325,14 @@ async function novaObjednavka(req, env, origin, base) {
     .bind(o.cislo, o.vytvorene, o.vytvorene, o.zdroj, o.sluzba, o.pocet, o.styl, o.s_videom, o.video, o.novy, o.kod, o.meno, o.email, o.telefon, o.inzerat, o.poznamka, o.cena, o.stav, o.token, emailN, telN, ipH, novyOk ? 1 : 0).run();
   await zapisHistoriu(env, o.cislo, `Objednávka prijatá (${zdroj})`);
   await ulozStopy(env, o.cislo, stopy);
+  if (ambKod) await zapisProviziu(env, ambKod, o);
 
   const riadky = [
     `🆕 <b>Nová objednávka ${o.cislo}</b> (${zdroj})`, '',
     sluzba === 'zariadenie' ? `🛋 <b>${esc(popisSluzby(o))}</b>` : `🎬 <b>${esc(popisSluzby(o))}</b>`,
     novyOk ? '🎁 Nový klient – overený, prvé 3 fotky zadarmo' : null,
     novyDovod ? `🚫 Žiadal zľavu pre nových klientov – zamietnutá (${novyDovod.startsWith('spolu') ? novyDovod : novyDovod + ' už bola objednávka'})` : null,
-    kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b>` : null,
+    ambKod ? `🤝 Ambasádor: <b>${esc(ambKod)}</b>${ambZlava ? ' (klient −10 %)' : ''}` : (kod ? `🤝 Odporúčací kód: <b>${esc(kod)}</b> (−10 % vo faktúre)` : null),
     `💶 <b>${eur(o.cena)}</b> · ${platbaKartou ? 'čaká na platbu kartou' : 'platba faktúrou'}`, '',
     `👤 ${esc(meno)}`, `✉️ ${esc(email)}`,
     telefon ? `📞 ${esc(telefon)}` : null,
@@ -461,7 +473,7 @@ async function adminZoznam(env, url) {
     .map(([k, t]) => `<a href="/admin?stav=${k}" class="${k === f ? 'on' : ''}">${t}</a>`).join('');
   const riadky = results.map((o) => `<tr class="kl" onclick="location='/admin/o/${o.cislo}'"><td><b>${o.cislo}</b><div class="mut" style="font-size:12.5px">${cas(o.vytvorene)} · ${esc(o.zdroj)}</div></td><td>${esc(o.meno)}<div class="mut hm" style="font-size:12.5px">${esc(o.email)}</div></td><td class="hm">${esc(popisSluzby(o))}</td><td>${eur(o.cena)}${o.zaplatene ? ' ✓' : ''}</td><td>${pillStav(o.stav)}</td></tr>`).join('');
   return stranka('Objednávky – Realitný asistent', `<h1>Objednávky</h1><p class="mut">Za posledných 30 dní: ${sum.n} objednávok · zaplatené ${eur(sum.z)}</p>
-  <div class="row" style="margin-top:10px"><a class="btn" href="/admin/schvalenie">✅ Schvaľovanie</a><form method="post" action="/admin/spusti" style="margin:0"><button class="btn sec">🪄 Spustiť výrobu teraz</button></form><form method="post" action="/admin/suhrn" style="margin:0"><button class="btn sec">🌙 Poslať súhrn teraz</button></form></div>
+  <div class="row" style="margin-top:10px"><a class="btn" href="/admin/schvalenie">✅ Schvaľovanie</a><a class="btn sec" href="/admin/ambasadori">🤝 Ambasádori</a><form method="post" action="/admin/spusti" style="margin:0"><button class="btn sec">🪄 Spustiť výrobu teraz</button></form><form method="post" action="/admin/suhrn" style="margin:0"><button class="btn sec">🌙 Poslať súhrn teraz</button></form></div>
   <div class="row filt" style="margin-top:12px">${filt}</div>
   <div class="card" style="padding:6px 10px"><table><thead><tr><th>Číslo</th><th>Zákazník</th><th class="hm">Služba</th><th>Cena</th><th>Stav</th></tr></thead><tbody>${riadky || '<tr><td colspan="5" class="mut" style="padding:20px">Žiadne objednávky.</td></tr>'}</tbody></table></div>`, true);
 }
@@ -544,12 +556,14 @@ async function adminAkcia(req, env, base, cislo, akcia) {
     if (f.get('zaplatene') === '1') {
       await env.DB.prepare("UPDATE objednavky SET zaplatene = 1, stav = CASE WHEN stav IN ('nova','caka_platbu') THEN 'zaplatena' ELSE stav END, aktualizovane = ? WHERE cislo = ?").bind(teraz(), cislo).run();
       await zapisHistoriu(env, cislo, 'Označená ako zaplatená (ručne)');
+      await potvrdProviziu(env, cislo);
       sprava = 'Označené ako zaplatené.';
     }
     const s = f.get('stav');
     if (s && STAVY[s]) {
       await env.DB.prepare('UPDATE objednavky SET stav = ?, aktualizovane = ? WHERE cislo = ?').bind(s, teraz(), cislo).run();
       await zapisHistoriu(env, cislo, `Stav: ${STAVY[s][0]}`);
+      if (s === 'zrusena') await env.DB.prepare("UPDATE provizie SET stav = 'zrusene' WHERE cislo = ? AND stav != 'vyplatena'").bind(cislo).run();
       sprava = `Stav zmenený na: ${STAVY[s][0]}.`;
     }
   } else if (akcia === 'poznamka') {
@@ -612,6 +626,7 @@ async function stripeWebhook(req, env) {
     if (o && !o.zaplatene) {
       await env.DB.prepare("UPDATE objednavky SET zaplatene = 1, stav = 'zaplatena', aktualizovane = ? WHERE cislo = ?").bind(teraz(), cislo).run();
       await zapisHistoriu(env, cislo, `Zaplatené kartou (${eur(e.data.object.amount_total / 100)})`);
+      await potvrdProviziu(env, cislo);
       o.zaplatene = 1;
       await posliEmail(env, o, 'potvrdenie', new URL(req.url).origin).catch(() => {});
       await tgSprava(env, `💳 <b>Zaplatené: ${cislo}</b>\n${esc(popisSluzby(o))} · ${eur(e.data.object.amount_total / 100)}\n👤 ${esc(o.meno)}`).catch(() => {});
@@ -862,6 +877,140 @@ async function vystupAkcia(env, id, akcia, req) {
   return json({ ok: true }, 200);
 }
 
+// ================= AMBASÁDORSKÝ PROGRAM =================
+const AMB = { provizia: 0.20, zlava: 0.10, dni: 365, minVyplata: 50, lehota: 14 };
+const jeAmbKod = (k) => /^AMB-[A-Z0-9]{3,20}$/.test(String(k || '').toUpperCase());
+
+async function ambasadorPodlaKodu(env, kod) {
+  if (!jeAmbKod(kod)) return null;
+  return env.DB.prepare("SELECT * FROM ambasadori WHERE kod = ? AND stav = 'schvaleny'").bind(String(kod).toUpperCase()).first();
+}
+// klient patrí ambasádorovi 12 mesiacov od prvej objednávky s jeho kódom
+async function ambasadorKlienta(env, emailN, telN) {
+  const od = new Date(Date.now() - AMB.dni * 864e5).toISOString();
+  const r = await env.DB.prepare(`SELECT kod FROM objednavky WHERE kod LIKE 'AMB-%' AND stav != 'zrusena' AND vytvorene > ?
+    AND (email_n = ? OR (? != '' AND telefon_n = ?)) ORDER BY vytvorene LIMIT 1`).bind(od, emailN, telN || '', telN || '').first();
+  return r ? r.kod : null;
+}
+async function zapisProviziu(env, kod, o) {
+  if (!kod || !(o.cena > 0)) return;
+  const uz = await env.DB.prepare('SELECT 1 FROM provizie WHERE cislo = ?').bind(o.cislo).first();
+  if (uz) return;
+  await env.DB.prepare('INSERT INTO provizie (kod, cislo, suma, provizia, stav, vytvorene) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(kod, o.cislo, o.cena, Math.round(o.cena * AMB.provizia * 100) / 100, 'caka', teraz()).run();
+}
+async function potvrdProviziu(env, cislo) {
+  const splatne = new Date(Date.now() + AMB.lehota * 864e5).toISOString();
+  await env.DB.prepare("UPDATE provizie SET stav = 'potvrdena', splatne = ? WHERE cislo = ? AND stav = 'caka'").bind(splatne, cislo).run();
+}
+
+// --- registrácia ---
+async function novyAmbasador(req, env, origin) {
+  let f;
+  try { f = await req.formData(); } catch { return json({ ok: false, chyba: 'Neplatné údaje formulára' }, 400, origin); }
+  if (kratko(f.get('web'))) return json({ ok: true }, 200, origin);
+  const g = (k, n = 300) => kratko(f.get(k), n);
+  const a = {
+    meno: g('meno', 120), email: g('email', 160), telefon: g('telefon', 40), pozicia: g('pozicia', 60), kancelaria: g('kancelaria', 160),
+    mesto: g('mesto', 120), roky: g('roky', 30), predane: g('predane', 30), profil: g('profil', 500), siet: g('siet', 40), kontakty: g('kontakty', 1000),
+    instagram: g('instagram', 200), facebook: g('facebook', 200), linkedin: g('linkedin', 200), tiktok: g('tiktok', 200), youtube: g('youtube', 200),
+    sledovatelia: g('sledovatelia', 40), ako: g('ako', 2000), skusenosti: g('skusenosti', 2000), fakturacia: g('fakturacia', 40),
+  };
+  if (!a.meno || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a.email) || !normTelefon(a.telefon)) return json({ ok: false, chyba: 'Vyplňte meno, e-mail a telefón.' }, 400, origin);
+  if (!a.ako) return json({ ok: false, chyba: 'Napíšte nám, ako by ste naše služby odporúčali.' }, 400, origin);
+  if (f.get('suhlas') !== 'ano') return json({ ok: false, chyba: 'Potvrďte súhlas s podmienkami programu.' }, 400, origin);
+  const emailN = normEmail(a.email);
+  const uz = await env.DB.prepare('SELECT stav FROM ambasadori WHERE email_n = ?').bind(emailN).first();
+  if (uz) return json({ ok: false, chyba: uz.stav === 'schvaleny' ? 'Na tento e-mail už ambasádorský účet máte.' : 'Vašu prihlášku už máme, ozveme sa vám.' }, 400, origin);
+  const zid = g('zid', 80);
+  const r = await env.DB.prepare(`INSERT INTO ambasadori (vytvorene, stav, meno, email, email_n, telefon, telefon_n, pozicia, kancelaria, mesto, roky, predane, profil, siet, kontakty,
+      instagram, facebook, linkedin, tiktok, youtube, sledovatelia, ako, skusenosti, fakturacia, ip_h, zid_h)
+      VALUES (?, 'nova', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(teraz(), a.meno, a.email, emailN, a.telefon, normTelefon(a.telefon), a.pozicia, a.kancelaria, a.mesto, a.roky, a.predane, a.profil, a.siet, a.kontakty,
+      a.instagram, a.facebook, a.linkedin, a.tiktok, a.youtube, a.sledovatelia, a.ako, a.skusenosti, a.fakturacia, await ipHash(env, req), zid ? await hmac(env, 'z:' + zid) : '').run();
+  const id = r.meta.last_row_id;
+  const siete = ['instagram', 'facebook', 'linkedin', 'tiktok', 'youtube'].filter((k) => a[k]).join(', ');
+  await tgSprava(env, [`🤝 <b>Nová prihláška ambasádora</b>`, '', `👤 ${esc(a.meno)} · ${esc(a.pozicia || '')}`, a.kancelaria ? `🏢 ${esc(a.kancelaria)}${a.mesto ? ' · ' + esc(a.mesto) : ''}` : null,
+    `👥 Maklérov vo svojej sieti: <b>${esc(a.siet || '?')}</b>`, siete ? `📱 ${esc(siete)} · sledovatelia: ${esc(a.sledovatelia || '?')}` : null,
+    a.predane ? `🏠 Predané za 12 mes.: ${esc(a.predane)}` : null, '', `💬 ${esc(a.ako.slice(0, 400))}`].filter((x) => x !== null).join('\n'),
+    [[{ text: '👀 Posúdiť prihlášku', url: `${BASE_URL}/admin/ambasadori/${id}?s=${await hmac(env, 'amb:' + id)}` }]]).catch(() => {});
+  return json({ ok: true }, 200, origin);
+}
+
+// --- admin ---
+function vyrobKod(meno) {
+  const pr = String(meno || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z ]/g, '').trim().split(/\s+/).pop() || 'PARTNER';
+  return `AMB-${pr.slice(0, 12)}${Math.floor(10 + Math.random() * 90)}`;
+}
+async function adminAmbasadori(env) {
+  const { results } = await env.DB.prepare(`SELECT a.*, (SELECT COUNT(*) FROM provizie p WHERE p.kod = a.kod AND p.stav != 'zrusene') n,
+      (SELECT COALESCE(SUM(provizia),0) FROM provizie p WHERE p.kod = a.kod AND p.stav = 'potvrdena') k_vyplate,
+      (SELECT COALESCE(SUM(provizia),0) FROM provizie p WHERE p.kod = a.kod AND p.stav = 'vyplatena') vyplatene
+    FROM ambasadori a ORDER BY CASE a.stav WHEN 'nova' THEN 0 WHEN 'schvaleny' THEN 1 ELSE 2 END, a.vytvorene DESC`).all();
+  const pill = { nova: ['Nová prihláška', '#B54708'], schvaleny: ['Schválený', '#12B76A'], zamietnuty: ['Zamietnutý', '#B42318'] };
+  const riadky = results.map((a) => `<tr class="kl" onclick="location='/admin/ambasadori/${a.id}'"><td><b>${esc(a.meno)}</b><div class="mut" style="font-size:12.5px">${esc(a.kancelaria || '')}</div></td>
+    <td class="hm">${esc(a.siet || '')}</td><td>${esc(a.kod || '–')}</td><td>${a.n || 0} obj.<div class="mut" style="font-size:12.5px">k výplate ${eur(a.k_vyplate)}</div></td>
+    <td><span class="pill" style="background:${(pill[a.stav] || ['', '#667085'])[1]}">${(pill[a.stav] || [a.stav])[0]}</span></td></tr>`).join('');
+  return stranka('Ambasádori', `<p><a href="/admin">← Objednávky</a></p><h1>Ambasádori</h1>
+    <p class="mut">Provízia ${AMB.provizia * 100} % z objednávok klientov počas ${AMB.dni / 30 | 0} mesiacov · klient −${AMB.zlava * 100} % · výplata po ${AMB.lehota} dňoch, min. ${AMB.minVyplata} €. Peniaze posielaš ty – systém len počíta.</p>
+    <div class="card" style="padding:6px 10px"><table><thead><tr><th>Meno</th><th class="hm">Sieť maklérov</th><th>Kód</th><th>Provízie</th><th>Stav</th></tr></thead>
+    <tbody>${riadky || '<tr><td colspan="5" class="mut" style="padding:20px">Zatiaľ žiadne prihlášky.</td></tr>'}</tbody></table></div>`, true);
+}
+async function adminAmbasador(env, id, sprava) {
+  const a = await env.DB.prepare('SELECT * FROM ambasadori WHERE id = ?').bind(id).first();
+  if (!a) return html(stranka('Nenájdené', '<h1>Prihláška neexistuje</h1>', true), 404);
+  const { results: prov } = await env.DB.prepare('SELECT * FROM provizie WHERE kod = ? ORDER BY vytvorene DESC LIMIT 200').bind(a.kod || '-').all();
+  const sum = (s) => prov.filter((p) => p.stav === s).reduce((x, p) => x + p.provizia, 0);
+  const odkaz = a.kod ? `${WEB}/?amb=${a.kod}` : '';
+  const telo = a.stav === 'schvaleny'
+    ? `Dobrý deň${a.meno ? ', ' + a.meno.split(' ')[0] : ''},\n\nvítame vás medzi ambasádormi Realitného asistenta.\n\nVáš kód: ${a.kod}\nVáš odkaz: ${odkaz}\n\nKolegovia, ktorí objednajú cez váš odkaz alebo s vaším kódom, majú zľavu ${AMB.zlava * 100} % na prvú objednávku. Vy dostanete ${AMB.provizia * 100} % z každej ich zaplatenej objednávky počas ${AMB.dni / 30 | 0} mesiacov. Prehľad a výplatu vám posielame raz mesačne.\n\nS pozdravom\nRealitný asistent\ninfo@realitnyasistent.eu`
+    : `Dobrý deň${a.meno ? ', ' + a.meno.split(' ')[0] : ''},\n\nďakujeme za prihlášku do ambasádorského programu. Momentálne ju nemôžeme prijať. Ak sa niečo zmení, radi sa vám ozveme.\n\nS pozdravom\nRealitný asistent`;
+  const mailto = `mailto:${encodeURIComponent(a.email)}?subject=${encodeURIComponent('Ambasádorský program Realitného asistenta')}&body=${encodeURIComponent(telo)}`;
+  const r = (t, v, link) => v ? `<dt>${t}</dt><dd>${link ? `<a href="${esc(/^https?:/.test(v) ? v : 'https://' + v)}" target="_blank" rel="noopener">${esc(v)}</a>` : esc(v)}</dd>` : '';
+  return html(stranka(`${a.meno} – ambasádor`, `<p><a href="/admin/ambasadori">← Ambasádori</a></p>${sprava ? `<div class="ok-box">${esc(sprava)}</div>` : ''}
+    <h1>${esc(a.meno)}</h1><p class="mut" style="margin:0">Prihláška ${cas(a.vytvorene)}${a.kod ? ' · kód <b>' + a.kod + '</b>' : ''}</p>
+    <div class="card"><h2>Rozhodnutie</h2><form method="post" action="/admin/ambasadori/${a.id}/stav" class="row">
+      ${a.stav !== 'schvaleny' ? '<button class="btn" name="stav" value="schvaleny">✅ Schváliť a vytvoriť kód</button>' : ''}
+      ${a.stav !== 'zamietnuty' ? '<button class="btn red sm" name="stav" value="zamietnuty">Zamietnuť</button>' : ''}
+    </form>${a.kod ? `<p style="margin-bottom:0">Odkaz ambasádora: <a href="${odkaz}" target="_blank">${odkaz}</a></p>` : ''}
+    <p style="margin-bottom:0"><a class="btn sec sm" href="${mailto}">✉️ Koncept e-mailu: ${a.stav === 'schvaleny' ? 'privítanie s kódom' : 'zamietnutie'}</a></p></div>
+    <div class="card"><h2>Dosah</h2><dl>${r('Pozícia', a.pozicia)}${r('Kancelária', a.kancelaria)}${r('Mesto / región', a.mesto)}${r('Maklérov v sieti', a.siet)}${r('Kontakty / komunity', a.kontakty)}
+      ${r('Instagram', a.instagram, 1)}${r('Facebook', a.facebook, 1)}${r('LinkedIn', a.linkedin, 1)}${r('TikTok', a.tiktok, 1)}${r('YouTube', a.youtube, 1)}${r('Sledovatelia spolu', a.sledovatelia)}</dl></div>
+    <div class="card"><h2>Skúsenosti</h2><dl>${r('V realitách', a.roky)}${r('Predané za 12 mes.', a.predane)}${r('Profil / overenie', a.profil, 1)}${r('Fakturácia', a.fakturacia)}</dl>
+      <h3 style="margin:14px 0 4px;font-size:15px">Ako by nás odporúčal</h3><p style="white-space:pre-wrap;margin:0">${esc(a.ako)}</p>
+      ${a.skusenosti ? `<h3 style="margin:14px 0 4px;font-size:15px">Skúsenosti, poznámka</h3><p style="white-space:pre-wrap;margin:0">${esc(a.skusenosti)}</p>` : ''}
+      <dl style="margin-top:12px"><dt>Kontakt</dt><dd><a href="mailto:${esc(a.email)}">${esc(a.email)}</a> · <a href="tel:${esc(a.telefon)}">${esc(a.telefon)}</a></dd></dl></div>
+    ${a.kod ? `<div class="card"><h2>Provízie</h2><p>Čaká na platbu klienta: <b>${eur(sum('caka'))}</b> · Potvrdené: <b>${eur(sum('potvrdena'))}</b> · Vyplatené: <b>${eur(sum('vyplatena'))}</b></p>
+      <table><thead><tr><th>Objednávka</th><th>Suma</th><th>Provízia</th><th>Stav</th></tr></thead><tbody>${prov.map((p) => `<tr><td><a href="/admin/o/${p.cislo}">${p.cislo}</a><div class="mut" style="font-size:12.5px">${cas(p.vytvorene)}</div></td><td>${eur(p.suma)}</td><td>${eur(p.provizia)}</td><td>${esc(p.stav)}${p.splatne && p.stav === 'potvrdena' ? '<div class="mut" style="font-size:12.5px">od ' + cas(p.splatne).split(' ')[0] + '</div>' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="mut">Zatiaľ nič.</td></tr>'}</tbody></table>
+      ${sum('potvrdena') >= AMB.minVyplata ? `<form method="post" action="/admin/ambasadori/${a.id}/vyplatene" style="margin-top:12px"><button class="btn sec sm">💶 Označiť potvrdené provízie ako vyplatené (${eur(sum('potvrdena'))})</button></form>` : `<p class="mut" style="font-size:13px">Výplata od ${AMB.minVyplata} € potvrdených provízií.</p>`}</div>` : ''}
+    <div class="card"><h2>Interná poznámka</h2><form method="post" action="/admin/ambasadori/${a.id}/poznamka"><textarea name="interna" rows="3">${esc(a.interna || '')}</textarea><button class="btn sec sm" style="margin-top:8px">Uložiť</button></form></div>`, true));
+}
+async function adminAmbAkcia(req, env, id, akcia) {
+  const a = await env.DB.prepare('SELECT * FROM ambasadori WHERE id = ?').bind(id).first();
+  if (!a) return html('Nenájdené', 404);
+  const f = await req.formData();
+  let m = '';
+  if (akcia === 'stav') {
+    const s = f.get('stav');
+    if (s === 'schvaleny') {
+      let kod = a.kod;
+      for (let k = 0; !kod && k < 5; k++) { const n = vyrobKod(a.meno); if (!(await env.DB.prepare('SELECT 1 FROM ambasadori WHERE kod = ?').bind(n).first())) kod = n; }
+      await env.DB.prepare("UPDATE ambasadori SET stav = 'schvaleny', kod = ?, schvalene = ? WHERE id = ?").bind(kod, teraz(), id).run();
+      m = `Schválené. Kód ${kod}. Pošli ambasádorovi privítací e-mail (koncept nižšie).`;
+    } else if (s === 'zamietnuty') {
+      await env.DB.prepare("UPDATE ambasadori SET stav = 'zamietnuty' WHERE id = ?").bind(id).run();
+      m = 'Prihláška zamietnutá.';
+    }
+  } else if (akcia === 'poznamka') {
+    await env.DB.prepare('UPDATE ambasadori SET interna = ? WHERE id = ?').bind(kratko(f.get('interna'), 4000), id).run();
+    m = 'Poznámka uložená.';
+  } else if (akcia === 'vyplatene') {
+    await env.DB.prepare("UPDATE provizie SET stav = 'vyplatena' WHERE kod = ? AND stav = 'potvrdena'").bind(a.kod).run();
+    m = 'Provízie označené ako vyplatené.';
+  }
+  return presmeruj(`/admin/ambasadori/${id}?m=${encodeURIComponent(m)}`);
+}
+
 export default {
   async scheduled(event, env) {
     try {
@@ -884,6 +1033,14 @@ export default {
         return await novaObjednavka(req, env, origin, base);
       }
       if (req.method === 'POST' && cesta === '/stripe') return await stripeWebhook(req, env);
+      if (req.method === 'POST' && cesta === '/ambasador') {
+        if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
+        return await novyAmbasador(req, env, origin);
+      }
+      let ma = cesta.match(/^\/admin\/ambasadori\/(\d+)$/);
+      if (ma && req.method === 'GET' && url.searchParams.get('s') && env.ADMIN_KEY && rovnake(url.searchParams.get('s'), await hmac(env, 'amb:' + ma[1]))) {
+        return presmeruj(`/admin/ambasadori/${ma[1]}`, adminCookie(env));
+      }
       if (req.method === 'POST' && cesta === '/novy-klient') {
         if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
         return await overNovehoKlienta(req, env, origin);
@@ -914,6 +1071,10 @@ export default {
         if (m && !m[2] && req.method === 'GET') return await adminDetail(env, base, cislo, url.searchParams.get('m'));
         if (ok !== true && ok !== 'nastav') return html('Pre túto akciu otvor prehľad cez svoj odkaz s kľúčom.', 403);
         if (req.method === 'GET' && cesta === '/admin/schvalenie') return html(await stranaSchvalenia(env, base));
+        if (req.method === 'GET' && cesta === '/admin/ambasadori') return html(await adminAmbasadori(env));
+        let am;
+        if (req.method === 'GET' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)$/))) return await adminAmbasador(env, +am[1], url.searchParams.get('m'));
+        if (req.method === 'POST' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)\/(stav|poznamka|vyplatene)$/))) return await adminAmbAkcia(req, env, +am[1], am[2]);
         let v;
         if (req.method === 'GET' && (v = cesta.match(/^\/admin\/v\/(\d+)$/))) {
           const r = await env.DB.prepare('SELECT b64 FROM vystupy WHERE id = ?').bind(+v[1]).first();

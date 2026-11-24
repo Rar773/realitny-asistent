@@ -136,3 +136,6 @@ document.querySelectorAll('.ba').forEach(ba => {
   ba.addEventListener('pointermove', e => { if (d) mv(e); });
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => ba.addEventListener(t, () => { d = false; }));
 });
+
+// odkaz ambasádora (?amb=KOD) – zapamätáme na 60 dní
+(() => { try { const k = new URLSearchParams(location.search).get('amb'); if (k && /^AMB-[A-Za-z0-9]{3,20}$/.test(k)) localStorage.setItem('ra_amb', JSON.stringify({ k: k.toUpperCase(), t: Date.now() })); } catch (e) { /* nič */ } })();

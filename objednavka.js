@@ -129,6 +129,7 @@
     if (inz && !/^https?:\/\//i.test(inz)) return chyba('Odkaz na inzerát musí začínať https://'), form.inzerat.focus();
     if (!fotky.length && !inz) return chyba('Nahrajte fotky alebo vložte odkaz na inzerát.');
     if ($('oNovy').checked && sluzba === 'zariadenie' && !form.telefon.value.trim()) return chyba('Pre zľavu pre nových klientov vyplňte telefónne číslo.'), form.telefon.focus();
+    if (form.kod.value.trim() && $('oNovy').checked) { $('oNovy').checked = false; prepocitaj(); }
     if (!form.suhlas.checked) return chyba('Potvrďte súhlas s obchodnými podmienkami.');
 
     const btn = $('oOdoslat');
@@ -160,6 +161,8 @@
     }
   });
 
+  // kód ambasádora z odkazu
+  try { const a = JSON.parse(localStorage.getItem('ra_amb') || 'null'); if (a && Date.now() - a.t < 60 * 864e5 && !form.kod.value) form.kod.value = a.k; } catch { /* nič */ }
   // predvoľba služby z odkazu, napr. objednavka.html?sluzba=standard
   const q = new URLSearchParams(location.search).get('sluzba');
   const opt = q && form.querySelector(`[name="sluzba"][value="${q}"]`);

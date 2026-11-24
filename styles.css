@@ -1092,3 +1092,7 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 
 /* 4 služby na úvode – 2×2 */
 @media (min-width:981px){.g3.g4s{grid-template-columns:repeat(2,1fr)}}
+
+/* výber vo formulároch */
+.opole select{font:inherit;font-weight:400;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.opole select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(119,40,230,.15)}
