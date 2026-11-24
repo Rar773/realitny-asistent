@@ -113,6 +113,56 @@ async function nacitaj(env, cislo) {
 }
 const stavUrl = (base, o) => `${base}/stav/${o.cislo}?t=${o.token}`;
 
+// ---------- e-maily zákazníkom (Resend) ----------
+function emailHtml(nadpis, odseky, tlacidlo, odkaz) {
+  return `<!doctype html><html lang="sk"><body style="margin:0;background:#F4F5F9;font-family:Arial,Helvetica,sans-serif;color:#202436">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F5F9;padding:24px 12px"><tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:16px;border:1px solid #E6E8EF">
+<tr><td style="padding:22px 26px 6px;font-weight:800;font-size:17px;color:#7728E6">Realitný <span style="color:#202436">asistent</span></td></tr>
+<tr><td style="padding:8px 26px 4px"><h1 style="font-size:21px;margin:0 0 10px;color:#202436">${esc(nadpis)}</h1>
+${odseky.map((o) => `<p style="font-size:15px;line-height:1.55;margin:0 0 12px">${o}</p>`).join('')}
+${tlacidlo ? `<p style="margin:18px 0 22px"><a href="${odkaz}" style="display:inline-block;background:#7728E6;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:10px">${esc(tlacidlo)}</a></p>` : ''}
+</td></tr>
+<tr><td style="padding:14px 26px 22px;border-top:1px solid #EEF0F5;font-size:13px;color:#667085">Realitný asistent · <a href="mailto:info@realitnyasistent.eu" style="color:#7728E6">info@realitnyasistent.eu</a> · <a href="${WEB}" style="color:#7728E6">realitnyasistent.eu</a><br>Na tento e-mail môžete priamo odpovedať.</td></tr>
+</table></td></tr></table></body></html>`;
+}
+async function posliEmail(env, o, druh, base) {
+  if (!env.RESEND_KEY || !o.email) return false;
+  const uz = await env.DB.prepare('SELECT 1 FROM historia WHERE cislo = ? AND udalost = ?').bind(o.cislo, `E-mail odoslaný: ${druh}`).first();
+  if (uz) return false;
+  const su = stavUrl(base, o);
+  let predmet, html, text;
+  if (druh === 'potvrdenie') {
+    predmet = `Potvrdenie objednávky ${o.cislo}`;
+    const p = [`Dobrý deň${o.meno ? ', ' + esc(o.meno.split(' ')[0]) : ''},`,
+      `ďakujeme za objednávku <b>${o.cislo}</b>: ${esc(popisSluzby(o))}, cena <b>${eur(o.cena)}</b>.`,
+      o.zaplatene ? 'Platbu sme prijali, ďakujeme.' : 'Faktúru vám pošleme e-mailom.',
+      'Hotové fotky alebo video vám pripravíme spravidla do 24 hodín. Keď budú hotové, pošleme vám e-mail a stiahnete si ich na stránke objednávky.'];
+    html = emailHtml('Ďakujeme za objednávku', p, 'Stav objednávky', su);
+  } else {
+    predmet = `Objednávka ${o.cislo} je hotová`;
+    const p = [`Dobrý deň${o.meno ? ', ' + esc(o.meno.split(' ')[0]) : ''},`,
+      `vaša objednávka <b>${o.cislo}</b> (${esc(popisSluzby(o))}) je hotová. Výsledky si stiahnete kliknutím na tlačidlo nižšie.`,
+      o.sluzba === 'zariadenie' ? 'Virtuálne zariadené fotky prosím v inzeráte označte ako virtuálne zariadené, aby kupujúci vedel, že nábytok nie je súčasťou predaja.' : null,
+      'Ak budete chcieť niečo upraviť, stačí odpovedať na tento e-mail. Prajeme úspešný predaj.'].filter(Boolean);
+    html = emailHtml('Vaša objednávka je hotová', p, 'Stiahnuť výsledky', su);
+  }
+  text = html.replace(/<a [^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g, '$2: $1').replace(/<[^>]+>/g, ' ').replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n').trim();
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: 'Realitný asistent <info@realitnyasistent.eu>', to: [o.email], reply_to: 'info@realitnyasistent.eu', subject: predmet, html, text }),
+  });
+  if (!r.ok) {
+    const chyba = await r.text().catch(() => '');
+    await zapisHistoriu(env, o.cislo, `E-mail (${druh}) sa nepodarilo odoslať: ${chyba.slice(0, 200)}`);
+    await tgSprava(env, `⚠️ ${o.cislo}: e-mail „${druh}“ sa nepodarilo odoslať zákazníkovi – pošli ho ručne z prehľadu.`).catch(() => {});
+    return false;
+  }
+  await zapisHistoriu(env, o.cislo, `E-mail odoslaný: ${druh}`);
+  return true;
+}
+
 // ---------- Stripe ----------
 async function stripeCheckout(env, base, o) {
   const p = new URLSearchParams();
@@ -224,6 +274,7 @@ async function novaObjednavka(req, env, origin, base) {
       await tgSprava(env, `⚠️ ${o.cislo}: platobnú bránu sa nepodarilo otvoriť – vybav faktúrou.`).catch(() => {});
     }
   }
+  if (o.stav === 'nova') await posliEmail(env, o, 'potvrdenie', base).catch((e) => console.log('email', e.message));
   return json({ ok: true, cislo: o.cislo, cena: o.cena, stav_url: stavUrl(base, o), platba_url }, 200, origin);
 }
 
@@ -336,7 +387,7 @@ async function adminDetail(env, base, cislo, sprava) {
       <button class="btn">Nahrať výsledky</button>
       <p class="mut" style="font-size:13px">Zákazník si ich stiahne na svojej stránke so stavom objednávky. Fotky sa uložia aj do Telegramu.</p>
     </form></div>
-  <div class="card"><h2>E-mail zákazníkovi</h2><p class="mut" style="margin-top:0">Pripravený koncept – otvorí sa v tvojom e-maile, odošleš ho ty.</p>
+  <div class="card"><h2>E-mail zákazníkovi</h2>${env.RESEND_KEY ? '<p class="mut" style="margin-top:0">Potvrdenie a e-mail „hotovo“ odchádzajú zákazníkovi automaticky (pozri Históriu). Tento koncept použi len pri potrebe.</p>' : '<p class="mut" style="margin-top:0">Pripravený koncept – otvorí sa v tvojom e-maile, odošleš ho ty. (Automatické e-maily sa zapnú po nastavení Resend.)</p>'}
     <a class="btn sec" href="${mailto}">✉️ Otvoriť koncept: ${o.stav === 'dodana' ? 'hotovo' : 'potvrdenie'}</a>
     <details style="margin-top:10px"><summary class="mut">Zobraziť text</summary><pre style="white-space:pre-wrap;font:inherit;background:#F4F5F9;padding:12px;border-radius:10px">${esc(telo)}</pre></details></div>
   <div class="card"><h2>Interná poznámka</h2><form method="post" action="/admin/o/${o.cislo}/poznamka"><textarea name="interna" rows="3">${esc(o.interna || '')}</textarea><button class="btn sec sm" style="margin-top:8px">Uložiť</button></form></div>
@@ -373,6 +424,10 @@ async function adminAkcia(req, env, base, cislo, akcia) {
       await zapisHistoriu(env, cislo, `Nahraté výsledky: ${ids.length}${dodat ? ' · Dodaná' : ''}`);
       sprava = `Nahraté ${ids.length} ${ids.length === 1 ? 'súbor' : 'súbory'}.${dodat ? ' Objednávka je Dodaná – pošli zákazníkovi e-mail (koncept nižšie).' : ''}`;
     }
+  }
+  const po = await nacitaj(env, cislo);
+  if (po && po.stav === 'dodana' && po.vysledky.length) {
+    if (await posliEmail(env, po, 'hotovo', base).catch(() => false)) sprava += ' Zákazníkovi sme poslali e-mail s výsledkami.';
   }
   return presmeruj(`/admin/o/${cislo}?m=${encodeURIComponent(sprava)}`);
 }
@@ -416,6 +471,8 @@ async function stripeWebhook(req, env) {
     if (o && !o.zaplatene) {
       await env.DB.prepare("UPDATE objednavky SET zaplatene = 1, stav = 'zaplatena', aktualizovane = ? WHERE cislo = ?").bind(teraz(), cislo).run();
       await zapisHistoriu(env, cislo, `Zaplatené kartou (${eur(e.data.object.amount_total / 100)})`);
+      o.zaplatene = 1;
+      await posliEmail(env, o, 'potvrdenie', new URL(req.url).origin).catch(() => {});
       await tgSprava(env, `💳 <b>Zaplatené: ${cislo}</b>\n${esc(popisSluzby(o))} · ${eur(e.data.object.amount_total / 100)}\n👤 ${esc(o.meno)}`).catch(() => {});
     }
   }
