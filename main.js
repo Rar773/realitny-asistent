@@ -124,3 +124,15 @@ function wOdoslat(ev) {
   const set = () => { const r = f.querySelector('input:checked'); go.href = 'mailto:info@realitnyasistent.eu?subject=' + encodeURIComponent(r.dataset.s); };
   f.addEventListener('change', set); set();
 })();
+
+// Pred/po posuvník
+document.querySelectorAll('.ba').forEach(ba => {
+  const r = ba.querySelector('input');
+  const set = v => { v = Math.max(0, Math.min(100, v)); ba.style.setProperty('--p', v + '%'); r.value = v; };
+  const mv = e => { const b = ba.getBoundingClientRect(); set((e.clientX - b.left) / b.width * 100); };
+  let d = false;
+  r.addEventListener('input', () => set(+r.value));
+  ba.addEventListener('pointerdown', e => { d = true; try { ba.setPointerCapture(e.pointerId); } catch (x) {} mv(e); });
+  ba.addEventListener('pointermove', e => { if (d) mv(e); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => ba.addEventListener(t, () => { d = false; }));
+});
