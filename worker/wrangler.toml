@@ -1,0 +1,8 @@
+name = "ra-objednavky"
+main = "objednavky.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+# Tajné premenné (nastavujú sa mimo repa):
+#   TG_TOKEN – token Telegram bota Realitného asistenta
+#   TG_CHAT  – chat_id, kam chodia objednávky (Marian)
