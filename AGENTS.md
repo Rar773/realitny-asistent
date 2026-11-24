@@ -107,15 +107,15 @@ v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ost
 
 ## 5b. Ambasádorský program – platné pravidlá (nemeniť bez súhlasu Mariana)
 
-- Stránka `ambasador.html`, podmienky `podmienky.html#ambasador` (časť 8a). Prihlášky spracúva server `worker/objednavky.js` (`/ambasador`), schvaľuje Marian.
+- Stránka `ambasador.html`, podmienky `podmienky.html#ambasador` (časť 8a). Prihlášky spracúva server `../realitny-asistent-worker/objednavky.js` (`/ambasador`), schvaľuje Marian.
 - Štandard: ambasádor **15 %** z ceny zaplatenej klientom, počas **12 mesiacov** od prvej objednávky s kódom; klient **−10 %** na prvú objednávku.
 - Bonus: **50 nových platiacich klientov** → web s ponukou nehnuteľností + 12 mesiacov asistenta Všetky portály zadarmo.
 - Výplata mesačne, provízia 14 dní po platbe, minimum 50 €. Individuálne podmienky nastavuje Marian v prehľade.
 
-## 5c. Chat s pomocníkom (chat.js + worker/chat.js)
+## 5c. Chat s pomocníkom (chat.js + ../realitny-asistent-worker/chat.js)
 - Okno chatu je `chat.js` (načíta ho `main.js` na všetkých stránkach). Rovnaký kód je vložený aj v aplikácii (`ui/index.html`, nastavenie `window.RA_CHAT`).
-- Odpovede pripravuje Worker `/chat` (OpenAI). Všetky fakty, ktoré pomocník smie povedať, sú v `worker/chat.js` v konštantách `ZNALOSTI` a `NAVOD_APP`.
-- **Pri každej zmene cien, služieb, podmienok alebo funkcií aplikácie uprav aj `ZNALOSTI` vo `worker/chat.js`** a nasaď Worker (`npx.cmd wrangler deploy` v priečinku worker). Inak bude chat hovoriť staré ceny.
+- Odpovede pripravuje Worker `/chat` (OpenAI). Všetky fakty, ktoré pomocník smie povedať, sú v `../realitny-asistent-../realitny-asistent-worker/chat.js` v konštantách `ZNALOSTI` a `NAVOD_APP`.
+- **Pri každej zmene cien, služieb, podmienok alebo funkcií aplikácie uprav aj `ZNALOSTI` vo `../realitny-asistent-../realitny-asistent-worker/chat.js`** a nasaď Worker (`npx.cmd wrangler deploy` v priečinku worker). Inak bude chat hovoriť staré ceny.
 - Kontakt z chatu (`/chat/kontakt`) chodí Marianovi na Telegram. Prehľad rozhovorov: `/admin/chaty`. Rozhovory sa mažú po 90 dňoch.
 - Limity proti zneužitiu: 30 správ za hodinu na IP/zariadenie, 800 správ za deň spolu (premenná `CHAT_DEN_LIMIT`).
 
@@ -126,3 +126,7 @@ python tools/kontrola.py
 ```
 Skontroluje: zakázané slová, 1. osobu jednotného čísla, odkazy a kotvy na stránkach, chýbajúce súbory,
 prítomnosť povinných id pre JS, e-mailovú adresu a zhodu verzie CSS/JS na všetkých stránkach.
+
+
+## Server (Cloudflare Worker)
+Kód servera objednávok, chatu a zmlúv je v **súkromnom** repe Rar773/realitny-asistent-worker (lokálne C:\Users\rarex\Documents\realitny-asistent-worker, nasadenie: `npx wrangler deploy` z toho priečinka). Do tohto verejného repa ho už nedávame – nesmie byť verejný.
