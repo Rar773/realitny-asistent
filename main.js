@@ -173,3 +173,13 @@ document.querySelectorAll('.ba').forEach(ba => {
   if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
   oznac();
 })();
+
+// chat s pomocníkom – načíta sa až po načítaní stránky
+(function () {
+  function nacitaj() {
+    if (document.getElementById('rac-btn')) return;
+    var m = document.querySelector('script[src*="main.js"]'), v = m && m.src.split('?')[1];
+    var s = document.createElement('script'); s.src = 'chat.js' + (v ? '?' + v : ''); s.defer = true; document.body.appendChild(s);
+  }
+  if (document.readyState === 'complete') setTimeout(nacitaj, 400); else window.addEventListener('load', function () { setTimeout(nacitaj, 400); });
+})();

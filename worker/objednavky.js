@@ -2,6 +2,8 @@
 // Objednávka → databáza (D1) → Telegram (Marian) → prehľad /admin → stránka stavu pre zákazníka /stav
 // Platba kartou cez Stripe sa zapne sama, keď sú nastavené STRIPE_KEY a STRIPE_WEBHOOK_SECRET.
 
+import { chatOdpoved, chatKontakt, chatSuhrn, chatUdrzba, chatAdmin } from './chat.js';
+
 const WEB = 'https://realitnyasistent.eu';
 const POVOLENE = [WEB, 'https://www.realitnyasistent.eu', 'http://localhost:8765', 'http://127.0.0.1:8765'];
 const MAX_FOTIEK = 10;
@@ -473,7 +475,7 @@ async function adminZoznam(env, url) {
     .map(([k, t]) => `<a href="/admin?stav=${k}" class="${k === f ? 'on' : ''}">${t}</a>`).join('');
   const riadky = results.map((o) => `<tr class="kl" onclick="location='/admin/o/${o.cislo}'"><td><b>${o.cislo}</b><div class="mut" style="font-size:12.5px">${cas(o.vytvorene)} · ${esc(o.zdroj)}</div></td><td>${esc(o.meno)}<div class="mut hm" style="font-size:12.5px">${esc(o.email)}</div></td><td class="hm">${esc(popisSluzby(o))}</td><td>${eur(o.cena)}${o.zaplatene ? ' ✓' : ''}</td><td>${pillStav(o.stav)}</td></tr>`).join('');
   return stranka('Objednávky – Realitný asistent', `<h1>Objednávky</h1><p class="mut">Za posledných 30 dní: ${sum.n} objednávok · zaplatené ${eur(sum.z)}</p>
-  <div class="row" style="margin-top:10px"><a class="btn" href="/admin/schvalenie">✅ Schvaľovanie</a><a class="btn sec" href="/admin/ambasadori">🤝 Ambasádori</a><form method="post" action="/admin/spusti" style="margin:0"><button class="btn sec">🪄 Spustiť výrobu teraz</button></form><form method="post" action="/admin/suhrn" style="margin:0"><button class="btn sec">🌙 Poslať súhrn teraz</button></form></div>
+  <div class="row" style="margin-top:10px"><a class="btn" href="/admin/schvalenie">✅ Schvaľovanie</a><a class="btn sec" href="/admin/ambasadori">🤝 Ambasádori</a><a class="btn sec" href="/admin/chaty">💬 Chat</a><form method="post" action="/admin/spusti" style="margin:0"><button class="btn sec">🪄 Spustiť výrobu teraz</button></form><form method="post" action="/admin/suhrn" style="margin:0"><button class="btn sec">🌙 Poslať súhrn teraz</button></form></div>
   <div class="row filt" style="margin-top:12px">${filt}</div>
   <div class="card" style="padding:6px 10px"><table><thead><tr><th>Číslo</th><th>Zákazník</th><th class="hm">Služba</th><th>Cena</th><th>Stav</th></tr></thead><tbody>${riadky || '<tr><td colspan="5" class="mut" style="padding:20px">Žiadne objednávky.</td></tr>'}</tbody></table></div>`, true);
 }
@@ -807,12 +809,20 @@ async function prehladNaSchvalenie(env) {
 }
 async function vecernySuhrn(env, pripomienka) {
   const s = await prehladNaSchvalenie(env);
-  if (!s.hotove.length && !s.videa.length) { if (!pripomienka && s.rozrobene.length) await tgSprava(env, `🌙 Dnes ešte nič na schválenie – ${s.rozrobene.length} ${s.rozrobene.length === 1 ? 'objednávka sa' : 'objednávky sa'} ešte vyrába.`).catch(() => {}); return; }
+  const chatR = pripomienka ? '' : await chatSuhrn(env).catch(() => '');
+  if (!s.hotove.length && !s.videa.length) {
+    if (!pripomienka) {
+      const t = [s.rozrobene.length ? `🌙 Dnes ešte nič na schválenie – ${s.rozrobene.length} ${s.rozrobene.length === 1 ? 'objednávka sa' : 'objednávky sa'} ešte vyrába.` : '', chatR].filter(Boolean).join('\n');
+      if (t) await tgSprava(env, t).catch(() => {});
+    }
+    return;
+  }
   const odkaz = `${BASE_URL}/admin/schvalenie?s=${await hmac(env, 'schvalenie')}`;
   const r = [pripomienka ? '⏰ <b>Pripomienka: čaká na tvoje schválenie</b>' : '🌙 <b>Večerný súhrn</b>', ''];
   if (s.hotove.length) r.push(`🛋 Na schválenie: <b>${s.hotove.length}</b> ${s.hotove.length === 1 ? 'objednávka' : 'objednávky'}, <b>${s.fotiek}</b> fotiek${s.problemov ? ` (⚠️ ${s.problemov} na kontrolu)` : ''}`);
   if (s.rozrobene.length) r.push(`⏳ Ešte sa vyrába: ${s.rozrobene.length}`);
   if (s.videa.length) r.push(`🎬 Čaká na tvoje video: ${s.videa.length} (${s.videa.map((o) => o.cislo).join(', ')})`);
+  if (chatR) r.push(chatR);
   await tgSprava(env, r.join('\n'), s.hotove.length ? [[{ text: '✅ Otvoriť schvaľovanie', url: odkaz }]] : null);
 }
 
@@ -1042,7 +1052,7 @@ async function adminAmbAkcia(req, env, id, akcia) {
 export default {
   async scheduled(event, env) {
     try {
-      if (event.cron === '0 18 * * *') await vecernySuhrn(env, false);
+      if (event.cron === '0 18 * * *') { await vecernySuhrn(env, false); await chatUdrzba(env).catch((e) => console.log('chat udrzba', e.message)); }
       else if (event.cron === '0 20 * * *') await vecernySuhrn(env, true);
       else await spracujFrontu(env);
     } catch (e) { console.log('cron chyba', e.stack || e.message); }
@@ -1073,6 +1083,11 @@ export default {
         if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
         return await overNovehoKlienta(req, env, origin);
       }
+      if (req.method === 'POST' && (cesta === '/chat' || cesta === '/chat/kontakt')) {
+        if (origin && !POVOLENE.includes(origin)) return json({ ok: false }, 403, origin);
+        const h = { json, origin, ipHash, tgSprava };
+        return cesta === '/chat' ? await chatOdpoved(req, env, h) : await chatKontakt(req, env, h);
+      }
 
       let m;
       if (req.method === 'GET' && (m = cesta.match(/^\/f\/(.+)$/))) return await subor(env, decodeURIComponent(m[1]), url);
@@ -1100,6 +1115,7 @@ export default {
         if (ok !== true && ok !== 'nastav') return html('Pre túto akciu otvor prehľad cez svoj odkaz s kľúčom.', 403);
         if (req.method === 'GET' && cesta === '/admin/schvalenie') return html(await stranaSchvalenia(env, base));
         if (req.method === 'GET' && cesta === '/admin/ambasadori') return html(await adminAmbasadori(env));
+        if (req.method === 'GET' && cesta === '/admin/chaty') return html(await chatAdmin(env, stranka));
         let am;
         if (req.method === 'GET' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)$/))) return await adminAmbasador(env, +am[1], url.searchParams.get('m'));
         if (req.method === 'POST' && (am = cesta.match(/^\/admin\/ambasadori\/(\d+)\/(stav|poznamka|vyplatene|podmienky)$/))) return await adminAmbAkcia(req, env, +am[1], am[2]);
