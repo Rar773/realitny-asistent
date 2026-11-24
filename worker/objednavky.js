@@ -416,7 +416,7 @@ async function galeria(env, base, zoznam) {
 }
 
 // ---------- automatické zariadenie (OpenAI) ----------
-const MIESTNOST_EN = { 'Obývačka': 'living room', 'Spálňa': 'bedroom', 'Kuchyňa': 'kitchen', 'Jedáleň': 'dining room', 'Detská izba': "children's room", 'Pracovňa': 'home office', 'Kúpeľňa': 'bathroom' };
+const MIESTNOST_EN = { 'Obývačka s kuchyňou': 'open-plan living room with a kitchen area', 'Obývačka': 'living room', 'Spálňa': 'bedroom', 'Kuchyňa': 'kitchen', 'Jedáleň': 'dining room', 'Detská izba': "children's room", 'Pracovňa': 'home office', 'Kúpeľňa': 'bathroom' };
 const STYL_EN = {
   moderny: 'modern style with clean lines, light grey and beige tones, a comfortable sofa or bed, simple wooden accents',
   skandinavsky: 'warm Scandinavian style with light wood, linen textiles, green plants and soft neutral colours',
@@ -429,6 +429,7 @@ function promptZariadenia(o, foto, pokyn) {
     `Virtually stage this empty ${izba} for a real estate listing.`,
     'Keep the room exactly as it is: the same walls, ceiling, floor, windows, doors, radiators, sockets and light switches, the same camera angle, perspective, framing and zoom, pixel-aligned with the original photo. Do not change the architecture, do not add or remove windows or doors, do not crop.',
     `Add realistic furniture and decor suitable for a ${izba} in a ${STYL_EN[o.styl] || STYL_EN.moderny}.`,
+    'Kitchen: if the room is or contains a kitchen, or you see kitchen plumbing or outlets on a wall (water pipes, drain, cooker or appliance sockets, an extractor outlet, a tiled kitchen strip), install a complete fitted kitchen exactly there: base and wall cabinets, worktop, sink with tap, hob, oven and fridge, in colours matching the style. A dining table alone is not enough – the kitchen units are required.',
     'Lighting fixtures are decor, not architecture: replace every bare light bulb, socket or exposed electrical cable hanging from the ceiling (or sticking out of a wall where a lamp belongs) with a finished, stylish ceiling light or pendant lamp that matches the style, mounted at the same spot. Nothing unfinished may remain visible on the ceiling.',
     'Natural soft daylight, realistic shadows and reflections on the floor. Photorealistic high-end real estate photography. No people. Do not add any new text, watermark or logo.',
     'If the original photo has a watermark or agency logo, keep it exactly as it is: the same position, size, shape, letters, colour and transparency, sharp and undistorted, drawn on top of everything (furniture must not cover it). Do not remove, move, redraw or blur it.',
@@ -718,6 +719,7 @@ Skontroluj:
 3. Na obrázku nie sú ľudia a nepribudli žiadne nové texty ani logá. Ak má originál vodoznak alebo logo realitky, musí byť na zariadenej fotke zachované na rovnakom mieste, celé, čitateľné a nepokrivené (pokrivené, rozmazané alebo chýbajúce logo = ok false).
 4. Nábytok zodpovedá miestnosti (${o.fotky[i].popis || 'miestnosť'}).
 5. Na strope ani na stenách nevisí holá žiarovka ani trčiaci elektrický kábel – musia byť nahradené hotovým svietidlom.
+6. Ak je na fotke kuchyňa alebo kuchynský kút (vývody vody, zásuvky na sporák, dlaždice pri stene), musí tam byť kompletná kuchynská linka so skrinkami, pracovnou doskou, drezom a varnou doskou – samotný stôl nestačí (inak ok false).
 Odpovedz IBA ako JSON: {"ok": true alebo false, "dovod": "krátko po slovensky, čo je zlé (alebo prázdny reťazec)"}. Drobné rozdiely v osvetlení nevadia.`;
   const r = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',

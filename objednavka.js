@@ -4,7 +4,7 @@
     ? 'http://localhost:8787/objednavka'
     : 'https://ra-objednavky.rarex731.workers.dev/objednavka';
   const MAX = 10;
-  const MIESTNOSTI = ['Obývačka', 'Spálňa', 'Kuchyňa', 'Jedáleň', 'Detská izba', 'Pracovňa', 'Kúpeľňa', 'Iná'];
+  const MIESTNOSTI = ['Obývačka', 'Obývačka s kuchyňou', 'Spálňa', 'Kuchyňa', 'Jedáleň', 'Detská izba', 'Pracovňa', 'Kúpeľňa', 'Iná'];
   const $ = (id) => document.getElementById(id);
   const form = $('obj');
   if (!form) return;
