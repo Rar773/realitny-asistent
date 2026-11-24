@@ -1089,3 +1089,6 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .ohotovo .btn{margin-top:14px}
 @media (max-width:980px){.obj{grid-template-columns:1fr}.osum{position:static}}
 @media (max-width:640px){.ovyber,.ostyly{grid-template-columns:1fr}.og2{grid-template-columns:1fr}.okrok{padding:18px 16px 14px}.ofotky{grid-template-columns:repeat(2,1fr)}}
+
+/* 4 služby na úvode – 2×2 */
+@media (min-width:981px){.g3.g4s{grid-template-columns:repeat(2,1fr)}}
