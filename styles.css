@@ -773,3 +773,229 @@ footer{background:#fff;border-top:1px solid var(--line)}
 /* oprava: cisla krokov odporucania neprekryvaju text */
 .rsteps li{position:relative;padding:16px 18px 16px 64px}
 .rsteps li::before{left:16px;top:14px}
+
+
+/* =========================================================
+   Podstránky – detailné rozloženie podľa návrhu 04
+   ========================================================= */
+
+/* Videá: video ukážka je súčasťou hero, galéria zobrazuje už len ďalšie formáty. */
+.video-page .phero-g.side{
+  grid-template-columns:minmax(0,1fr) minmax(360px,.98fr);
+  gap:44px;
+}
+.video-page .phero-g.side>div:first-child{max-width:650px}
+.video-page .vidhero{
+  padding:14px;
+  gap:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  box-shadow:0 14px 36px rgba(36,28,66,.09);
+}
+.video-page .vidhero-media{
+  position:relative;
+  overflow:hidden;
+  border-radius:13px;
+  aspect-ratio:16/9;
+  background:#17172f;
+}
+.video-page .vidhero-media video{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.video-page .vidhero-format{
+  position:absolute;
+  top:12px;
+  left:12px;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:9px;
+  background:rgba(255,255,255,.94);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:800;
+  pointer-events:none;
+}
+.video-page .vidhero-points{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 14px;
+  padding:2px 3px 3px;
+}
+.video-page .vidhero-points span{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  color:var(--ink2);
+  font-size:13.5px;
+  font-weight:600;
+  line-height:1.45;
+}
+.video-page .vidhero-points svg{
+  width:17px;
+  height:17px;
+  flex:0 0 17px;
+  color:var(--brand);
+}
+.video-page #videa{padding:64px 0}
+.video-page .vids-secondary{
+  grid-template-columns:minmax(0,1fr) minmax(230px,.52fr);
+  align-items:center;
+}
+.video-page .vids-secondary .vbox{
+  margin:0;
+  min-width:0;
+}
+.video-page .vids-secondary .vbox.vert{
+  width:100%;
+  max-width:300px;
+  justify-self:center;
+}
+.video-page .vids-secondary .vbox video{
+  display:block;
+  width:100%;
+}
+.video-page .vids-secondary .cap{
+  flex-wrap:wrap;
+}
+
+/* Aplikácia: jeden výrazný hero, kompaktné portály a pravidelná mriežka funkcií. */
+.app-page .apphero-grid{
+  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  gap:46px;
+  align-items:center;
+}
+.app-page .apphero-copy{min-width:0}
+.app-page .apphero-copy .lead{max-width:570px}
+.app-page .apphero-points{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin:20px 0 0;
+}
+.app-page .apphero-points span{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.45;
+}
+.app-page .apphero-points span::before{
+  content:"";
+  width:7px;
+  height:7px;
+  flex:0 0 7px;
+  border-radius:50%;
+  background:var(--brand);
+  transform:translateY(-1px);
+}
+.app-page .apphero-points b{color:var(--ink);font-weight:700}
+.app-page .pick{
+  width:100%;
+  max-width:500px;
+  margin-top:22px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  box-shadow:var(--sh);
+  background:#fff;
+}
+.app-page .apphero-demo{
+  min-width:0;
+  padding:16px 0 30px;
+}
+.app-page .apphero-demo .laptop{
+  filter:drop-shadow(0 15px 25px rgba(35,25,68,.10));
+}
+.app-page .apphero-demo .chip{
+  border-radius:11px;
+  box-shadow:0 8px 22px rgba(32,36,54,.10);
+}
+.app-page .app-feature-section .sh{max-width:760px}
+.app-page .app-fwrap{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:20px;
+}
+.app-page .app-fwrap .plist{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px 14px;
+  align-items:center;
+  padding:18px 20px;
+  border-radius:16px;
+}
+.app-page .app-fwrap .plist h3,
+.app-page .app-fwrap .plist p{grid-column:1/-1}
+.app-page .app-fwrap .plist h3{margin:0 0 2px;font-size:16px}
+.app-page .app-fwrap .plist>div{
+  min-width:0;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fbfaff;
+  font-size:14px;
+}
+.app-page .app-fwrap .plist>div small{font-size:11px}
+.app-page .app-fwrap .plist p{margin:4px 0 0;font-size:13px}
+.app-page .app-fwrap .feat{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.app-page .app-fwrap .feat>div{
+  padding:22px;
+  border-radius:16px;
+}
+.app-page .app-fwrap .feat h3{font-size:17px;margin:13px 0 6px}
+.app-page .app-showcase .shots{
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--sh);
+}
+.app-page .app-pricing .plans2{align-items:stretch}
+.app-page .app-pricing .plan{
+  padding:28px;
+  border-radius:18px;
+}
+.app-page .app-pricing .plan.hl{border-width:2px}
+.app-page .app-pricing .obd{
+  display:inline-flex;
+  padding:5px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:var(--sh);
+}
+.app-page .app-pricing .obd button{border-radius:9px}
+.app-page .app-pricing .note{max-width:850px;margin:24px auto 0;text-align:center}
+
+@media(max-width:1100px){
+  .video-page .phero-g.side{grid-template-columns:1fr 1fr;gap:26px}
+  .app-page .apphero-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .app-page .app-fwrap .plist{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:980px){
+  .video-page .phero-g.side,
+  .app-page .apphero-grid{grid-template-columns:1fr;gap:28px}
+  .video-page .vidhero{max-width:760px}
+  .app-page .apphero-demo{max-width:850px;width:100%;margin:0 auto}
+  .app-page .apphero-copy .pick{max-width:620px}
+  .app-page .app-fwrap .feat{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .video-page .vidhero-points{grid-template-columns:1fr}
+  .video-page .vids-secondary{grid-template-columns:1fr;gap:16px}
+  .video-page .vids-secondary .vbox.vert{max-width:280px}
+  .app-page .apphero-points{gap:7px}
+  .app-page .apphero-demo{padding:4px 0 20px}
+  .app-page .apphero-demo .chip{font-size:11px;right:0}
+  .app-page .app-fwrap .plist{grid-template-columns:1fr}
+  .app-page .app-fwrap .feat{grid-template-columns:1fr}
+  .app-page .app-showcase .shots{padding:12px}
+  .app-page .app-pricing .plan{padding:24px 20px}
+}
