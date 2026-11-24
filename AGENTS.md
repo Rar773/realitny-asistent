@@ -112,6 +112,13 @@ v `index.html` (sekcia `#odporucanie`) a v `podmienky.html` (časť 8) musia ost
 - Bonus: **50 nových platiacich klientov** → web s ponukou nehnuteľností + 12 mesiacov asistenta Všetky portály zadarmo.
 - Výplata mesačne, provízia 14 dní po platbe, minimum 50 €. Individuálne podmienky nastavuje Marian v prehľade.
 
+## 5c. Chat s pomocníkom (chat.js + worker/chat.js)
+- Okno chatu je `chat.js` (načíta ho `main.js` na všetkých stránkach). Rovnaký kód je vložený aj v aplikácii (`ui/index.html`, nastavenie `window.RA_CHAT`).
+- Odpovede pripravuje Worker `/chat` (OpenAI). Všetky fakty, ktoré pomocník smie povedať, sú v `worker/chat.js` v konštantách `ZNALOSTI` a `NAVOD_APP`.
+- **Pri každej zmene cien, služieb, podmienok alebo funkcií aplikácie uprav aj `ZNALOSTI` vo `worker/chat.js`** a nasaď Worker (`npx.cmd wrangler deploy` v priečinku worker). Inak bude chat hovoriť staré ceny.
+- Kontakt z chatu (`/chat/kontakt`) chodí Marianovi na Telegram. Prehľad rozhovorov: `/admin/chaty`. Rozhovory sa mažú po 90 dňoch.
+- Limity proti zneužitiu: 30 správ za hodinu na IP/zariadenie, 800 správ za deň spolu (premenná `CHAT_DEN_LIMIT`).
+
 ## 6. Kontrola
 
 ```
