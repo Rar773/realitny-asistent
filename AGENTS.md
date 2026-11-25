@@ -71,7 +71,7 @@ Riaď sa `_podklady/ZADANIE.md` a obrázkami v `_podklady/` (koncept A je hlavn�
 | Balík videí | 10 + 2 Štandard za 290 €, 10 + 3 Prémiové za 890 € |
 | Asistent Bazoš | 19 € / mesiac (ročne 190 €) |
 | Asistent Všetky portály | 29 € / mesiac, ročne 290 € |
-| Web Vizitka | 500 € |
+| Web Basic | 500 € |
 | Web s ponukou nehnuteľností | 700 € |
 | Web na mieru | dohodou |
 | Správa webu | 120 € / rok (12 malých úprav), ďalšia úprava 10 €, väčšie práce 25 €/h, expres +10 € |
