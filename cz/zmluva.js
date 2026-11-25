@@ -23,6 +23,27 @@
     if (html) { Z.html = html; $('zDok').srcdoc = html; }
     ukaz('zForm', false); ukaz('zHotovo');
   }
+  // online odstúpenie spotrebiteľa (§ 20a zák. 108/2024 Z. z., § 1830a NOZ)
+  function odstupenie(o) {
+    if (!o || !(o.mozne || o.odstupena)) return ukaz('zOdst', false);
+    ukaz('zOdst');
+    if (o.odstupena) { $('zOdstInfo').textContent = 'Od smlouvy jste odstoupili ' + o.odstupena + '. Potvrzení jsme poslali e-mailem' + (o.email ? ' na ' + o.email : '') + '. Makléř vám vrátí platby podle poučení o odstoupení, nejpozději do 14 dnů.'; ukaz('zOdstBtnW', false); ukaz('zOdstForm', false); return; }
+    $('zOdstInfo').textContent = 'Od smlouvy můžete odstoupit bez udání důvodu do ' + o.do + ' (včetně). Stačí kliknout níže.';
+    $('zOZml').textContent = (Z.nazov || 'Smlouva') + (Z.potvrdena ? ', potvrzená ' + Z.potvrdena : '');
+    if (!$('zOMeno').value) $('zOMeno').value = Z.potvrdil || Z.klient || '';
+  }
+  function omsg(text) { const m = $('zOMsg'); m.textContent = text; m.className = 'msg er'; }
+  $('zOdstBtn').onclick = () => { ukaz('zOdstBtnW', false); ukaz('zOdstForm'); $('zOMeno').focus(); };
+  $('zOPotvrd').onclick = async () => {
+    const meno = $('zOMeno').value.trim(), email = $('zOEmail').value.trim();
+    if (meno.length < 4 || !/\s/.test(meno)) return omsg('Napište své jméno a příjmení.');
+    if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return omsg('Napište e-mail, na který vám pošleme potvrzení.');
+    const b = $('zOPotvrd'); b.disabled = true; b.textContent = 'Odesíláme…';
+    const r = await post('/z/odstup', { id, t, meno, email });
+    b.disabled = false; b.textContent = 'Potvrdit odstoupení od smlouvy';
+    if (!r.ok) return omsg(r.chyba || 'Odstoupení se nepodařilo odeslat. Zkuste to znovu nebo napište makléři.');
+    odstupenie({ odstupena: r.odstupena, email });
+  };
   async function start() {
     if (!id || !t) return chyba('Odkaz na smlouvu je neúplný. Otevřete ho prosím znovu z e-mailu nebo zprávy od makléře.');
     Z = await post('/z/nacitaj', { id, t });
@@ -32,7 +53,7 @@
     $('zMaklerK').textContent = Z.makler ? ' (' + Z.makler + (Z.makler_tel ? ', ' + Z.makler_tel : '') + ')' : '';
     $('zDok').srcdoc = Z.html;
     ukaz('zKarta');
-    if (Z.stav === 'potvrdena') return hotovo(Z.potvrdena);
+    if (Z.stav === 'potvrdena') { hotovo(Z.potvrdena); return odstupenie(Z.odstupenie); }
     if (Z.klient) $('zMeno').value = Z.klient;
     if (Z.treba_kod) { ukaz('zKodW'); $('zKodInfo').textContent = 'Kód pošleme na ' + Z.email + '.'; }
     ukaz('zForm');
@@ -55,7 +76,8 @@
     const r = await post('/z/potvrd', { id, t, meno, kod: $('zKod').value, suhlas: true });
     b.disabled = false; b.textContent = 'Potvrdit smlouvu';
     if (!r.ok) return msg(r.chyba || 'Potvrdenie sa nepodarilo.');
-    Z.potvrdil = meno; hotovo(r.potvrdena, r.html);
+    Z.potvrdil = meno; Z.potvrdena = r.potvrdena; hotovo(r.potvrdena, r.html);
+    const n = await post('/z/nacitaj', { id, t }); if (n.ok) odstupenie(n.odstupenie);
   };
   start();
 })();

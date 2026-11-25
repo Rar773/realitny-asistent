@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20261126a">
-<script src="zmluva.js?v=20261126a" defer></script>
+<script src="zmluva.js?v=20261125o" defer></script>
 <style>
 .zm{max-width:860px;margin:0 auto}.zm .card{background:#fff;border:1px solid #E6E8EF;border-radius:18px;padding:22px 24px;margin:0 0 18px;box-shadow:0 6px 24px rgba(32,36,54,.05)}
 .zm iframe{width:100%;height:68vh;min-height:420px;border:1px solid #E6E8EF;border-radius:12px;background:#fff}
@@ -38,6 +38,19 @@
   <div class="card hide" id="zChyba"><p class="msg er" id="zChybaT" style="margin:0"></p></div>
   <div class="card hide" id="zHotovo"><div class="hot"><div class="ik">✓</div><h2 style="margin:0 0 6px">Zmluva je potvrdená</h2><p class="mut" id="zHotovoT"></p>
     <div class="rad" style="justify-content:center"><button class="btn sec" type="button" id="zStiahni2">Stiahnuť kópiu zmluvy</button></div></div></div>
+  <div class="card hide" id="zOdst">
+    <h2 style="margin:0 0 6px;font-size:20px">Odstúpenie od zmluvy</h2>
+    <p class="mut" id="zOdstInfo" style="margin:0 0 12px"></p>
+    <div class="rad" id="zOdstBtnW" style="margin-top:0"><button class="btn sec" type="button" id="zOdstBtn">Odstúpiť od zmluvy tu</button></div>
+    <div id="zOdstForm" class="hide">
+      <label class="pole" for="zOMeno">Vaše meno a priezvisko</label><input type="text" id="zOMeno" autocomplete="name">
+      <label class="pole">Zmluva</label><p style="margin:0" id="zOZml"></p>
+      <label class="pole" for="zOEmail">E-mail, na ktorý vám pošleme potvrdenie</label><input type="text" id="zOEmail" inputmode="email" autocomplete="email">
+      <p class="mut" style="margin:10px 0 0">Odstúpenie sa odošle až po kliknutí na „Potvrdiť odstúpenie od zmluvy“. Prijatie vám hneď potvrdíme e-mailom.</p>
+      <div class="rad"><button class="btn" type="button" id="zOPotvrd">Potvrdiť odstúpenie od zmluvy</button></div>
+      <p class="msg hide" id="zOMsg"></p>
+    </div>
+  </div>
   <div class="card hide" id="zKarta">
     <p class="mut" style="margin:0 0 12px">Zmluvu si prečítajte celú – posúvajte ju v okne nižšie. <a href="#" id="zStiahni">Stiahnuť zmluvu</a></p>
     <iframe id="zDok" title="Text zmluvy" sandbox></iframe>
