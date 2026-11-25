@@ -44,7 +44,8 @@ const SHOTS = {
   inzeraty: ['Inzeráty – zmena ceny zadarmo, TOP, vloženie znova po 60 dňoch a presun starých inzerátov z Bazoša.', 'Inzeráty na Bazoši s cenou, zobrazeniami, platnosťou a tlačidlami na zmenu ceny a TOP'],
   dopyty: ['Dopyty – správy záujemcov zoradené podľa inzerátu, odpoveď priamo z aplikácie.', 'Dopyty od záujemcov zoradené podľa inzerátov s možnosťou odpovedať'],
   statistiky: ['Štatistiky – zobrazenia, dopyty a obhliadky po týždňoch a pri každom inzeráte.', 'Štatistiky: dopyty a obhliadky po týždňoch a tabuľka inzerátov'],
-  zmluvy: ['Zmluvy – z listu vlastníctva sa vyplní zmluva o sprostredkovaní, ktorú klient potvrdí online.', 'Zmluvy: nahratý list vlastníctva a vyplnené údaje nehnuteľnosti'],
+  obchody: ['Obchody – každá nehnuteľnosť krok za krokom od náboru po odovzdanie, so zmluvami a overením klienta.', 'Obchod: kroky od náboru po odovzdanie, doklady, strany obchodu a zmluvy'],
+  zmluvy: ['Zmluvy – všetky zmluvy s číslom a stavom. Zmluvu o sprostredkovaní vyplníte z listu vlastníctva.', 'Zoznam zmlúv s číslom, typom, klientom a stavom'],
   objednat: ['Objednávky – virtuálne zariadenie, videá a Reels objednáte v aplikácii a hotové súbory sa stiahnu samy.', 'Objednávky: moje objednávky so stavom a výber služby'],
   klienti: ['Klienti – všetci záujemcovia na jednom mieste, s poznámkami a históriou.', 'Zoznam klientov s kontaktmi, stavom a poznámkami'],
   obhliadky: ['Obhliadky – naplánujete jedným klikom a pridáte do Google Kalendára.', 'Plánovanie obhliadok s tlačidlom do Google Kalendára']
