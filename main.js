@@ -124,7 +124,7 @@ function wOdoslat(ev) {
 /* ---------- Asistent: výber verzie v úvode ---------- */
 (function () {
   const f = document.getElementById('pick'), go = document.getElementById('pickGo'); if (!f || !go) return;
-  const set = () => { const r = f.querySelector('input:checked'); go.href = 'mailto:info@realitnyasistent.eu?subject=' + encodeURIComponent(r.dataset.s); };
+  const set = () => { const r = f.querySelector('input:checked'); go.href = 'ucet.html#registracia'; go.dataset.plan = r.dataset.s; };
   f.addEventListener('change', set); set();
 })();
 
