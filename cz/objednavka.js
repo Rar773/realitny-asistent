@@ -1,0 +1,222 @@
+// Objednávkový formulár – virtuálne zariadenie a videá
+(() => {
+  const API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+    ? 'http://localhost:8787/objednavka'
+    : 'https://ra-objednavky.rarex731.workers.dev/objednavka';
+  const MAX = 10;
+  const MIESTNOSTI = ['Obývačka', 'Obývačka s kuchyňou', 'Spálňa', 'Kuchyňa', 'Jedáleň', 'Detská izba', 'Pracovňa', 'Kúpeľňa', 'Iná'];
+  const $ = (id) => document.getElementById(id);
+  const form = $('obj');
+  if (!form) return;
+
+  let fotky = []; // {subor, nahlad, miestnost}
+  // trvalé id prehliadača (ochrana zľavy pre nových klientov)
+  let ZID = '';
+  try { ZID = localStorage.getItem('ra_zid') || ''; if (!ZID) { ZID = crypto.randomUUID(); localStorage.setItem('ra_zid', ZID); } } catch { ZID = ''; }
+  if (!ZID) { const m = document.cookie.match(/ra_zid=([^;]+)/); ZID = m ? m[1] : (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)); }
+  document.cookie = 'ra_zid=' + ZID + '; max-age=63072000; path=/; SameSite=Lax; Secure';
+
+  const cenaZar = (n) => (n <= 0 ? 0 : Math.min(129 * n, 490)); // 1 fotka 129 Kč, celý inzerát (do 10 fotiek) 490 Kč
+  const MCZ = { 'Obývačka': 'Obývák', 'Obývačka s kuchyňou': 'Obývák s kuchyní', 'Spálňa': 'Ložnice', 'Kuchyňa': 'Kuchyně', 'Jedáleň': 'Jídelna', 'Detská izba': 'Dětský pokoj', 'Pracovňa': 'Pracovna', 'Kúpeľňa': 'Koupelna', 'Iná': 'Jiná' };
+  const eur = (x) => String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + ' Kč';
+  const val = (n) => (form.querySelector(`[name="${n}"]:checked`) || {}).value;
+
+  function pocet() { return fotky.length || (parseInt($('oPocet').value, 10) || 0); }
+
+  function prepocitaj() {
+    const sluzba = val('sluzba');
+    const zar = sluzba === 'zariadenie';
+    document.querySelectorAll('.ozar').forEach((el) => { el.hidden = !zar || (el.id === 'oPocetWrap' && fotky.length > 0); });
+    $('oKrokKontakt').textContent = zar ? '4' : '3';
+    $('oVidWrap').hidden = !$('oSVideom').checked;
+    if (zar && !fotky.length) $('oPocetWrap').hidden = false;
+
+    const r = [];
+    let spolu = 0;
+    if (zar) {
+      const n = Math.min(MAX, pocet());
+      const predpl = $('oPredpl').checked;
+      if (predpl) $('oNovy').checked = false;
+      const novy = $('oNovy').checked;
+      let z = predpl ? 0 : novy ? Math.max(0, cenaZar(n) - cenaZar(Math.min(n, 1))) : cenaZar(n);
+      r.push([`Virtuální zařízení · ${n} ${n === 1 ? 'fotka' : n > 1 && n < 5 ? 'fotky' : 'fotek'}${n >= 4 ? ' (celý inzerát)' : ''}`, eur(cenaZar(n))]);
+      if (predpl && n) r.push(['Inzerát z předplatného Všechny portály', '−' + eur(cenaZar(n))]);
+      if (novy && n) r.push(['Nový klient · 1 fotka zdarma', '−' + eur(cenaZar(n) - z)]);
+      if ($('oSVideom').checked) {
+        const prem = val('video') === 'premiove';
+        r.push(['Sleva 50 % s videem', '−' + eur(z - Math.round(z / 2))]);
+        z = Math.round(z / 2);
+        r.push([prem ? 'Video Prémiové' : 'Video Standard', eur(prem ? 2290 : 749)]);
+        spolu += prem ? 2290 : 749;
+      }
+      spolu += z;
+      if ($('oReels').checked) { const rc = n >= 4 ? 129 : 249; r.push([n >= 4 ? 'Reels před → po (zvýhodněné k inzerátu)' : 'Reels před → po', eur(rc)]); spolu += rc; }
+    } else {
+      const prem = sluzba === 'premiove';
+      r.push([prem ? 'Video Prémiové' : 'Video Standard', eur(prem ? 2290 : 749)]);
+      spolu = prem ? 2290 : 749;
+    }
+    $('oSuhrn').innerHTML = r.map(([a, b]) => `<div><span>${a}</span><span>${b}</span></div>`).join('');
+    $('oCena').textContent = eur(spolu);
+  }
+
+  function vykresli() {
+    const ul = $('oZoznam');
+    ul.innerHTML = '';
+    fotky.forEach((f, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<img src="${f.nahlad}" alt="Fotka ${i + 1}"><select aria-label="Místnost na fotce ${i + 1}">${MIESTNOSTI.map((m) => `<option value="${m}"${m === f.miestnost ? ' selected' : ''}>${MCZ[m] || m}</option>`).join('')}</select><button type="button" aria-label="Odstranit fotku ${i + 1}">×</button>`;
+      li.querySelector('select').addEventListener('change', (e) => { f.miestnost = e.target.value; });
+      li.querySelector('button').addEventListener('click', () => { URL.revokeObjectURL(f.nahlad); fotky.splice(i, 1); vykresli(); });
+      ul.appendChild(li);
+    });
+    $('oDrop').classList.toggle('plne', fotky.length >= MAX);
+    prepocitaj();
+  }
+
+  function pridaj(zoznam) {
+    const nove = [...zoznam].filter((s) => s.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif)$/i.test(s.name));
+    const volne = MAX - fotky.length;
+    if (nove.length > volne) chyba(`V jedné objednávce může být nejvíce ${MAX} fotek.`);
+    nove.slice(0, volne).forEach((s) => {
+      fotky.push({ subor: s, nahlad: URL.createObjectURL(s), miestnost: MIESTNOSTI[0] });
+    });
+    vykresli();
+  }
+
+  // zmenšenie fotky v prehliadači (max 2560 px, JPEG) – rýchlejšie odoslanie
+  async function zmensi(s) {
+    try {
+      const bmp = await createImageBitmap(s);
+      const k = Math.min(1, 2560 / Math.max(bmp.width, bmp.height));
+      if (k === 1 && s.size < 4e6 && s.type === 'image/jpeg') return s;
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const b = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.9));
+      return b ? new File([b], s.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }) : s;
+    } catch { return s; }
+  }
+
+  function chyba(t) { const e = $('oChyba'); e.textContent = t; e.hidden = !t; }
+
+  $('oFotky').addEventListener('change', (e) => { pridaj(e.target.files); e.target.value = ''; });
+  const drop = $('oDrop');
+  ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('nad'); }));
+  ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('nad')));
+  drop.addEventListener('drop', (e) => { e.preventDefault(); pridaj(e.dataTransfer.files); });
+  // overenie nároku na zľavu pre nových klientov
+  const NOVY_API = API.replace(/\/objednavka$/, '/novy-klient');
+  let overTimer;
+  async function overNovy() {
+    const info = $('oNovyInfo');
+    if (!$('oNovy').checked) { info.hidden = true; return; }
+    if (!form.telefon.value.trim()) { info.textContent = 'Pro slevu pro nové klienty vyplňte i telefon.'; info.hidden = false; return; }
+    if (!form.email.value.includes('@')) { info.hidden = true; return; }
+    try {
+      const r = await fetch(NOVY_API + '?jazyk=cs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, telefon: form.telefon.value, meno: form.meno.value, zid: ZID, fp: FP }) }).then((x) => x.json());
+      if (r.novy === false) { $('oNovy').checked = false; info.textContent = r.sprava; info.hidden = false; prepocitaj(); }
+      else info.hidden = true;
+    } catch { info.hidden = true; }
+  }
+  ['email', 'telefon', 'meno'].forEach((n) => form[n].addEventListener('input', () => { clearTimeout(overTimer); overTimer = setTimeout(overNovy, 700); }));
+  $('oNovy').addEventListener('change', () => { if ($('oNovy').checked) $('oPredpl').checked = false; overNovy(); });
+  form.addEventListener('change', prepocitaj);
+  form.addEventListener('input', (e) => { if (e.target.id === 'oPocet') prepocitaj(); });
+
+
+  // odtlačok zariadenia (ochrana zliav)
+  let FP = '';
+  (async () => {
+    try {
+      const c = document.createElement('canvas'); c.width = 240; c.height = 60; const x = c.getContext('2d');
+      x.textBaseline = 'top'; x.font = '16px Arial'; x.fillStyle = '#f60'; x.fillRect(100, 1, 62, 20); x.fillStyle = '#069'; x.fillText('Realitný asistent ✓ 1.0', 2, 15); x.fillStyle = 'rgba(102,204,0,.7)'; x.fillText('Realitný asistent ✓ 1.0', 4, 17);
+      const d = [navigator.userAgent, navigator.language, (navigator.languages || []).join(','), Intl.DateTimeFormat().resolvedOptions().timeZone, screen.width + 'x' + screen.height + 'x' + screen.colorDepth, navigator.hardwareConcurrency, navigator.deviceMemory, navigator.platform, navigator.maxTouchPoints, c.toDataURL()].join('|');
+      const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(d));
+      FP = [...new Uint8Array(h)].slice(0, 16).map((b) => b.toString(16).padStart(2, '0')).join('');
+    } catch { FP = ''; }
+  })();
+  // podobnosť fotiek (dHash 8x8)
+  async function dHash(s) {
+    try {
+      const b = await createImageBitmap(s); const c = document.createElement('canvas'); c.width = 9; c.height = 8;
+      const x = c.getContext('2d'); x.drawImage(b, 0, 0, 9, 8); const d = x.getImageData(0, 0, 9, 8).data; let h = '';
+      for (let y = 0; y < 8; y++) { let n = 0; for (let i = 0; i < 8; i++) { const p = (y * 9 + i) * 4, q = p + 4; const a = d[p] * 0.3 + d[p + 1] * 0.59 + d[p + 2] * 0.11, z = d[q] * 0.3 + d[q + 1] * 0.59 + d[q + 2] * 0.11; n = (n << 1) | (a > z ? 1 : 0); } h += n.toString(16).padStart(2, '0'); }
+      return h;
+    } catch { return ''; }
+  }
+  // „nie som robot“ – len pri objednávkach zadarmo
+  const TS_KLUC = '0x4AAAAAAGQzRVHjw4Z2OR71';
+  let tsToken = '', tsId = null, tsNac = null;
+  const zadarmo = () => val('sluzba') === 'zariadenie' && ($('oNovy').checked || $('oPredpl').checked);
+  function nacitajTs() {
+    if (!tsNac) tsNac = new Promise((ok, zle) => { const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = ok; sc.onerror = zle; document.head.appendChild(sc); });
+    return tsNac;
+  }
+  async function robot() {
+    const box = $('oTs');
+    if (!zadarmo()) { box.hidden = true; return; }
+    box.hidden = false;
+    if (tsId !== null) return;
+    tsId = -1;
+    try { await nacitajTs(); tsId = window.turnstile.render(box, { sitekey: TS_KLUC, language: 'sk', callback: (t) => { tsToken = t; chyba(''); }, 'expired-callback': () => { tsToken = ''; }, 'error-callback': () => { tsToken = ''; } }); }
+    catch { box.textContent = 'Ověření se nepodařilo načíst. Obnovte stránku.'; tsId = null; }
+  }
+  function resetRobot() { tsToken = ''; try { if (tsId !== null && tsId !== -1 && window.turnstile) window.turnstile.reset(tsId); } catch { /* nič */ } }
+  form.addEventListener('change', robot);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    chyba('');
+    const sluzba = val('sluzba');
+    const inz = form.inzerat.value.trim();
+    if (!form.meno.value.trim()) return chyba('Vyplňte jméno.'), form.meno.focus();
+    if (!form.email.checkValidity() || !form.email.value) return chyba('Vyplňte platný e-mail.'), form.email.focus();
+    if (inz && !/^https?:\/\//i.test(inz)) return chyba('Odkaz na inzerát musí začínat https://'), form.inzerat.focus();
+    if (!fotky.length && !inz) return chyba('Nahrajte fotky nebo vložte odkaz na inzerát.');
+    if ($('oNovy').checked && sluzba === 'zariadenie' && !form.telefon.value.trim()) return chyba('Pro slevu pro nové klienty vyplňte telefonní číslo.'), form.telefon.focus();
+    if (form.kod.value.trim() && $('oNovy').checked) { $('oNovy').checked = false; prepocitaj(); }
+    if (!form.suhlas.checked) return chyba('Potvrďte souhlas s obchodními podmínkami.');
+    if (zadarmo() && !tsToken) { robot(); return chyba('Potvrďte prosím, že nejste robot (políčko nad tlačítkem).'); }
+
+    const btn = $('oOdoslat');
+    btn.disabled = true;
+    btn.textContent = fotky.length ? 'Připravujeme fotky…' : 'Odesíláme…';
+    try {
+      const fd = new FormData(form);
+      fd.delete('fotky');
+      fd.set('zid', ZID); fd.set('jazyk', 'cs'); fd.set('mena', 'CZK');
+      if (FP) fd.set('fp', FP);
+      if (zadarmo()) fd.set('ts', tsToken);
+      if (sluzba !== 'zariadenie') { ['styl', 's_videom', 'video', 'novy', 'pocet', 'reels', 'predplatne'].forEach((k) => fd.delete(k)); }
+      if (fotky.length) fd.delete('pocet');
+      for (const f of fotky) { const ph = await dHash(f.subor); if (ph) fd.append('ph', ph); fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
+      btn.textContent = 'Odesíláme…';
+      const r = await fetch(API + '?jazyk=cs', { method: 'POST', body: fd });
+      const j = await r.json().catch(() => ({}));
+      resetRobot();
+      if (!r.ok || !j.ok) throw new Error(j.chyba || 'Objednávku se nepodařilo odeslat.');
+      if (j.platba_url) { btn.textContent = 'Přesměrováváme na platbu…'; location.href = j.platba_url; return; }
+      $('oCislo').textContent = j.cislo;
+      if (j.novy_zamietnuty) $('oCislo').insertAdjacentHTML('afterend', '<br><small>Slevu pro nové klienty jsme neuplatnili – už jste u nás objednávali. Cena: ' + eur(+j.cena) + '</small>');
+      if (j.predplatne_zamietnute) $('oCislo').insertAdjacentHTML('afterend', '<br><small>Inzerát z předplatného jste tento měsíc už využili, cenu jsme vypočítali podle ceníku: ' + eur(+j.cena) + '</small>');
+      if (j.stav_url) $('oStavLink').href = j.stav_url; else $('oStavLink').hidden = true;
+      form.hidden = true;
+      const h = $('oHotovo'); h.hidden = false; h.focus();
+      h.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (err) {
+      const t = err && err.message && !/fetch/i.test(err.message) ? err.message : 'Objednávku se nepodařilo odeslat. Zkontrolujte připojení a zkuste to znovu.';
+      chyba(/info@/.test(t) ? t : t + ' Případně nám napište na info@realitnyasistent.eu.');
+      btn.disabled = false;
+      btn.textContent = 'Odeslat objednávku';
+    }
+  });
+
+  // kód ambasádora z odkazu
+  try { const a = JSON.parse(localStorage.getItem('ra_amb') || 'null'); if (a && Date.now() - a.t < 60 * 864e5 && !form.kod.value) form.kod.value = a.k; } catch { /* nič */ }
+  // predvoľba služby z odkazu, napr. objednavka.html?sluzba=standard
+  const q = new URLSearchParams(location.search).get('sluzba');
+  const opt = q && form.querySelector(`[name="sluzba"][value="${q}"]`);
+  if (opt) opt.checked = true;
+  prepocitaj();
+})();

@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
-pages = {p.name: p.read_text(encoding='utf-8') for p in ROOT.glob('*.html')}
+pages = {p.relative_to(ROOT).as_posix(): p.read_text(encoding='utf-8') for p in list(ROOT.glob('*.html')) + list((ROOT / 'cz').glob('*.html'))}
 chyby = []
 
 def text(s):
@@ -28,14 +28,16 @@ for f, s in pages.items():
 # 2) odkazy, súbory a kotvy
 ids = {f: set(re.findall(r'\bid="([^"]+)"', s)) for f, s in pages.items()}
 for f, s in pages.items():
-    if f == '404.html':
+    if f.endswith('404.html'):
         continue
+    zlozka = os.path.dirname(f)
     for h in re.findall(r'(?:href|src|poster)="([^"]+)"', s) + [x.split()[0] for x in re.findall(r'srcset="([^"]+)"', s)]:
         if h.startswith(('http', 'mailto:', 'tel:', 'data:')):
             continue
         path, _, anc = h.partition('#')
         path = path.split('?')[0]
         if path:
+            path = os.path.normpath(os.path.join(zlozka, path)).replace(os.sep, '/')
             p = ROOT / path
             if path.endswith('/'):
                 p = p / 'index.html'
@@ -63,7 +65,7 @@ for f, zoznam in povinne.items():
         if f in ids and i not in ids[f]:
             chyby.append(f'{f}: chýba id="{i}" (potrebné pre JavaScript)')
 for f in pages:
-    if f != '404.html' and 'kontakt' not in ids[f]:
+    if not f.endswith('404.html') and 'kontakt' not in ids[f]:
         chyby.append(f'{f}: chýba sekcia id="kontakt"')
 
 # 5) rovnaká verzia CSS a JS na všetkých stránkach
@@ -73,7 +75,7 @@ if len(vsetky) > 1:
     chyby.append(f'rôzne verzie styles.css/main.js na stránkach: {sorted(vsetky)} – zjednoť ich')
 
 # 6) kľúčové ceny musia na webe ostať
-spolu = ' '.join(text(s) for s in pages.values()).replace('\xa0', ' ')
+spolu = ' '.join(text(s) for f, s in pages.items() if not f.startswith('cz/')).replace('\xa0', ' ')
 for c in ['29 €', '89 €', '19 €', '290 €', '500 €', '700 €', '120 €', '790 €', '990 €', '1 390 €']:
     if c not in spolu:
         chyby.append(f'na webe chýba cena {c}')

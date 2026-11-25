@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smlouva k potvrzení – Realitní asistent</title>
+<meta name="description" content="Přečtěte si smlouvu od svého makléře a potvrďte ji online.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/png" href="../ikona.png">
+<link rel="apple-touch-icon" href="../ikona.png">
+<meta name="theme-color" content="#7728E6">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=20261126a">
+<script src="zmluva.js?v=20261126a" defer></script>
+<style>
+.zm{max-width:860px;margin:0 auto}.zm .card{background:#fff;border:1px solid #E6E8EF;border-radius:18px;padding:22px 24px;margin:0 0 18px;box-shadow:0 6px 24px rgba(32,36,54,.05)}
+.zm iframe{width:100%;height:68vh;min-height:420px;border:1px solid #E6E8EF;border-radius:12px;background:#fff}
+.zm label.ch{display:flex;gap:10px;align-items:flex-start;margin:6px 0 14px;font-weight:500;line-height:1.45}.zm label.ch input{margin-top:4px;width:18px;height:18px;flex:none}
+.zm .pole{display:block;font-weight:600;margin:10px 0 6px}.zm input[type=text],.zm input[inputmode]{width:100%;max-width:420px;padding:12px 14px;border:1.5px solid #E2E4EC;border-radius:10px;font:inherit;font-size:16px}
+.zm .rad{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.zm .msg{margin:12px 0 0;font-weight:600}.zm .msg.er{color:#B42318}.zm .msg.ok{color:#067647}
+.zm .hot{text-align:center;padding:30px 24px}.zm .hot .ik{width:64px;height:64px;border-radius:50%;background:#ECFDF3;color:#067647;display:grid;place-items:center;margin:0 auto 12px;font-size:32px}
+.zm .mut{color:#667085;font-size:14.5px}.hide{display:none!important}
+</style>
+<link rel="alternate" hreflang="sk" href="https://realitnyasistent.eu/zmluva.html">
+<link rel="alternate" hreflang="cs" href="https://realitnyasistent.eu/cz/zmluva.html">
+</head>
+<body>
+<header class="top" id="hlavicka"><div class="wrap nav">
+  <a class="logo" href="index.html" aria-label="Realitní asistent – domů"><svg class="lg-ic" viewBox="0 0 48 44" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21 24 4l20 17"/><path d="M9 17v23h30V17"/><path d="M34 9V5"/><rect x="18.5" y="22" width="11" height="10" rx="1" stroke-width="3"/><path d="M24 22v10M18.5 27h11" stroke-width="2.5"/></svg><span class="lg-t"><b>Realitní</b><b>asistent</b></span></a>
+</div></header>
+<main id="obsah">
+<section class="phero"><div class="wrap">
+  <p class="kicker">Smlouva k potvrzení</p>
+  <h1 id="zNadpis">Načítáme smlouvu…</h1>
+  <p class="lead" id="zLead">Chvilku strpení.</p>
+</div></section>
+<section><div class="wrap zm">
+  <div class="card hide" id="zChyba"><p class="msg er" id="zChybaT" style="margin:0"></p></div>
+  <div class="card hide" id="zHotovo"><div class="hot"><div class="ik">✓</div><h2 style="margin:0 0 6px">Smlouva je potvrzená</h2><p class="mut" id="zHotovoT"></p>
+    <div class="rad" style="justify-content:center"><button class="btn sec" type="button" id="zStiahni2">Stáhnout kopii smlouvy</button></div></div></div>
+  <div class="card hide" id="zKarta">
+    <p class="mut" style="margin:0 0 12px">Smlouvu si přečtěte celou – posouvejte ji v okně níže. <a href="#" id="zStiahni">Stáhnout smlouvu</a></p>
+    <iframe id="zDok" title="Text smlouvy" sandbox></iframe>
+  </div>
+  <div class="card hide" id="zForm">
+    <h2 style="margin:0 0 6px;font-size:20px">Potvrzení smlouvy</h2>
+    <p class="mut" style="margin:0 0 12px">Potvrzením smlouvu uzavíráte elektronicky. Kopii smlouvy si můžete stáhnout, a pokud jste makléři dali e-mail, pošleme vám ji i e-mailem.</p>
+    <label class="ch"><input type="checkbox" id="zSuhlas"> <span>Přečetl(a) jsem si smlouvu včetně poučení o právu na odstoupení a souhlasím s jejím uzavřením.</span></label>
+    <label class="pole" for="zMeno">Vaše jméno a příjmení <span class="mut">(slouží jako podpis)</span></label>
+    <input type="text" id="zMeno" autocomplete="name">
+    <div id="zKodW" class="hide">
+      <label class="pole" for="zKod">Kód z e-mailu</label>
+      <div class="rad" style="margin-top:0"><input inputmode="numeric" id="zKod" maxlength="6" autocomplete="one-time-code" style="max-width:180px;letter-spacing:.2em"><button class="btn sec" type="button" id="zPosliKod">Poslat kód</button></div>
+      <p class="mut" id="zKodInfo" style="margin:6px 0 0"></p>
+    </div>
+    <div class="rad"><button class="btn" type="button" id="zPotvrd">Potvrdit smlouvu</button></div>
+    <p class="msg hide" id="zMsg"></p>
+  </div>
+  <p class="mut" id="kontakt" style="text-align:center;margin:8px 0 30px">Otázky ke smlouvě směřujte na svého makléře<span id="zMaklerK"></span>. Stránku provozuje Realitní asistent.</p>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="fg">
+    <div>
+      <a class="logo" href="index.html" aria-label="Realitní asistent – domů"><svg class="lg-ic" viewBox="0 0 48 44" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21 24 4l20 17"/><path d="M9 17v23h30V17"/><path d="M34 9V5"/><rect x="18.5" y="22" width="11" height="10" rx="1" stroke-width="3"/><path d="M24 22v10M18.5 27h11" stroke-width="2.5"/></svg><span class="lg-t"><b>Realitní</b><b>asistent</b></span></a>
+      <p>Méně času s inzeráty. Více času na klienty. Videa, aplikace a weby pro makléře a realitní kanceláře v Česku i na Slovensku.</p>
+    </div>
+    <div><h4>Služby</h4><a href="videa.html">Videa z fotek inzerátu</a><a href="index.html#zariadenie">Virtuální zařízení</a><a href="asistent.html">Realitní asistent</a><a href="weby.html">Weby pro makléře</a><a href="index.html#baliky">Balíčky</a></div>
+    <div><h4>Informace</h4><a href="ucet.html">Můj účet</a><a href="odporucanie.html">Doporučte kolegu</a><a href="ambasador.html">Ambasadorský program</a><a href="podmienky.html">Obchodní podmínky</a><a href="sukromie.html">Ochrana osobních údajů</a><a href="podmienky.html#odstupenie">Vrácení peněz</a></div>
+    <div><h4>Kontakt</h4><a href="mailto:info@realitnyasistent.eu">info@realitnyasistent.eu</a><p style="margin-top:6px">Odpovídáme zpravidla do 1 pracovního dne.</p></div>
+  </div>
+  <div class="fbot"><span>© 2026 Marian Márton · Všechna práva vyhrazena. Kopírování obsahu bez souhlasu je zakázáno (<a href="podmienky.html#dusevne">více</a>).</span><span>Nejsme plátci DPH, k cenám se DPH nepřipočítává.</span></div>
+</div></footer>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "353fe732265c45b597ddd3a05a173ef3"}'></script>
+</body>
+</html>

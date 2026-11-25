@@ -1,0 +1,14 @@
+{
+"index.html": "index.json",
+"asistent.html": "asistent.json",
+"ucet.html": "ucet.json",
+"videa.html": "videa.json",
+"404.html": "404.json",
+"objednavka.html": "objednavka.json",
+"weby.html": "weby.json",
+"odporucanie.html": "odporucanie.json",
+"ambasador.html": "ambasador.json",
+"zmluva.html": "zmluva.json",
+"podmienky.html": "podmienky.json",
+"sukromie.html": "sukromie.json"
+}
