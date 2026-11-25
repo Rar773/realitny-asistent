@@ -1145,3 +1145,5 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .zm-ukazka img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 18px 50px rgba(32,36,54,.14);display:block}
 .zm-ukazka figcaption{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
 @media (max-width:900px){.app-zmluvy .zmg{grid-template-columns:1fr;gap:28px}}
+.pick .pzl{font-style:normal;font-size:12px;font-weight:700;margin-left:6px;padding:2px 7px;border-radius:999px;background:var(--okbg);color:var(--ok);white-space:nowrap}
+.pick .pstara{font:500 14px var(--body);color:var(--muted);margin-right:6px}
