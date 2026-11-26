@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pri parku – 16 bytov v Seredi (ukážka prémiového webu projektu)</title>
+<meta name="description" content="Ukážka prémiového webu developerského projektu od Realitný asistent. Výber poschodia priamo na budove, 3D pôdorys poschodia a vizualizácie miestností.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pri parku – 16 bytov v Seredi">
+<meta property="og:description" content="Vyberte si byt priamo na budove: 3D pôdorys poschodia a vizualizácie miestností.">
+<meta property="og:image" content="https://realitnyasistent.eu/ukazka5/img/budova-1400.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="img/budova-2400.webp" imagesrcset="img/budova-1400.webp 1400w, img/budova-2400.webp 2400w" imagesizes="100vw">
+<style>
+:root{
+  --ink:#1C2226;--ink2:#4E585E;--ink3:#7A848A;
+  --paper:#FFFFFF;--mist:#F1F3F2;--mist2:#E5E9E7;--line:#D9DFDC;
+  --larch:#A8693A;--larch-d:#8A5530;--larch-50:#F6EDE5;
+  --volny:#2F8A55;--rez:#C9921E;--pred:#98A09C;
+  --r:16px;--head:"Bricolage Grotesque",system-ui,sans-serif;--body:"Hanken Grotesk",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--head);font-weight:700;letter-spacing:-.025em;margin:0;line-height:1.05}
+h2{font-size:clamp(30px,3.6vw,46px)}
+.w{max-width:1320px;margin:0 auto;padding:0 28px}
+section{padding:100px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--ink);color:#fff;text-decoration:none;font:600 16px var(--body);padding:13px 22px;border-radius:12px;border:0;cursor:pointer;transition:background .15s}
+.btn:hover{background:#000}
+.btn.lar{background:var(--larch)}.btn.lar:hover{background:var(--larch-d)}
+.btn.sec{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.sec:hover{box-shadow:inset 0 0 0 1.5px var(--ink3)}
+:focus-visible{outline:3px solid #E3A35F;outline-offset:2px}
+.demo{background:var(--ink);color:#E4E9E7;font-size:14px;text-align:center;padding:9px 16px}
+.demo a{color:#fff;font-weight:600}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* hlavička */
+.hl{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.hl.sc{border-color:var(--line)}
+.nav{display:flex;align-items:center;gap:28px;height:72px}
+.logo{display:flex;align-items:center;gap:10px;font:700 21px var(--head);letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.logo i{width:12px;height:28px;background:var(--larch);border-radius:3px}
+.nav nav{display:flex;gap:4px;margin-left:12px}
+.nav nav a{text-decoration:none;color:var(--ink2);font-weight:500;font-size:15.5px;padding:8px 12px;border-radius:10px;white-space:nowrap}
+.nav nav a:hover{color:var(--ink);background:var(--mist)}
+.nav .tel{margin-left:auto;font-weight:600;text-decoration:none;white-space:nowrap}
+.nav .btn{white-space:nowrap}
+
+/* úvod s budovou */
+.hero{padding:44px 0 0}
+.hero-t{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;align-items:end}
+.hero h1{font-size:clamp(46px,6.4vw,92px)}
+.hero h1 span{display:block;color:var(--ink3);font-size:.42em;letter-spacing:-.015em;line-height:1.2;margin-top:.4em;font-weight:600}
+.hero-r p{color:var(--ink2);margin:0 0 20px;font-size:18.5px;max-width:44ch}
+.cisla{display:flex;gap:28px;flex-wrap:wrap}
+.cisla b{display:block;font:700 30px var(--head);letter-spacing:-.02em}
+.cisla span{font-size:14px;color:var(--ink3)}
+.bud{position:relative;margin:40px auto 0;max-width:1600px}
+.bud-in{position:relative;border-radius:var(--r);overflow:hidden;background:#cfe0ee}
+.bud-in img{width:100%;height:auto;aspect-ratio:2752/1536;object-fit:cover}
+.bud svg{position:absolute;inset:0;width:100%;height:100%}
+.pos{cursor:pointer;outline:none}
+.pos polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,0);stroke-width:3;transition:fill .18s,stroke .18s}
+.pos:hover polygon,.pos:focus-visible polygon,.pos.on polygon{fill:rgba(168,105,58,.28);stroke:#fff}
+.btip{position:absolute;pointer-events:none;background:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 10px 30px rgba(20,25,28,.22);min-width:210px;opacity:0;transform:translateY(6px);transition:opacity .15s,transform .15s}
+.btip.on{opacity:1;transform:none}
+.btip b{display:block;font:700 19px var(--head)}
+.btip span{display:block;color:var(--ink2);font-size:14.5px}
+.btip em{font-style:normal;color:var(--larch);font-weight:600}
+.pos-rad{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px auto 0;max-width:1600px;padding:0 28px}
+.pos-rad>span{color:var(--ink2);font-size:15px;margin-right:6px}
+.pchip{border:0;background:var(--mist);border-radius:12px;padding:10px 16px;font:600 15px var(--body);color:var(--ink);cursor:pointer;display:flex;gap:10px;align-items:baseline}
+.pchip small{font-weight:500;color:var(--volny)}
+.pchip:hover{background:var(--mist2)}
+
+/* výber bytu */
+#vyber{background:var(--mist);margin-top:100px}
+.vy-h{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.crumb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--ink3);font-size:15px;margin-top:14px;min-height:26px}
+.crumb button{border:0;background:none;padding:2px 4px;font:inherit;color:var(--ink2);cursor:pointer;border-radius:6px}
+.crumb button:hover{color:var(--ink);text-decoration:underline}
+.crumb b{color:var(--ink);font-weight:600}
+.ptabs{display:inline-flex;background:#fff;border-radius:12px;padding:4px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.ptabs button{border:0;background:none;padding:9px 16px;border-radius:9px;font:600 15px var(--body);color:var(--ink2);cursor:pointer;white-space:nowrap}
+.ptabs button[aria-pressed=true]{background:var(--ink);color:#fff}
+.vy{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:20px;margin-top:28px;align-items:start}
+.rez{position:relative;background:#E9E8E5;border-radius:var(--r);overflow:hidden}
+.rez img{width:100%;height:auto;aspect-ratio:2752/1536;transition:opacity .35s,transform .5s}
+.rez.zmena img{opacity:.35;transform:scale(1.02)}
+.rez svg{position:absolute;inset:0;width:100%;height:100%}
+.byt{cursor:pointer;outline:none}
+.byt polygon{stroke-width:4;transition:fill .15s,stroke-width .15s}
+.byt.volny polygon{fill:rgba(47,138,85,.16);stroke:rgba(47,138,85,.85)}
+.byt.rezervovany polygon{fill:rgba(201,146,30,.16);stroke:rgba(201,146,30,.9)}
+.byt.predany polygon{fill:rgba(120,128,124,.26);stroke:rgba(120,128,124,.75)}
+.byt:hover polygon,.byt:focus-visible polygon{stroke-width:7}
+.byt.volny:hover polygon{fill:rgba(47,138,85,.28)}
+.byt.akt polygon{fill:rgba(255,255,255,0)!important;stroke:#fff;stroke-width:6}
+.byt.tlm{opacity:.35}
+.blab{pointer-events:none}
+.blab rect{fill:#fff}
+.blab text{font-family:var(--body);font-weight:700;fill:var(--ink);text-anchor:middle}
+.blab text.s{font-weight:600}
+.izba{cursor:pointer;outline:none}
+.izba polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,.0);stroke-width:4;transition:fill .15s,stroke .15s}
+.izba:hover polygon,.izba:focus-visible polygon{fill:rgba(255,255,255,.22);stroke:#fff}
+.izba .pin circle{fill:var(--ink)}
+.izba.foto .pin circle{fill:var(--larch)}
+.izba .pin path{stroke:#fff}
+.izba:hover .pin circle{fill:#000}
+.rez-hint{position:absolute;left:16px;bottom:14px;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 12px;font-size:14px;color:var(--ink2);pointer-events:none}
+.leg{display:flex;gap:16px;flex-wrap:wrap;font-size:14.5px;color:var(--ink2)}
+.leg span{display:flex;align-items:center;gap:7px}
+.leg i{width:12px;height:12px;border-radius:3px}
+.leg .volny i{background:var(--volny)}.leg .rezervovany i{background:var(--rez)}.leg .predany i{background:var(--pred)}
+.panel{background:#fff;border-radius:var(--r);padding:24px;min-height:200px}
+.panel h3{font-size:26px}
+.panel .sub{color:var(--ink3);font-size:15px;margin-top:4px}
+.blist{list-style:none;margin:18px 0 0;padding:0}
+.blist button{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center;text-align:left;border:0;background:none;padding:14px 4px;border-top:1px solid var(--line);cursor:pointer;font:inherit;color:inherit}
+.blist li:last-child button{border-bottom:1px solid var(--line)}
+.blist button:hover{background:var(--mist)}
+.blist .c{font:700 18px var(--head)}
+.blist .d{color:var(--ink2);font-size:15px}
+.blist .p{font-weight:600;text-align:right;white-space:nowrap}
+.st{display:inline-block;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.st.volny{background:#E2F2E8;color:#226B41}.st.rezervovany{background:#FAEFD3;color:#865F0B}.st.predany{background:var(--mist2);color:#66706B}
+.kc{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:16px 0 6px;flex-wrap:wrap}
+.kc b{font:700 32px var(--head);letter-spacing:-.02em}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin:12px 0 4px}
+.par div{padding:9px 0;border-bottom:1px solid var(--line)}
+.par span{display:block;font-size:13px;color:var(--ink3)}
+.par b{font-weight:600}
+.mini{background:var(--mist);border-radius:12px;padding:12px;margin:16px 0}
+.mini svg{width:100%;height:auto}
+.mini rect.m{fill:#fff;stroke:var(--ink);stroke-width:.06}
+.mini rect.m.f{fill:#F6EDE5;cursor:pointer}
+.mini rect.m.f:hover{fill:#EBD7C4}
+.mini text{font:600 .34px var(--body);fill:var(--ink);text-anchor:middle}
+.mini text.a{font:500 .28px var(--body);fill:var(--ink3)}
+.izl{list-style:none;margin:0;padding:0}
+.izl li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;font-size:15.5px}
+.izl button{border:0;background:var(--larch-50);color:var(--larch-d);font:600 13.5px var(--body);padding:5px 10px;border-radius:8px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.izl button:hover{background:#EEDCCB}
+.akc{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.akc .btn{flex:1 1 auto}
+.spat{border:0;background:none;color:var(--ink2);font:600 15px var(--body);padding:0;cursor:pointer;margin-bottom:10px}
+.spat:hover{color:var(--ink)}
+
+/* tabuľka */
+.fil{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:28px 0 18px}
+.fil select{font:600 15px var(--body);padding:10px 34px 10px 14px;border-radius:10px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%231C2226' stroke-width='1.8'%3E%3Cpath d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;color:var(--ink)}
+.fil .poc{margin-left:auto;color:var(--ink2);font-size:15px}
+.tab{width:100%;border-collapse:collapse}
+.tab th{font:600 13.5px var(--body);color:var(--ink3);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+.tab td{padding:15px 14px;border-bottom:1px solid var(--line)}
+.tab tbody tr{cursor:pointer}
+.tab tbody tr:hover{background:var(--mist)}
+.tab tr.predany td{color:var(--ink3)}
+.tab .num{text-align:right}
+.tab .c{font:700 17px var(--head)}
+
+/* štandardy, lokalita, kontakt */
+.std{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:36px}
+.std div{border-top:2px solid var(--ink);padding-top:16px}
+.std b{display:block;font:700 19px var(--head);margin-bottom:6px}
+.std p{margin:0;color:var(--ink2);font-size:15.5px}
+.lok{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;margin-top:36px}
+.vzd{list-style:none;margin:0;padding:0}
+.vzd li{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.vzd li span{color:var(--ink2)}
+#kontakt{background:var(--ink);color:#E4E9E7}
+#kontakt h2{color:#fff}
+.kont{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px}
+.pred{display:flex;gap:14px;align-items:center;margin-top:26px}
+.pred .av{width:56px;height:56px;border-radius:50%;background:var(--larch);display:grid;place-items:center;color:#fff;font:700 19px var(--head)}
+.pred a{color:#fff;font-weight:600;text-decoration:none}
+.fm{background:#fff;color:var(--ink);border-radius:var(--r);padding:26px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fm label{display:flex;flex-direction:column;gap:6px;font-size:14.5px;font-weight:500}
+.fm .full{grid-column:1/-1}
+.fm input,.fm select,.fm textarea{font:16px var(--body);padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;color:var(--ink);background:#fff}
+.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--ink3);outline:none}
+.fm .btn{justify-self:start}
+.ok{grid-column:1/-1;margin:0;display:none;background:var(--larch-50);border-radius:10px;padding:12px 16px;font-size:15px}
+.ok.on{display:block}
+footer{padding:28px 0;font-size:14px;color:var(--ink3)}
+footer .w{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
+
+/* okno s vizualizáciou miestnosti */
+dialog{border:0;padding:0;background:#11171A;color:#fff;width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;margin:0}
+dialog::backdrop{background:#11171A}
+.lb{width:100%;height:100%;display:grid;grid-template-rows:auto 1fr auto;position:relative}
+.lb-h{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 20px}
+.lb-h b{font:700 20px var(--head)}
+.lb-h span{color:#AEB8BC;font-size:14.5px;margin-left:10px}
+.lb-img{display:grid;place-items:center;padding:0 76px;min-height:0}
+.lb-img img,.lb-img canvas{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;min-height:0}
+.lb-img img.zrk{transform:scaleX(-1)}
+.lb-p{text-align:center;color:#AEB8BC;font-size:14.5px;padding:12px 20px 20px}
+.lb button.k{border:0;background:rgba(255,255,255,.12);color:#fff;width:48px;height:48px;border-radius:50%;cursor:pointer;display:grid;place-items:center}
+.lb button.k:hover{background:rgba(255,255,255,.22)}
+.lb .sip{position:absolute;top:50%;transform:translateY(-50%)}
+.lb .sip.l{left:14px}.lb .sip.r{right:14px}
+
+/* karta bytu na tlač */
+.karta{display:none}
+@media print{
+  body>*:not(.karta){display:none!important}
+  .karta{display:block;color:#000;font:12pt/1.45 var(--body)}
+  .karta h1{font-size:28pt;margin:0 0 4pt}
+  .karta .mini{background:none;padding:0;margin:14pt 0}
+  .karta table{width:100%;border-collapse:collapse;margin-top:10pt}
+  .karta td{padding:5pt 0;border-bottom:.5pt solid #bbb}
+  .karta td:last-child{text-align:right}
+  @page{margin:16mm}
+}
+
+@media (max-width:1100px){
+  .nav nav{display:none}
+  .hero-t,.lok,.kont{grid-template-columns:1fr;gap:28px}
+  .vy{grid-template-columns:1fr}
+  .std{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  section{padding:72px 0}
+  .w{padding:0 20px}
+  .nav .tel{display:none}
+  .nav .btn{margin-left:auto;padding:10px 14px;font-size:14px}
+  .bud-in{border-radius:0}
+  .pos-rad{padding:0 20px}
+  .tab .m{display:none}
+  .tab td,.tab th{padding:12px 8px}
+  .std{grid-template-columns:1fr}
+  .fm{grid-template-columns:1fr;padding:20px}
+  .lb-img{padding:0 8px}
+  .lb .sip{top:auto;bottom:16px;transform:none}
+  .lb-p{padding:12px 76px 28px}
+  .rez-hint{display:none}
+  .ptabs .dl{display:none}
+  .ptabs::before{content:'Poschodie';align-self:center;padding:0 10px 0 8px;font-weight:600;font-size:14px;color:var(--ink3)}
+  .ptabs button{padding:9px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="demo">Toto je ukážka prémiového webu projektu. Projekt, byty aj ceny sú vymyslené. <a href="../projekty.html">Späť na Weby pre developerov</a></div>
+
+<header class="hl" id="hl"><div class="w nav">
+  <a class="logo" href="#"><i aria-hidden="true"></i>Pri parku</a>
+  <nav aria-label="Hlavná navigácia"><a href="#vyber">Výber bytu</a><a href="#byty">Byty a ceny</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a></nav>
+  <a class="tel" href="tel:+421900000000">0900 000 000</a>
+  <a class="btn lar" href="#kontakt">Dohodnúť obhliadku</a>
+</div></header>
+
+<main>
+<section class="hero" aria-labelledby="h1">
+  <div class="w hero-t">
+    <h1 id="h1">Pri parku<span>16 bytov na okraji parku v Seredi</span></h1>
+    <div class="hero-r">
+      <p>Byty s balkónom alebo terasou do zelene, kolaudácia v lete 2027. Vyberte si poschodie priamo na budove.</p>
+      <div class="cisla"><div><b id="cVol">9</b><span>voľných bytov</span></div><div><b>1 až 3</b><span>izby</span></div><div><b id="cOd">od 129 900 €</b><span>vrátane pivnice</span></div></div>
+    </div>
+  </div>
+  <div class="bud" id="bud">
+    <div class="bud-in">
+      <picture><source type="image/webp" srcset="img/budova-1400.webp 1400w, img/budova-2400.webp 2400w" sizes="100vw"><img src="img/budova-1400.jpg" alt="Bytový dom Pri parku so štyrmi poschodiami, balkónmi so skleneným zábradlím a dreveným pásom v strede fasády" width="2752" height="1536"></picture>
+      <svg viewBox="0 0 2400 1350" preserveAspectRatio="none" id="fas" role="group" aria-label="Výber poschodia na budove"></svg>
+    </div>
+    <div class="btip" id="btip" aria-hidden="true"></div>
+  </div>
+  <div class="pos-rad" id="posRad"><span>Poschodie</span></div>
+</section>
+
+<section id="vyber" aria-labelledby="h-vy">
+  <div class="w">
+    <div class="vy-h">
+      <div><h2 id="h-vy">Výber bytu</h2><div class="crumb" id="crumb"></div></div>
+      <div class="ptabs" role="group" aria-label="Poschodie" id="ptabs"></div>
+    </div>
+    <div class="vy">
+      <div>
+        <div class="rez" id="rez">
+          <picture><source type="image/webp" srcset="img/poschodie-1400.webp 1400w, img/poschodie-2400.webp 2400w" sizes="(max-width:1100px) 100vw, 900px"><img src="img/poschodie-1400.jpg" alt="3D pôdorys typického poschodia so štyrmi zariadenými bytmi okolo schodiska" width="2752" height="1536" loading="lazy" id="rezImg"></picture>
+          <svg viewBox="0 0 2400 1350" preserveAspectRatio="none" id="rezSvg" role="group" aria-label="Byty na poschodí"></svg>
+          <span class="rez-hint" id="rezHint">Kliknite na byt</span>
+        </div>
+        <div class="leg" style="margin-top:14px"><span class="volny"><i></i>voľný</span><span class="rezervovany"><i></i>rezervovaný</span><span class="predany"><i></i>predaný</span></div>
+      </div>
+      <aside class="panel" id="panel" aria-live="polite"></aside>
+    </div>
+  </div>
+</section>
+
+<section id="byty" aria-labelledby="h-by">
+  <div class="w">
+    <h2 id="h-by">Byty a ceny</h2>
+    <div class="fil">
+      <select id="fIz" aria-label="Počet izieb"><option value="">Všetky byty</option><option value="1">1-izbové</option><option value="2">2-izbové</option><option value="3">3-izbové</option></select>
+      <select id="fSt" aria-label="Stav"><option value="">Každý stav</option><option value="volny">Len voľné</option></select>
+      <span class="poc" id="poc"></span>
+    </div>
+    <table class="tab">
+      <thead><tr><th scope="col">Byt</th><th scope="col">Izby</th><th scope="col" class="m num">Plocha</th><th scope="col" class="m num">Balkón</th><th scope="col" class="num">Cena</th><th scope="col">Stav</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="standardy" aria-labelledby="h-st" style="padding-top:0">
+  <div class="w">
+    <h2 id="h-st">Štandardy</h2>
+    <div class="std">
+      <div><b>Teplo a vzduch</b><p>Tepelné čerpadlo, podlahové kúrenie a rekuperácia v každom byte.</p></div>
+      <div><b>Okná a balkóny</b><p>Trojsklá v tmavých rámoch, balkóny so skleneným zábradlím a drevenou podlahou.</p></div>
+      <div><b>Podlahy a kúpeľne</b><p>Dubové parkety, veľkoformátová dlažba, sprchy bez vaničky.</p></div>
+      <div><b>K bytu</b><p>Pivnica v suteréne a parkovacie miesto pred domom.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="lokalita" aria-labelledby="h-lo" style="padding-top:0">
+  <div class="w lok">
+    <div><h2 id="h-lo">Lokalita</h2><p style="color:var(--ink2);margin:18px 0 0;max-width:40ch">Tichá ulica na okraji mestského parku, pešo k škole aj obchodom.</p></div>
+    <ul class="vzd">
+      <li>Mestský park<span>hneď za domom</span></li>
+      <li>Materská a základná škola<span>6 min pešo</span></li>
+      <li>Potraviny a lekáreň<span>4 min pešo</span></li>
+      <li>Železničná stanica<span>5 min autom</span></li>
+      <li>Rýchlostná cesta R1<span>8 min autom</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="kontakt" aria-labelledby="h-ko">
+  <div class="w kont">
+    <div>
+      <h2 id="h-ko">Dohodnite si obhliadku</h2>
+      <p style="color:#B9C4C8;margin:18px 0 0;max-width:42ch">Napíšte nám, ktorý byt vás zaujal. Ozveme sa do jedného pracovného dňa.</p>
+      <div class="pred"><span class="av" aria-hidden="true">MH</span><div><b>Martina Hudecová</b><br><span style="color:#B9C4C8">predaj projektu Pri parku</span><br><a href="tel:+421900000000">0900 000 000</a></div></div>
+    </div>
+    <form class="fm" id="fm" novalidate>
+      <label class="full">Byt, o ktorý mám záujem<select id="fByt" name="byt"></select></label>
+      <label>Meno a priezvisko<input name="meno" autocomplete="name" required></label>
+      <label>Telefón<input name="tel" type="tel" autocomplete="tel" required></label>
+      <label class="full">E-mail<input name="email" type="email" autocomplete="email" required></label>
+      <label class="full">Správa<textarea name="sprava" rows="3" placeholder="Napríklad kedy sa vám hodí obhliadka"></textarea></label>
+      <button class="btn lar" type="submit">Odoslať dopyt</button>
+      <p class="ok" id="fmOk" role="status">Toto je ukážka webu, preto sa dopyt nikam neodoslal. Na skutočnom webe príde predajcovi e-mailom aj do Realitného asistenta.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer><div class="w"><span><b>Pri parku</b>, Sereď. Ukážkový projekt.</span><span>Stav bytov sa aktualizuje automaticky z Realitného asistenta.</span><span>Web vytvoril <a href="../projekty.html">Realitný asistent</a></span></div></footer>
+
+<dialog id="lb" aria-labelledby="lbN">
+  <div class="lb">
+    <div class="lb-h"><div><b id="lbN"></b><span id="lbS"></span></div><button class="k" type="button" id="lbX" aria-label="Zavrieť"><svg width="18" height="18" viewBox="0 0 16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m3 3 10 10M13 3 3 13"/></svg></button></div>
+    <div class="lb-img" id="lbI"></div>
+    <p class="lb-p" id="lbP"></p>
+    <button class="k sip l" type="button" id="lbL" aria-label="Predchádzajúca miestnosť"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+    <button class="k sip r" type="button" id="lbR" aria-label="Ďalšia miestnosť"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+  </div>
+</dialog>
+
+<div class="karta" id="karta"></div>
+
+<script>
+const G = {"fasada":[[[505,1099],[1895,1099],[1895,894],[505,894]],[[505,894],[1895,894],[1895,689],[505,689]],[[505,689],[1895,689],[1895,483],[505,483]],[[505,483],[1895,483],[1895,278],[505,278]]],"byty":{"A":[[584,471],[1187,636],[1023,1039],[366,837]],"B":[[1187,636],[1849,818],[1751,1263],[1023,1039]],"C":[[785,136],[1251,250],[1128,530],[629,396]],"D":[[1424,292],[1782,380],[1701,683],[1314,580]]},"balk":{"A":[[400,872],[1006,1059],[964,1162],[346,965]],"B":[[1047,1072],[1717,1279],[1691,1394],[1005,1175]],"C":[[842,114],[1262,216],[1233,281],[807,175]],"D":[[1462,264],[1773,340],[1754,409],[1437,331]]},"izby":{"A":[{"n":"Obývačka s kuchyňou","m2":32.2,"p":[[584,471],[855,545],[660,927],[366,837]],"r":[0,7.8,4.6,14.8]},{"n":"Predsieň","m2":10.6,"p":[[855,545],[1087,608],[1022,758],[782,689]],"r":[4.6,7.8,8.4,10.6]},{"n":"Kúpeľňa","m2":4.5,"p":[[1087,608],[1187,636],[1126,787],[1022,758]],"r":[8.4,7.8,10,10.6]},{"n":"Spálňa","m2":11.8,"p":[[782,689],[958,739],[845,984],[660,927]],"r":[4.6,10.6,7.4,14.8]},{"n":"Detská izba","m2":10.9,"p":[[958,739],[1126,787],[1023,1039],[845,984]],"r":[7.4,10.6,10,14.8]}],"B":[{"n":"Obývačka s kuchyňou","m2":32.2,"p":[[1537,732],[1849,818],[1751,1263],[1406,1157]],"r":[15.4,7.8,20,14.8]},{"n":"Predsieň","m2":10.6,"p":[[1289,664],[1537,732],[1488,891],[1231,818]],"r":[11.6,7.8,15.4,10.6]},{"n":"Kúpeľňa","m2":4.5,"p":[[1187,636],[1289,664],[1231,818],[1126,787]],"r":[10,7.8,11.6,10.6]},{"n":"Spálňa","m2":11.8,"p":[[1298,837],[1488,891],[1406,1157],[1205,1095]],"r":[12.6,10.6,15.4,14.8]},{"n":"Detská izba","m2":10.9,"p":[[1126,787],[1298,837],[1205,1095],[1023,1039]],"r":[10,10.6,12.6,14.8]}],"C":[{"n":"Obývačka s kuchyňou","m2":28.5,"p":[[785,136],[1033,197],[894,468],[629,396]],"r":[0,0,4.6,6.2]},{"n":"Spálňa","m2":14.0,"p":[[1033,197],[1251,250],[1182,407],[955,349]],"r":[4.6,0,8.5,3.6]},{"n":"Predsieň","m2":5.7,"p":[[955,349],[1082,381],[1026,503],[894,468]],"r":[4.6,3.6,6.8,6.2]},{"n":"Kúpeľňa","m2":4.4,"p":[[1082,381],[1182,407],[1128,530],[1026,503]],"r":[6.8,3.6,8.5,6.2]}],"D":[{"n":"Izba s kuchyňou","m2":22.8,"p":[[1424,292],[1782,380],[1734,560],[1359,463]],"r":[11.5,0,17.5,3.8]},{"n":"Predsieň","m2":6.7,"p":[[1359,463],[1531,507],[1492,627],[1314,580]],"r":[11.5,3.8,14.3,6.2]},{"n":"Kúpeľňa","m2":7.7,"p":[[1531,507],[1734,560],[1701,683],[1492,627]],"r":[14.3,3.8,17.5,6.2]}]}};
+const $ = id => document.getElementById(id);
+const eur = x => x.toLocaleString('sk-SK').replace(/\s/g,' ') + ' €';
+const m2 = x => x.toFixed(1).replace('.', ',') + ' m²';
+const STAV = { volny:'voľný', rezervovany:'rezervovaný', predany:'predaný' };
+const TYP = {
+  A:{ izby:3, nazov:'3-izbový byt', balk:15.0, zakl:229900, krok:5000 },
+  B:{ izby:3, nazov:'3-izbový byt', balk:15.0, zakl:232900, krok:5000 },
+  C:{ izby:2, nazov:'2-izbový byt', balk:12.6, zakl:172900, krok:4000 },
+  D:{ izby:1, nazov:'1-izbový byt', balk:8.6,  zakl:129900, krok:3000 }
+};
+const PORADIE = ['A','B','C','D'], CISLO = { A:'01', B:'02', C:'03', D:'04' };
+const STAVY = ['predany','volny','rezervovany','predany', 'volny','predany','volny','volny', 'rezervovany','volny','predany','volny', 'volny','volny','volny','rezervovany'];
+/* vizualizácie miestností: číslo obrázka v img/izby/; byt B používa zrkadlovo obrázky bytu A */
+const FOTO = { A:{'Obývačka s kuchyňou':1,'Spálňa':2,'Detská izba':3,'Kúpeľňa':4,'Balkón':8}, C:{'Obývačka s kuchyňou':5,'Spálňa':6,'Kúpeľňa':4,'Balkón':8}, D:{'Izba s kuchyňou':7,'Kúpeľňa':4,'Balkón':8} };
+FOTO.B = FOTO.A;
+const FOTKY_HOTOVE = [1, 2, 3, 4, 5, 6, 7, 8]; /* čísla obrázkov, ktoré už sú v img/izby/ */
+
+const D = [];
+for (let p = 1; p <= 4; p++) PORADIE.forEach((t, i) => {
+  const T = TYP[t], plocha = G.izby[t].reduce((s, r) => s + r.m2, 0);
+  D.push({ id:`${p}.${CISLO[t]}`, p, t, izby:T.izby, nazov:T.nazov, plocha, balk:T.balk, cena:T.zakl + (p - 1) * T.krok, stav:STAVY[(p - 1) * 4 + i] });
+});
+const volne = D.filter(d => d.stav === 'volny');
+$('cVol').textContent = volne.length;
+$('cOd').textContent = 'od ' + eur(Math.min(...volne.map(d => d.cena)));
+
+const stred = pts => { let x = 0, y = 0; pts.forEach(p => { x += p[0]; y += p[1]; }); return [x / pts.length, y / pts.length]; };
+const bodyStr = pts => pts.map(p => p.join(',')).join(' ');
+let poschodie = 1, aktByt = null;
+
+/* ---------- budova ---------- */
+const fas = $('fas'), tip = $('btip');
+fas.innerHTML = G.fasada.map((pts, i) => {
+  const p = i + 1, v = D.filter(d => d.p === p && d.stav === 'volny').length;
+  return `<g class="pos" data-p="${p}" tabindex="0" role="button" aria-label="${p}. poschodie, ${v} voľné byty"><polygon points="${bodyStr(pts)}"/></g>`;
+}).join('');
+function tipUkaz(p, ev){
+  const nas = D.filter(d => d.p === p), v = nas.filter(d => d.stav === 'volny');
+  tip.innerHTML = `<b>${p}. poschodie</b><span>${v.length ? `<em>${v.length} ${v.length === 1 ? 'voľný byt' : 'voľné byty'}</em> zo 4` : 'Všetky byty sú predané alebo rezervované'}</span>${v.length ? `<span>od ${eur(Math.min(...v.map(d => d.cena)))}</span>` : ''}`;
+  const b = $('bud').getBoundingClientRect();
+  let x, y;
+  if (ev && ev.clientX) { x = ev.clientX - b.left + 18; y = ev.clientY - b.top + 18; }
+  else { const pts = G.fasada[p - 1], c = stred(pts); x = c[0] / 2400 * b.width; y = Math.min(...pts.map(q => q[1])) / 1350 * b.height - 90; }
+  x = Math.min(x, b.width - 230); tip.style.left = x + 'px'; tip.style.top = y + 'px'; tip.classList.add('on');
+}
+fas.querySelectorAll('.pos').forEach(g => {
+  const p = +g.dataset.p;
+  g.addEventListener('mousemove', ev => tipUkaz(p, ev));
+  g.addEventListener('mouseleave', () => tip.classList.remove('on'));
+  g.addEventListener('focus', () => tipUkaz(p));
+  g.addEventListener('blur', () => tip.classList.remove('on'));
+  g.addEventListener('click', () => { tip.classList.remove('on'); chodNa(p); });
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); chodNa(p); } });
+});
+$('posRad').insertAdjacentHTML('beforeend', [4,3,2,1].map(p => {
+  const v = D.filter(d => d.p === p && d.stav === 'volny').length;
+  return `<button class="pchip" type="button" data-p="${p}">${p}. poschodie <small>${v ? v + ' voľné' : 'obsadené'}</small></button>`;
+}).join(''));
+$('posRad').querySelectorAll('.pchip').forEach(b => b.onclick = () => chodNa(+b.dataset.p));
+function chodNa(p){ nastavPoschodie(p, true); vyberByt(null); $('vyber').scrollIntoView(); }
+
+/* ---------- poschodie ---------- */
+$('ptabs').innerHTML = [1,2,3,4].map(p => `<button type="button" data-p="${p}" aria-pressed="${p === 1}" aria-label="${p}. poschodie">${p}.<span class="dl"> poschodie</span></button>`).join('');
+$('ptabs').querySelectorAll('button').forEach(b => b.onclick = () => { nastavPoschodie(+b.dataset.p, true); vyberByt(null); });
+function nastavPoschodie(p, anim){
+  poschodie = p;
+  $('ptabs').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.p === p));
+  fas.querySelectorAll('.pos').forEach(g => g.classList.toggle('on', +g.dataset.p === p));
+  if (anim) { $('rez').classList.add('zmena'); setTimeout(() => $('rez').classList.remove('zmena'), 260); }
+  kresliRez();
+}
+function kresliRez(){
+  const nas = D.filter(d => d.p === poschodie), cw = $('rez').clientWidth || 900, K = 2400 / cw;
+  const fs = Math.round(14 * K), fs2 = Math.round(11.5 * K), lw = Math.round(86 * K), lh = Math.round(46 * K), pr = Math.round(15 * K);
+  let h = nas.map(d => {
+    const pts = G.byty[d.t], c = stred(pts), sk = aktByt && aktByt.id === d.id, tlm = aktByt && !sk;
+    return `<g class="byt ${d.stav}${sk ? ' akt' : ''}${tlm ? ' tlm' : ''}" data-id="${d.id}" tabindex="0" role="button" aria-label="Byt ${d.id}, ${d.nazov}, ${STAV[d.stav]}${d.stav !== 'predany' ? ', ' + eur(d.cena) : ''}"><polygon points="${bodyStr(pts)}"/>${sk ? '' :
+      `<g class="blab"><rect x="${c[0] - lw / 2}" y="${c[1] - lh / 2}" width="${lw}" height="${lh}" rx="${Math.round(8 * K)}"/><text x="${c[0]}" y="${c[1] - lh * .04}" style="font-size:${fs}px">Byt ${d.id}</text><text class="s" x="${c[0]}" y="${c[1] + lh * .34}" style="font-size:${fs2}px;fill:${d.stav === 'volny' ? 'var(--volny)' : d.stav === 'rezervovany' ? '#865F0B' : 'var(--ink3)'}">${STAV[d.stav]}</text></g>`}</g>`;
+  }).join('');
+  if (aktByt) {
+    const izby = G.izby[aktByt.t].slice(), f = FOTO[aktByt.t] || {};
+    izby.push({ n:'Balkón', m2:aktByt.balk, p:G.balk[aktByt.t] });
+    h += izby.map((r, i) => {
+      const c = stred(r.p), maF = f[r.n] != null;
+      return `<g class="izba${maF ? ' foto' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${r.n}, ${m2(r.m2)}"><polygon points="${bodyStr(r.p)}"/>${maF ? `<g class="pin"><circle cx="${c[0]}" cy="${c[1]}" r="${pr}"/><g transform="translate(${c[0]} ${c[1]}) scale(${pr / 30})"><path d="M-13 -5h6l4-6h6l4 6h6v15h-26z M0 2m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="none" stroke-width="3.2" stroke-linejoin="round"/></g></g>` : ''}</g>`;
+    }).join('');
+  }
+  const svg = $('rezSvg'); svg.innerHTML = h;
+  svg.querySelectorAll('.byt').forEach(g => {
+    const d = D.find(x => x.id === g.dataset.id);
+    g.addEventListener('click', () => vyberByt(d));
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); vyberByt(d); } });
+  });
+  svg.querySelectorAll('.izba').forEach(g => {
+    g.addEventListener('click', e => { e.stopPropagation(); otvorIzbu(+g.dataset.i); });
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); otvorIzbu(+g.dataset.i); } });
+  });
+  $('rezHint').textContent = aktByt ? 'Kliknite na miestnosť' : 'Kliknite na byt';
+  panel(); crumb();
+}
+function crumb(){
+  let h = `<button type="button" data-k="bud">Budova</button> › `;
+  h += aktByt ? `<button type="button" data-k="pos">${poschodie}. poschodie</button> › <b>Byt ${aktByt.id}</b>` : `<b>${poschodie}. poschodie</b>`;
+  $('crumb').innerHTML = h;
+  $('crumb').querySelectorAll('button').forEach(b => b.onclick = () => { if (b.dataset.k === 'bud') { vyberByt(null); $('bud').scrollIntoView({ block:'center' }); } else vyberByt(null); });
+}
+function izbyBytu(d){ const l = G.izby[d.t].slice(); l.push({ n:'Balkón', m2:d.balk, p:G.balk[d.t], balk:true }); return l; }
+function miniPlan(d, klik){
+  const R = G.izby[d.t].map(r => r.r), x0 = Math.min(...R.map(r => r[0])), y0 = Math.min(...R.map(r => r[1])), x1 = Math.max(...R.map(r => r[2])), y1 = Math.max(...R.map(r => r[3]));
+  const f = FOTO[d.t] || {}, zrk = d.t === 'B';
+  return `<svg viewBox="${x0 - .2} ${y0 - .2} ${x1 - x0 + .4} ${y1 - y0 + .4}" role="img" aria-label="Pôdorys bytu ${d.id}">` + G.izby[d.t].map((r, i) => {
+    const [a, b, c, e] = r.r, w = c - a, h = e - b, cx = a + w / 2, cy = b + h / 2, mal = w < 2.4 || h < 2.4;
+    const n = r.n.replace(' s kuchyňou', '');
+    return `<rect class="m${f[r.n] != null && klik ? ' f' : ''}" data-i="${i}" x="${a}" y="${b}" width="${w}" height="${h}"/>` +
+      (mal ? `<text x="${cx}" y="${cy + .1}" style="font-size:.26px">${n}</text>` : `<text x="${cx}" y="${cy - .05}">${n}</text><text class="a" x="${cx}" y="${cy + .38}">${m2(r.m2)}</text>`);
+  }).join('') + `</svg>`;
+}
+function panel(){
+  const P = $('panel');
+  if (!aktByt) {
+    const nas = D.filter(d => d.p === poschodie);
+    P.innerHTML = `<h3>${poschodie}. poschodie</h3><div class="sub">${nas.filter(d => d.stav === 'volny').length} voľné byty zo 4</div><ul class="blist">${nas.map(d =>
+      `<li><button type="button" data-id="${d.id}"><span class="c">${d.id}</span><span class="d">${d.nazov}, ${m2(d.plocha)}</span><span class="p">${d.stav === 'predany' ? '' : eur(d.cena)}</span><span></span><span><span class="st ${d.stav}">${STAV[d.stav]}</span></span></button></li>`).join('')}</ul>`;
+    P.querySelectorAll('.blist button').forEach(b => b.onclick = () => vyberByt(D.find(x => x.id === b.dataset.id)));
+    return;
+  }
+  const d = aktByt, f = FOTO[d.t] || {}, pred = d.stav === 'predany';
+  P.innerHTML = `<button class="spat" type="button" id="spat">‹ Všetky byty na poschodí</button><h3>Byt ${d.id}</h3><div class="sub">${d.nazov}, ${d.p}. poschodie</div>
+    <div class="kc"><b>${pred ? 'Predaný' : eur(d.cena)}</b><span class="st ${d.stav}">${STAV[d.stav]}</span></div>
+    <div class="par"><div><span>Plocha bytu</span><b>${m2(d.plocha)}</b></div><div><span>Balkón</span><b>${m2(d.balk)}</b></div><div><span>Izby</span><b>${d.izby}</b></div><div><span>Orientácia</span><b>${d.t === 'A' || d.t === 'B' ? 'juh, do parku' : 'sever, do dvora'}</b></div></div>
+    <div class="mini">${miniPlan(d, true)}</div>
+    <ul class="izl">${izbyBytu(d).map((r, i) => `<li><span>${r.n} <span style="color:var(--ink3)">${m2(r.m2)}</span></span>${f[r.n] != null ? `<button type="button" data-i="${i}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Pozrieť</button>` : ''}</li>`).join('')}</ul>
+    <div class="akc">${pred ? `<button class="btn sec" type="button" id="iVol">Pozrieť voľné byty</button>` : `<button class="btn lar" type="button" id="iZau">${d.stav === 'rezervovany' ? 'Chcem byť na rade' : 'Mám záujem'}</button><button class="btn sec" type="button" id="iTl">Karta bytu (PDF)</button>`}</div>`;
+  $('spat').onclick = () => vyberByt(null);
+  P.querySelectorAll('.izl button').forEach(b => b.onclick = () => otvorIzbu(+b.dataset.i));
+  P.querySelectorAll('.mini rect.f').forEach(r => r.addEventListener('click', () => otvorIzbu(+r.dataset.i)));
+  if ($('iZau')) $('iZau').onclick = () => { $('fByt').value = d.id; $('kontakt').scrollIntoView(); setTimeout(() => $('fm').querySelector('input').focus({ preventScroll:true }), 500); };
+  if ($('iTl')) $('iTl').onclick = () => tlac(d);
+  if ($('iVol')) $('iVol').onclick = () => { $('fSt').value = 'volny'; tabulka(); $('byty').scrollIntoView(); };
+}
+function vyberByt(d, bezHash){
+  aktByt = d; kresliRez();
+  if (!bezHash) history.replaceState(null, '', d ? '#byt-' + d.id : location.pathname);
+}
+
+/* ---------- vizualizácia miestnosti ---------- */
+const lb = $('lb'); let lbI = 0, lbList = [];
+let rezObr = null;
+function otvorIzbu(i){ if (!rezObr) { rezObr = new Image(); rezObr.onload = () => { if (lb.open) ukazIzbu(lbI); }; rezObr.src = 'img/poschodie-2400.webp'; } lbList = izbyBytu(aktByt); ukazIzbu(i); if (!lb.open) lb.showModal(); $('lbX').focus(); }
+function ukazIzbu(i){
+  lbI = (i + lbList.length) % lbList.length;
+  const r = lbList[lbI], f = (FOTO[aktByt.t] || {})[r.n], box = $('lbI');
+  $('lbN').textContent = r.n; $('lbS').textContent = `Byt ${aktByt.id}, ${m2(r.m2)}`;
+  if (f != null && FOTKY_HOTOVE.includes(f)) {
+    box.innerHTML = `<img src="img/izby/izba-${f}.webp" alt="Vizualizácia: ${r.n.toLowerCase()} v byte ${aktByt.id}"${aktByt.t === 'B' ? ' class="zrk"' : ''}>`;
+    $('lbP').textContent = 'Vizualizácia interiéru. Nábytok a dekorácie sú ilustračné.';
+  } else {
+    const xs = r.p.map(p => p[0]), ys = r.p.map(p => p[1]), m = 120;
+    const sx = rezObr.naturalWidth / 2400 || 1, sy = rezObr.naturalHeight / 1350 || 1;
+    const x0 = Math.max(0, Math.min(...xs) - m), y0 = Math.max(0, Math.min(...ys) - m), x1 = Math.min(2400, Math.max(...xs) + m), y1 = Math.min(1350, Math.max(...ys) + m);
+    const c = document.createElement('canvas'); c.width = Math.round((x1 - x0) * sx); c.height = Math.round((y1 - y0) * sy);
+    const g = c.getContext('2d'); g.drawImage(rezObr, x0 * sx, y0 * sy, c.width, c.height, 0, 0, c.width, c.height);
+    g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); r.p.forEach((p, k) => g[k ? 'lineTo' : 'moveTo']((p[0] - x0) * sx, (p[1] - y0) * sy)); g.closePath(); g.stroke();
+    c.setAttribute('role', 'img'); c.setAttribute('aria-label', `${r.n} na 3D pôdoryse`);
+    box.innerHTML = ''; box.appendChild(c);
+    $('lbP').textContent = f != null ? 'Vizualizácia interiéru sa pripravuje. Zatiaľ vidíte miestnosť na 3D pôdoryse.' : 'Miestnosť na 3D pôdoryse.';
+  }
+}
+$('lbX').onclick = () => lb.close();
+$('lbL').onclick = () => ukazIzbu(lbI - 1);
+$('lbR').onclick = () => ukazIzbu(lbI + 1);
+lb.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') ukazIzbu(lbI - 1); if (e.key === 'ArrowRight') ukazIzbu(lbI + 1); });
+let tx = null;
+lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
+lb.addEventListener('touchend', e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) ukazIzbu(lbI + (dx < 0 ? 1 : -1)); tx = null; });
+
+/* ---------- karta bytu na tlač ---------- */
+function tlac(d){
+  $('karta').innerHTML = `<p style="margin:0 0 18pt;color:#555">Pri parku, Sereď · Martina Hudecová · 0900 000 000</p><h1>Byt ${d.id}</h1><p style="margin:0">${d.nazov}, ${d.p}. poschodie, ${STAV[d.stav]}</p>
+    <p style="font-size:20pt;font-weight:700;margin:10pt 0">${eur(d.cena)}</p><div class="mini">${miniPlan(d, false)}</div>
+    <table>${izbyBytu(d).map(r => `<tr><td>${r.n}</td><td>${m2(r.m2)}</td></tr>`).join('')}<tr><td><b>Plocha bytu</b></td><td><b>${m2(d.plocha)}</b></td></tr></table>
+    <p style="margin-top:18pt;color:#555;font-size:10pt">Ukážkový projekt. Plochy sú orientačné.</p>`;
+  print();
+}
+
+/* ---------- tabuľka ---------- */
+function tabulka(){
+  const iz = $('fIz').value, st = $('fSt').value;
+  const L = D.filter(d => (!iz || d.izby === +iz) && (!st || d.stav === st));
+  $('poc').textContent = `${L.length} ${L.length === 1 ? 'byt' : L.length < 5 ? 'byty' : 'bytov'}`;
+  $('tbody').innerHTML = L.map(d => `<tr class="${d.stav}" data-id="${d.id}" tabindex="0"><td class="c">${d.id}</td><td>${d.izby}-izbový</td><td class="m num">${m2(d.plocha)}</td><td class="m num">${m2(d.balk)}</td><td class="num">${d.stav === 'predany' ? '–' : eur(d.cena)}</td><td><span class="st ${d.stav}">${STAV[d.stav]}</span></td></tr>`).join('');
+  $('tbody').querySelectorAll('tr').forEach(tr => {
+    const go = () => { const d = D.find(x => x.id === tr.dataset.id); nastavPoschodie(d.p, false); vyberByt(d); $('vyber').scrollIntoView(); };
+    tr.onclick = go; tr.onkeydown = e => { if (e.key === 'Enter') go(); };
+  });
+}
+$('fIz').onchange = tabulka; $('fSt').onchange = tabulka;
+
+/* ---------- formulár ---------- */
+$('fByt').innerHTML = '<option value="">Ešte neviem</option>' + D.filter(d => d.stav !== 'predany').map(d => `<option>${d.id}</option>`).join('');
+$('fm').addEventListener('submit', e => {
+  e.preventDefault();
+  const zle = [...$('fm').querySelectorAll('[required]')].find(i => !i.value.trim() || !i.checkValidity());
+  if (zle) { zle.focus(); zle.reportValidity(); return; }
+  $('fmOk').classList.add('on');
+});
+addEventListener('scroll', () => $('hl').classList.toggle('sc', scrollY > 8), { passive:true });
+
+/* ---------- štart ---------- */
+let rzT; new ResizeObserver(() => { clearTimeout(rzT); rzT = setTimeout(kresliRez, 120); }).observe($('rez'));
+tabulka();
+function zHashu(){
+  const h = location.hash.match(/^#byt-(\d)\.(\d\d)$/), d = h && D.find(x => x.id === `${h[1]}.${h[2]}`);
+  if (!d) return false;
+  nastavPoschodie(d.p, false); vyberByt(d, true); setTimeout(() => $('vyber').scrollIntoView(), 50); return true;
+}
+addEventListener('hashchange', zHashu);
+if (!zHashu()) nastavPoschodie(1, false);
+</script>
+</body>
+</html>
