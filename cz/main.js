@@ -108,7 +108,7 @@ function pStav() {
   document.getElementById('pCena').textContent = (p ? 'od ' : '') + fm(+t.dataset.c);
   document.getElementById('pPrev').textContent = p ? 'první rok v ceně' : '6 měsíců v ceně';
   document.getElementById('pPotom').textContent = p ? '649 Kč měsíčně během prodeje' : '249 Kč měsíčně do prodeje';
-  document.getElementById('pAkt').textContent = p ? 'neomezeně během prodeje' : 'drobné úpravy v ceně';
+  document.getElementById('pAkt').textContent = p ? 'sami v asistentovi, zdarma' : 'drobné úpravy v ceně';
 }
 function pOdoslat(ev) {
   ev.preventDefault(); const f = ev.target; const d = new FormData(f); const t = f.querySelector('input[name=ptyp]:checked');

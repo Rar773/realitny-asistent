@@ -1,0 +1,17 @@
+{
+  "projekt": "Pod Lipami",
+  "zdroj": "Realitný asistent",
+  "aktualizovane": "2026-11-26T08:12:00+01:00",
+  "domy": [
+    { "id": "A1", "typ": "A", "pozemok": 560, "cena": 289000, "stav": "predany" },
+    { "id": "A2", "typ": "A", "pozemok": 535, "cena": 289000, "stav": "predany" },
+    { "id": "A3", "typ": "B", "pozemok": 640, "cena": 349000, "stav": "rezervovany" },
+    { "id": "A4", "typ": "A", "pozemok": 590, "cena": 305000, "stav": "volny" },
+    { "id": "A5", "typ": "B", "pozemok": 720, "cena": 359000, "stav": "volny" },
+    { "id": "B1", "typ": "A", "pozemok": 520, "cena": 289000, "stav": "volny" },
+    { "id": "B2", "typ": "A", "pozemok": 545, "cena": 292000, "stav": "rezervovany" },
+    { "id": "B3", "typ": "B", "pozemok": 610, "cena": 345000, "stav": "predany" },
+    { "id": "B4", "typ": "A", "pozemok": 600, "cena": 309000, "stav": "volny" },
+    { "id": "B5", "typ": "B", "pozemok": 735, "cena": 365000, "stav": "volny" }
+  ]
+}
