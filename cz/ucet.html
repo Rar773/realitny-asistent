@@ -95,14 +95,16 @@
   <div id="vUcet" class="hide">
     <div class="card"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
       <div><h2 style="margin:0">Předplatné</h2><p style="margin:8px 0 0" id="dStav"></p><p class="mut" style="margin:6px 0 0" id="dStavT"></p></div>
-      <button class="btn" type="button" id="dObjBtn">Objednat předplatné</button></div>
+      <span id="kancelaria"></span><button class="btn" type="button" id="dObjBtn">Objednat předplatné</button></div>
       <form id="fObj" class="hide" novalidate style="margin-top:16px;border-top:1px solid #EEF0F5;padding-top:14px">
         <b>Verze</b>
         <div class="plany">
           <label class="plan"><input type="radio" name="plan" value="vsetky" checked><span><b>Všechny portály</b><span class="mut">Bazoš, Sreality a další portály, smlouvy a obchody</span></span></label>
           <label class="plan"><input type="radio" name="plan" value="bazos"><span><b>Bazoš</b><span class="mut">inzeráty na Bazoši</span></span></label>
           <label class="plan"><input type="radio" name="plan" value="developer"><span><b>Developer</b><span class="mut">projekty, byty a domy, web projektu</span></span></label>
+          <label class="plan"><input type="radio" name="plan" value="kancelaria"><span><b>Kancelář</b><span class="mut">přehled pro vedoucího, platíte za makléře</span></span></label>
         </div>
+        <div id="oMiestaW" class="hide" style="margin-top:14px"><label class="p" for="oMiesta" style="margin-top:0">Počet makléřů <span class="mut">(nejméně 3, vedoucí je v ceně)</span></label><input type="number" id="oMiesta" min="3" max="50" value="3" style="max-width:120px"><p class="mut" style="font-size:13.5px;margin:6px 0 0">Platíte za každé místo makléře. Objednávka při aktivním předplatném ho prodlouží o zvolené období a nastaví nový počet míst.</p></div>
         <b style="display:block;margin-top:14px">Období</b>
         <div class="plany">
           <label class="plan"><input type="radio" name="obd" value="mes" checked><span><b id="cMes">749 Kč měsíčně</b><span class="mut">zrušíte kdykoli</span></span></label>

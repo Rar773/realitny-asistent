@@ -1,8 +1,9 @@
 (() => {
   const API = 'https://ra-objednavky.rarex731.workers.dev';
   const TS_KLUC = '0x4AAAAAAGQzRVHjw4Z2OR71';
-  const CENY = { vsetky: { mes: 29, rok: 290 }, bazos: { mes: 19, rok: 190 }, developer: { mes: 49, rok: 490 } };
+  const CENY = { vsetky: { mes: 29, rok: 290 }, bazos: { mes: 19, rok: 190 }, developer: { mes: 49, rok: 490 }, kancelaria: { mes: 25, rok: 250 } };
   const $ = (i) => document.getElementById(i);
+  const HASH0 = location.hash;  // pokracuj() mení adresu – kotvu (#kancelaria, #developer) si zapamätáme
   const ukaz = (i, a = true) => $(i).classList.toggle('hide', !a);
   const VIEWS = ['vVstup', 'vHeslo', 'vInfo', 'vApp', 'vUcet'];
   const view = (v) => VIEWS.forEach((x) => ukaz(x, x === v));
@@ -184,20 +185,25 @@
     ['Meno', 'Tel', 'Firma', 'Ico', 'Dic', 'Adresa'].forEach((k) => { $('u' + k).value = u[{ Meno: 'meno', Tel: 'telefon', Firma: 'firma', Ico: 'ico', Dic: 'dic', Adresa: 'adresa' }[k]] || ''; });
     ukaz('zStareW', U.ma_heslo); $('zNad').textContent = U.ma_heslo ? 'Zmena hesla' : 'Nastaviť heslo pre aplikáciu';
     view('vUcet');
+    if (!window._hashObj && ['#kancelaria', '#developer'].includes(HASH0)) { window._hashObj = 1; $('dObjBtn').click(); $('fObj').scrollIntoView({ block: 'center' }); }
   }
   function ceny() {
-    const p = document.querySelector('input[name=plan]:checked').value, c = CENY[p];
+    const p = document.querySelector('input[name=plan]:checked').value, n = p === 'kancelaria' ? miesta() : 1, c = { mes: CENY[p].mes * n, rok: CENY[p].rok * n };
+    ukaz('oMiestaW', p === 'kancelaria');
     $('cMes').textContent = `${c.mes} € mesačne`; $('cRok').textContent = `${c.rok} € ročne`; $('cRokS').textContent = `${c.mes * 12} €`;
   }
+  const miesta = () => Math.min(50, Math.max(3, Math.round(Number($('oMiesta').value) || 3)));
   document.querySelectorAll('input[name=plan]').forEach((r) => r.addEventListener('change', ceny));
-  $('dObjBtn').onclick = () => { ukaz('fObj'); ceny(); if (U && ['bazos', 'developer'].includes(U.licencia.plan) && U.licencia.stav === 'aktivna') document.querySelector(`input[name=plan][value=${U.licencia.plan}]`).checked = true; if (location.hash === '#developer') document.querySelector('input[name=plan][value=developer]').checked = true; ceny(); };
+  $('oMiesta').addEventListener('input', ceny);
+  $('oMiesta').addEventListener('change', () => { $('oMiesta').value = miesta(); ceny(); });
+  $('dObjBtn').onclick = () => { ukaz('fObj'); ceny(); if (U && ['bazos', 'developer', 'kancelaria'].includes(U.licencia.plan) && U.licencia.stav === 'aktivna') document.querySelector(`input[name=plan][value=${U.licencia.plan}]`).checked = true; if (U && U.licencia.plan === 'kancelaria' && U.licencia.miesta) $('oMiesta').value = U.licencia.miesta; if (['#developer', '#kancelaria'].includes(HASH0)) document.querySelector(`input[name=plan][value=${HASH0.slice(1)}]`).checked = true; ceny(); };
   $('oZrus').onclick = () => ukaz('fObj', false);
   $('fObj').addEventListener('submit', async (e) => {
     e.preventDefault(); msg('oMsg', '');
     if (!$('oSuhlas').checked) return msg('oMsg', 'Potvrďte súhlas s obchodnými podmienkami.');
     const plan = document.querySelector('input[name=plan]:checked').value, obdobie = document.querySelector('input[name=obd]:checked').value;
     zamkni(e.target, true);
-    const j = await post('/ucet/objednat', { plan, obdobie, kod: $('oKod').value.trim(), suhlas: true }, true);
+    const j = await post('/ucet/objednat', { plan, obdobie, miesta: plan === 'kancelaria' ? miesta() : undefined, kod: $('oKod').value.trim(), suhlas: true }, true);
     zamkni(e.target, false);
     if (!j.ok) return msg('oMsg', j.chyba);
     if (j.platba_url) { location.href = j.platba_url; return; }
