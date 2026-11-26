@@ -75,7 +75,7 @@
     u = String(u || '').trim();
     if (/^mailto:info@realitnyasistent\.eu/i.test(u)) return u;
     if (/^https:\/\/(www\.)?realitnyasistent\.eu(\/|$)/i.test(u)) return u;
-    if (/^(\.?\/)?[\w-]+\.html(#[\w-]*)?$/i.test(u) || /^#[\w-]+$/.test(u) || /^(\.?\/)?ukazka2?\/?$/.test(u)) {
+    if (/^(\.?\/)?[\w-]+\.html(#[\w-]*)?$/i.test(u) || /^#[\w-]+$/.test(u) || /^(\.\.\/|\.?\/)?ukazka\d?\/?$/.test(u)) {
       return C.zdroj === 'aplikacia' ? 'https://realitnyasistent.eu/' + u.replace(/^\.?\//, '') : u;
     }
     return '';
