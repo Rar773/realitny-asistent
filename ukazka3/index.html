@@ -154,6 +154,19 @@ header.sc{border-color:var(--line)}
 .pud .s{font:600 17px var(--body);fill:var(--ink2);text-anchor:middle}
 .pud-pod{display:flex;justify-content:space-between;color:var(--ink3);font-size:14px;margin-top:10px}
 
+/* interiér */
+.int{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.int figure{margin:0;border-radius:var(--r-l);overflow:hidden;position:relative;background:var(--stone)}
+.int figure img{width:100%;height:100%;object-fit:cover}
+.int .velka{grid-column:1/-1;aspect-ratio:2/1}
+.int .vys{aspect-ratio:4/5}
+.int figcaption{position:absolute;left:16px;bottom:14px;background:rgba(255,255,255,.92);color:var(--ink);font-size:14.5px;font-weight:600;padding:6px 12px;border-radius:999px}
+.int .vzor{background:var(--leaf);color:#fff;border-radius:var(--r-l);padding:32px;display:flex;flex-direction:column;justify-content:flex-end;gap:14px;aspect-ratio:4/5}
+.int .vzor h3{color:#fff;font-size:28px;font-weight:700;letter-spacing:-.02em}
+.int .vzor p{color:#DCE8D6}
+.int .vzor .btn{background:#fff;color:var(--leaf-d);align-self:flex-start}
+.int .vzor .btn:hover{background:var(--blossom)}
+
 /* štandardy */
 #standardy{background:var(--ink);color:#E9ECE4}
 #standardy h2{color:#fff}
@@ -257,6 +270,7 @@ footer b{color:var(--ink)}
   .hero-t,.typy,.lok,.fin,.kont,.sec-h{grid-template-columns:1fr}
   .sec-h{gap:16px}
   .std{grid-template-columns:1fr 1fr}
+  .int{grid-template-columns:1fr 1fr}.int .vzor{grid-column:1/-1;aspect-ratio:auto}
   .std div:not(:nth-child(3n+1)){padding-left:0;border-left:0}
   .std div:nth-child(even){padding-left:24px;border-left:1px solid #3B4136}
   .cas{grid-template-columns:1fr}
@@ -288,6 +302,7 @@ footer b{color:var(--ink)}
   .std{grid-template-columns:1fr}
   .std div:nth-child(even){padding-left:0;border-left:0}
   .typ-fakty b{font-size:22px}
+  .int{grid-template-columns:1fr}.int .velka{aspect-ratio:4/3}
   .fm{grid-template-columns:1fr;padding:22px}
   .splatky li{grid-template-columns:44px 1fr}
   .splatky em{grid-column:2}
@@ -306,7 +321,7 @@ footer b{color:var(--ink)}
 
 <header id="hl"><div class="w nav">
   <a class="logo" href="#" aria-label="Pod Lipami – úvod"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 29V15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16 15c-7 0-11-4.5-11-10.5C11 4.5 16 8 16 15Z" fill="currentColor"/><path d="M16 15c6 0 10.5-3.6 10.5-9C21 6 16 9 16 15Z" fill="currentColor" opacity=".55"/></svg>Pod Lipami</a>
-  <nav aria-label="Hlavná navigácia"><a href="#domy">Domy a ceny</a><a href="#typy">Typy domov</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a><a href="#financovanie">Financovanie</a></nav>
+  <nav aria-label="Hlavná navigácia"><a href="#domy">Domy a ceny</a><a href="#typy">Typy domov</a><a href="#interier">Interiér</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a><a href="#financovanie">Financovanie</a></nav>
   <a class="tel" href="tel:+421900000000">0900 000 000</a>
   <a class="btn" href="#kontakt">Dohodnúť obhliadku</a>
 </div></header>
@@ -361,6 +376,18 @@ footer b{color:var(--ink)}
         <div class="pud" id="pudTyp"></div>
         <div class="pud-pod"><span>Plochy sú orientačné.</span><span>Sever je hore.</span></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="interier" aria-labelledby="h-int" style="padding-top:0">
+  <div class="w">
+    <div class="sec-h"><h2 id="h-int">Interiér</h2><p>Vizualizácie domu typu B. Podlahy, obklady a farby si vyberiete vo vzorkovni, kuchyňu a nábytok podľa seba.</p></div>
+    <div class="int">
+      <figure class="velka"><picture><source type="image/webp" srcset="img/obyvacka.webp"><img src="img/obyvacka.jpg" alt="Obývačka s kuchyňou, ostrovčekom a posuvnou stenou na krytú terasu" width="1672" height="941" loading="lazy"></picture><figcaption>Obývačka s kuchyňou, 46 m²</figcaption></figure>
+      <figure class="vys"><picture><source type="image/webp" srcset="img/spalna.webp"><img src="img/spalna.jpg" alt="Spálňa s veľkým oknom do záhrady s mladou lipou" width="1122" height="1402" loading="lazy"></picture><figcaption>Spálňa s výhľadom do záhrady</figcaption></figure>
+      <figure class="vys"><picture><source type="image/webp" srcset="img/kupelna.webp"><img src="img/kupelna.jpg" alt="Kúpeľňa so sprchovým kútom bez vaničky a dlažbou v odtieni kameňa" width="1122" height="1402" loading="lazy"></picture><figcaption>Kúpeľňa so sprchovým kútom</figcaption></figure>
+      <div class="vzor"><h3>Prejdite sa vzorovým domom</h3><p>Interiér si môžete pozrieť naživo. Obhliadky robíme každý deň vrátane soboty.</p><a class="btn" href="#kontakt">Dohodnúť obhliadku</a></div>
     </div>
   </div>
 </section>
