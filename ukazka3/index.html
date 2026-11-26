@@ -53,7 +53,7 @@ header.sc{border-color:var(--line)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 21px var(--head);letter-spacing:-.02em}
 .logo svg{width:30px;height:30px;color:var(--leaf)}
 .nav nav{display:flex;gap:4px;margin-left:auto}
-.nav nav a{text-decoration:none;color:var(--ink2);font-weight:500;font-size:15.5px;padding:8px 12px;border-radius:999px}
+.nav nav a{text-decoration:none;color:var(--ink2);font-weight:500;font-size:15.5px;padding:8px 10px;border-radius:999px;white-space:nowrap}
 .nav nav a:hover{color:var(--ink);background:var(--stone)}
 .nav .tel{font-weight:600;text-decoration:none;font-size:15.5px;white-space:nowrap}
 .nav .btn{padding:11px 18px;font-size:15px}
@@ -270,6 +270,47 @@ footer b{color:var(--ink)}
 .det-mes{color:var(--ink2);font-size:15px;background:var(--stone);border-radius:var(--r-m);padding:14px 16px}
 .det-mes b{color:var(--ink)}
 
+/* 3D prehliadka */
+#prehliadka{padding-top:0}
+.d3{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:stretch}
+.d3-scena{position:relative;height:640px;background:var(--stone);border-radius:var(--r-l);overflow:hidden}
+.d3-scena canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.d3-piny{position:absolute;inset:0;pointer-events:none}
+.pin3{position:absolute;left:0;top:0;pointer-events:auto;display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;background:#fff;color:var(--ink);font:600 13.5px var(--body);padding:6px 11px 6px 8px;border-radius:999px;box-shadow:0 2px 10px rgba(35,39,31,.18);white-space:nowrap;transition:background .15s,color .15s}
+.pin3 i{width:9px;height:9px;border-radius:50%;background:var(--leaf);box-shadow:0 0 0 3px var(--leaf-50)}
+.pin3.sfoto{background:var(--leaf);color:#fff}
+.pin3:hover,.pin3.akt{background:var(--ink);color:#fff}
+.pin3:hover i,.pin3.akt i{background:#fff;box-shadow:none}
+.pin3:focus-visible{outline:3px solid var(--blossom);outline-offset:2px}
+.d3-ovl{position:absolute;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.d3-ovl .seg{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.d3-btn{border:0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.1);font:600 15px var(--body);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+.d3-btn[aria-pressed=true]{background:var(--ink);color:#fff}
+.d3-hint{position:absolute;left:16px;bottom:12px;margin:0;font-size:13.5px;color:var(--ink2);background:rgba(255,255,255,.82);padding:5px 12px;border-radius:999px;pointer-events:none}
+.d3 [hidden]{display:none!important}
+.d3-nac{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink2);font-size:15px}
+.d3-chyba{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;color:var(--ink2)}
+.d3-panel{background:var(--stone);border-radius:var(--r-l);padding:24px;display:flex;flex-direction:column;min-height:0;max-height:640px;overflow:auto}
+.logo,.nav .btn{white-space:nowrap}
+@media (max-width:1380px) and (min-width:1061px){.nav .tel{display:none}}
+.d3-panel h3{margin:0 0 4px;font:600 22px/1.2 var(--head)}
+.d3-panel .pl{color:var(--ink3);font-size:15px}
+.d3-panel ul{list-style:none;margin:14px 0 0;padding:0;overflow:auto}
+.d3-panel li button{width:100%;display:flex;justify-content:space-between;gap:12px;border:0;background:none;padding:10px 0;border-bottom:1px solid var(--line);font:500 15.5px var(--body);color:var(--ink);cursor:pointer;text-align:left}
+.d3-panel li button:hover span{color:var(--leaf)}
+.d3-panel li em{font-style:normal;font-size:12.5px;font-weight:600;color:var(--leaf);background:var(--leaf-50);padding:2px 8px;border-radius:999px;margin-left:6px}
+.d3-panel li b{font-weight:600;color:var(--ink2);white-space:nowrap}
+.d3-panel figure{margin:14px 0 0}
+.d3-panel figure picture{display:block}
+.d3-panel figure img{display:block;width:100%;height:auto!important;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-m)}
+.d3-panel figcaption{font-size:13px;color:var(--ink3);margin-top:6px}
+.d3-panel p{margin:14px 0 0;color:var(--ink2);font-size:15.5px}
+.d3-panel .btn{margin-top:auto;align-self:flex-start}
+.d3-panel [data-detail] .btn{margin-top:20px}
+.d3-hm{display:none}
+.d3-odk{display:inline-flex;align-items:center;gap:6px;color:var(--leaf);font-weight:600;text-decoration:none}
+@media (max-width:1060px){.d3-panel{max-height:none}.d3{grid-template-columns:1fr}.d3-scena{height:520px}.d3-panel ul{columns:2;column-gap:24px}}
+@media (max-width:720px){.d3-scena{height:440px;border-radius:var(--r-m)}.d3-panel ul{columns:1}.pin3{padding:5px;font-size:0}.pin3 span{display:none}.pin3.sfoto span,.pin3.akt span{display:inline;font-size:12.5px}.pin3.sfoto,.pin3.akt{padding:5px 9px 5px 7px}.d3-hint{font-size:12.5px}.d3-hd{display:none}.d3-hm{display:inline}}
 @media (max-width:1060px){
   .nav nav{display:none}
   .nav .tel{margin-left:auto}
@@ -328,7 +369,7 @@ footer b{color:var(--ink)}
 
 <header id="hl"><div class="w nav">
   <a class="logo" href="#" aria-label="Pod Lipami – úvod"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 29V15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16 15c-7 0-11-4.5-11-10.5C11 4.5 16 8 16 15Z" fill="currentColor"/><path d="M16 15c6 0 10.5-3.6 10.5-9C21 6 16 9 16 15Z" fill="currentColor" opacity=".55"/></svg>Pod Lipami</a>
-  <nav aria-label="Hlavná navigácia"><a href="#domy">Domy a ceny</a><a href="#typy">Typy domov</a><a href="#interier">Interiér</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a><a href="#financovanie">Financovanie</a></nav>
+  <nav aria-label="Hlavná navigácia"><a href="#domy">Domy a ceny</a><a href="#typy">Typy domov</a><a href="#prehliadka">3D prehliadka</a><a href="#interier">Interiér</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a><a href="#financovanie">Financovanie</a></nav>
   <a class="tel" href="tel:+421900000000">0900 000 000</a>
   <a class="btn" href="#kontakt">Dohodnúť obhliadku</a>
 </div></header>
@@ -382,7 +423,27 @@ footer b{color:var(--ink)}
         <div class="typ-fakty"><div><b id="tfPl">126 m²</b><span>úžitková plocha</span></div><div><b id="tfIz">3</b><span>izby a obývačka</span></div><div><b id="tfCe">od 289 000 €</b><span>vrátane pozemku</span></div></div>
         <div class="pud" id="pudTyp"></div>
         <div class="pud-pod"><span>Plochy sú orientačné.</span><span>Sever je hore.</span></div>
+        <p style="margin:18px 0 0"><a class="d3-odk" href="#prehliadka">Pozrieť dom typu B v 3D</a></p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="prehliadka" aria-labelledby="h-3d">
+  <div class="w">
+    <div class="sec-h"><h2 id="h-3d">3D prehliadka domu typu B</h2><p>Otáčajte domom, priblížte si ho a kliknite na miestnosť. Pri miestnostiach so zeleným štítkom sa otvorí vizualizácia interiéru.</p></div>
+    <div class="d3">
+      <div class="d3-scena" id="d3Scena">
+        <canvas id="d3c" role="img" aria-label="Interaktívny 3D model domu typu B so zariadenými miestnosťami"></canvas>
+        <div class="d3-piny" id="d3Piny"></div>
+        <div class="d3-nac" id="d3Nac">Načítavame 3D model domu…</div>
+        <div class="d3-ovl"><div class="seg" role="group" aria-label="Pohľad na dom"><button type="button" data-v="cely" aria-pressed="true">Celý dom</button><button type="button" data-v="zhora" aria-pressed="false">Zhora</button></div><button class="d3-btn" type="button" id="d3Steny" aria-pressed="false">Znížiť steny</button></div>
+        <p class="d3-hint"><span class="d3-hd">Potiahnutím otočíte, kolieskom priblížite.</span><span class="d3-hm">Jedným prstom otočíte, dvoma priblížite.</span></p>
+      </div>
+      <aside class="d3-panel" id="d3Panel" aria-live="polite">
+        <div data-zoznam><h3>Miestnosti</h3><span class="pl">152,7 m² úžitkovej plochy, garáž a terasa</span><ul></ul></div>
+        <div data-detail hidden><h3></h3><span class="pl" data-plocha></span><figure hidden><picture><source type="image/webp" srcset=""><img src="" alt="" width="1122" height="841" loading="lazy"></picture><figcaption></figcaption></figure><p></p><button class="btn ghost" type="button" data-spat>Späť na celý dom</button></div>
+      </aside>
     </div>
   </div>
 </section>
@@ -619,10 +680,11 @@ function otvor(id, bezHistorie){
       `<p class="det-mes">Pri 20 % vlastných zdrojov a splácaní 30 rokov orientačne <b>${eur(Math.round(splatka(d.cena,20,30)))} mesačne</b>.</p>`}
     ${d.stav === 'rezervovany' ? `<p class="det-mes">Dom je rezervovaný. Ak rezervácia nebude potvrdená, ozveme sa vám ako prvým.</p>` : ''}
     <div class="det-akc">${pred ? `<button class="btn" type="button" data-a="volne">Pozrieť voľné domy</button>` :
-      `<button class="btn" type="button" data-a="zaujem">${d.stav==='rezervovany' ? 'Chcem byť na rade' : 'Mám záujem o dom ' + d.id}</button><button class="btn ghost" type="button" data-a="tlac">Vytlačiť kartu domu</button>`}</div>`;
+      `<button class="btn" type="button" data-a="zaujem">${d.stav==='rezervovany' ? 'Chcem byť na rade' : 'Mám záujem o dom ' + d.id}</button><button class="btn ghost" type="button" data-a="tlac">Vytlačiť kartu domu</button>`}${d.typ === 'B' ? `<button class="btn ghost" type="button" data-a="3d">Pozrieť dom v 3D</button>` : ''}</div>`;
   $('detB').querySelectorAll('[data-a]').forEach(b => b.onclick = () => {
     if (b.dataset.a === 'tlac') return print();
     zavri(true);
+    if (b.dataset.a === '3d') { $('prehliadka').scrollIntoView(); return; }
     if (b.dataset.a === 'zaujem') { $('fDom').value = d.id; $('kontakt').scrollIntoView(); setTimeout(() => $('fm').querySelector('input').focus({preventScroll:true}), 450); }
     else { nastavStav('volny'); tabulka(); $('domy').scrollIntoView(); }
   });
@@ -714,6 +776,25 @@ function start(j){
 }
 fetch('projekt.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(start).catch(() => start(ZALOHA));
 })();
+</script>
+<script type="module">
+/* 3D prehliadka sa načíta, až keď sa k nej návštevník priblíži */
+const sc = document.getElementById('d3Scena'), seg = document.querySelectorAll('#d3Scena .seg button'), st = document.getElementById('d3Steny');
+let api = null, ide = false;
+const ovladanie = { pohlad: v => seg.forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)) };
+async function nacitaj(){
+  if (ide) return; ide = true;
+  try {
+    const m = await import('./js/dom3d.js');
+    api = m.spusti({ canvas: document.getElementById('d3c'), piny: document.getElementById('d3Piny'), panel: document.getElementById('d3Panel'),
+      nacitanie: document.getElementById('d3Nac'), ovladanie, chyba });
+  } catch (e) { chyba(); }
+}
+function chyba(){ document.getElementById('d3Nac').outerHTML = '<div class="d3-chyba">3D prehliadku sa vo vašom prehliadači nepodarilo spustiť. Pôdorys domu typu B nájdete vyššie v časti Typy domov.</div>'; }
+seg.forEach(b => b.onclick = () => api && api.pohlad(b.dataset.v));
+st.onclick = () => { const n = st.getAttribute('aria-pressed') !== 'true'; st.setAttribute('aria-pressed', n); api && api.steny(n); };
+if ('IntersectionObserver' in window) new IntersectionObserver((e, o) => { if (e.some(x => x.isIntersecting)) { o.disconnect(); nacitaj(); } }, { rootMargin: '600px' }).observe(sc);
+else nacitaj();
 </script>
 </body>
 </html>
