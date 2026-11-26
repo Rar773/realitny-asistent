@@ -1,7 +1,7 @@
 (() => {
   const API = 'https://ra-objednavky.rarex731.workers.dev';
   const TS_KLUC = '0x4AAAAAAGQzRVHjw4Z2OR71';
-  const CENY = { vsetky: { mes: 749, rok: 7490 }, bazos: { mes: 490, rok: 4900 } };
+  const CENY = { vsetky: { mes: 749, rok: 7490 }, bazos: { mes: 490, rok: 4900 }, developer: { mes: 1290, rok: 12900 } };
   const $ = (i) => document.getElementById(i);
   const ukaz = (i, a = true) => $(i).classList.toggle('hide', !a);
   const VIEWS = ['vVstup', 'vHeslo', 'vInfo', 'vApp', 'vUcet'];
@@ -190,7 +190,7 @@
     $('cMes').textContent = `${eur(c.mes)} měsíčně`; $('cRok').textContent = `${eur(c.rok)} ročně`; $('cRokS').textContent = eur(c.mes * 12);
   }
   document.querySelectorAll('input[name=plan]').forEach((r) => r.addEventListener('change', ceny));
-  $('dObjBtn').onclick = () => { ukaz('fObj'); ceny(); if (U && U.licencia.plan === 'bazos' && U.licencia.stav === 'aktivna') document.querySelector('input[name=plan][value=bazos]').checked = true; ceny(); };
+  $('dObjBtn').onclick = () => { ukaz('fObj'); ceny(); if (U && ['bazos', 'developer'].includes(U.licencia.plan) && U.licencia.stav === 'aktivna') document.querySelector(`input[name=plan][value=${U.licencia.plan}]`).checked = true; if (location.hash === '#developer') document.querySelector('input[name=plan][value=developer]').checked = true; ceny(); };
   $('oZrus').onclick = () => ukaz('fObj', false);
   $('fObj').addEventListener('submit', async (e) => {
     e.preventDefault(); msg('oMsg', '');

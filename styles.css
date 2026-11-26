@@ -1151,3 +1151,8 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .pick .pstara{font:500 14px var(--body);color:var(--muted);margin-right:6px}
 
 .jazyk{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 11px;margin-right:8px;border:1.5px solid #E2E4EC;border-radius:999px;font-weight:700;font-size:13px;color:inherit;text-decoration:none;letter-spacing:.02em}.jazyk:hover{border-color:#7728E6;color:#7728E6}
+
+.dev-plan{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px 40px;margin-top:24px;align-items:start}
+.dev-plan .feats{margin:6px 0 0;grid-template-columns:1fr 1fr}
+.dev-plan .btn{align-self:start;margin-top:18px}
+@media (max-width:900px){.dev-plan{grid-template-columns:1fr}.dev-plan .feats{grid-template-columns:1fr}}
