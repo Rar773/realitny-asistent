@@ -58,7 +58,7 @@ section{padding:100px 0}
 /* ===== prehliadka ===== */
 #prehliadka{padding:0;position:relative}
 .stage{position:relative;height:calc(100vh - var(--hh) - 41px);height:calc(100svh - var(--hh) - 41px);min-height:560px;overflow:hidden;overflow:clip;background:linear-gradient(#b3c8e2,#93b2d6 55%,#6f8a62);user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.stage.na-pos{background:#D7D3D0}
+.stage.na-pos{background:radial-gradient(ellipse at 50% 55%,#21304A,#111925 75%)}
 .vrs{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility 0s linear .7s}
 .vrs.on{opacity:1;visibility:visible;transition:opacity .7s ease,visibility 0s}
 .cam{position:absolute;left:0;top:0;width:2400px;height:1339.5px;transform-origin:0 0;will-change:transform}
@@ -107,7 +107,7 @@ section{padding:100px 0}
 .byt.predany:hover polygon{fill:rgba(120,128,124,.4)}
 .byt.akt polygon{fill:rgba(255,255,255,0)!important;stroke:#fff}
 .byt.tlm{opacity:.18;pointer-events:none}
-.tien{fill:rgba(215,211,208,.72);pointer-events:none;transition:opacity .6s}
+.tien{fill:rgba(17,25,38,.66);pointer-events:none;transition:opacity .6s}
 .blab{pointer-events:none}
 .blab rect{fill:var(--night)}
 .blab text{font-family:var(--body);font-weight:700;fill:#fff;text-anchor:middle}
@@ -435,7 +435,9 @@ const FOTO = { A:{'Obývačka s kuchyňou':1,'Spálňa':2,'Detská izba':3,'Kúp
 FOTO.B = FOTO.A;
 /* prelety kamery (videá z Higgsfieldu). Kým tu video nie je, prechod robí priblíženie obrázka. */
 const PRELETY = {
-  bud:'video/bud'   /* budova → 3D poschodie (Kling 3.0 Omni, Higgsfield); ďalšie: 'bud-3', 'pos-A', 'izba-A' */
+  /* poschodie sa vysunie z budovy a prejde do 3D; vlet z bytu do obývačky (Kling 3.0 Omni, Higgsfield) */
+  'bud-1':'video/bud-1', 'bud-2':'video/bud-2', 'bud-3':'video/bud-3', 'bud-4':'video/bud-4',
+  'izba-A':'video/izba-A', 'izba-B':'video/izba-B', 'izba-C':'video/izba-C', 'izba-D':'video/izba-D'
 };
 const VID_EXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? '.mp4' : '.webm';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -485,6 +487,11 @@ function kamera(el, r, o, rezim, ms, nasob = 1){
 const naObr = (el, x, y) => [el._t[0] + x * el._s, el._t[1] + y * KY * el._s];
 const R_BUD = () => mobil() ? [430, 150, 1970, 1240] : [0, 0, 2400, 1350];
 const R_PLAN = [330, 95, 1990, 1350];
+/* záber na poschodie, z ktorého štartuje prelet (rovnaký výrez ako začiatočný obrázok videa) */
+const rStart = p => { const b = bbox(G.fasada[p - 1]), cy = (b[1] + b[3]) / 2 * KY, y0 = Math.min(Math.max(cy - 450, 0), 1339.5 - 900); return [400, y0 / KY, 2000, (y0 + 900) / KY]; };
+/* výrez bytu, z ktorého štartuje vlet do obývačky (rovnaký ako začiatočný obrázok videa) */
+const rVlet = d => { const [x0, y0, x1, y1] = rByt(d), w = Math.max(x1 - x0, (y1 - y0) * KY * 16 / 9) * 1.05, h = w * 9 / 16, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2 * KY;
+  const xc = Math.min(Math.max(cx - w / 2, 0), 2400 - w), yc = Math.min(Math.max(cy - h / 2, 0), 1339.5 - h); return [xc, yc / KY, xc + w, (yc + h) / KY]; };
 const rPos = p => { const b = bbox(G.fasada[p - 1]); return [b[0] - 90, b[1] - 130, b[2] + 90, b[3] + 130]; };
 const rByt = d => { const b1 = bbox(G.byty[d.t]), b2 = bbox(G.balk[d.t]); return [Math.min(b1[0], b2[0]) - 50, Math.min(b1[1], b2[1]) - 50, Math.max(b1[2], b2[2]) + 50, Math.max(b1[3], b2[3]) + 50]; };
 function camBud(ms){ return kamera($('camBud'), R_BUD(), oblast(false), mobil() ? 'contain' : 'cover', ms); }
@@ -533,13 +540,16 @@ async function chodNaPos(p, push = true){
   if (z === 'bud') {
     tipSkry();
     fas.querySelectorAll('.pos').forEach(g => g.classList.toggle('svieti', +g.dataset.p === p));
-    trieda();
-    const pl = prelet('bud-' + p, poPrelete) || prelet('bud', poPrelete);
-    if (pl) { await pl; await cakaj(1000); }
+    stage.classList.add('zoom'); vy.classList.add('zoom');   /* panel ukážeme až po prelete */
+    if (PRELETY['bud-' + p] && !RM) {
+      kamera($('camBud'), rStart(p), oblast(false), 'cover', 1000);
+      await cakaj(1050);
+      await prelet('bud-' + p, () => { poPrelete(); trieda(); }); await cakaj(1000);
+    }
     else {
       kamera($('camBud'), rPos(p), oblast(false), 'contain', 1100);
       await cakaj(750);
-      camPos(0, 1.22); vrstva('vrsPos'); camPos(1100);
+      camPos(0, 1.22); vrstva('vrsPos'); trieda(); camPos(1100);
       await cakaj(1100);
     }
     fas.querySelectorAll('.pos').forEach(g => g.classList.remove('svieti'));
@@ -569,9 +579,11 @@ async function chodNaIzbu(i, push = true){
   ukazIzbu(); zapis(push);
   if (z === 'byt') {
     const r = L[S.i], b = bbox(r.p, 30);
-    const pl = prelet('izba-' + S.d.t, () => { vrstva('vrsIzba', true); trieda(); });
-    if (pl) await pl;
-    else {
+    if (S.i === 0 && PRELETY['izba-' + S.d.t] && !RM) {
+      $('rezSvg').classList.add('letim'); stage.classList.add('na-izba'); vy.classList.add('na-izba');
+      kamera($('camPos'), rVlet(S.d), oblast(false), 'cover', 600); await cakaj(620);
+      await prelet('izba-' + S.d.t, () => { vrstva('vrsIzba', true); trieda(); });
+    } else {
       $('rezSvg').classList.add('letim');
       kamera($('camPos'), b, oblast(false), 'contain', 750);
       await cakaj(500); vrstva('vrsIzba'); trieda(); await cakaj(600);
@@ -708,7 +720,10 @@ function panel(){
 }
 
 /* ---------- miestnosť ---------- */
-function predNacitaj(d){ fotoIzby(d).forEach(r => { const im = new Image(); im.src = `img/izby/izba-${FOTO[d.t][r.n]}.webp`; }); }
+function predNacitaj(d){
+  fotoIzby(d).forEach(r => { const im = new Image(); im.src = `img/izby/izba-${FOTO[d.t][r.n]}.webp`; });
+  const v = PRELETY['izba-' + d.t]; if (v && !RM && !document.querySelector(`link[href="${v + VID_EXT}"]`)) { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = v + VID_EXT; document.head.appendChild(l); }
+}
 function ukazIzbu(){
   const d = S.d, L = fotoIzby(d), r = L[S.i], f = FOTO[d.t][r.n], box = $('izFoto');
   const im = new Image(); im.src = `img/izby/izba-${f}.webp`; im.alt = `Vizualizácia: ${r.n.toLowerCase()} v byte ${d.id}`; im.draggable = false;
@@ -795,7 +810,7 @@ const jeOdkaz = zHashu();
 if (jeOdkaz) setTimeout(() => $('prehliadka').scrollIntoView(), 30);
 addEventListener('load', () => {
   const im = new Image(); im.src = mobil() ? 'img/poschodie-1400.webp' : 'img/poschodie-2400.webp';
-  if (!RM && PRELETY.bud) setTimeout(() => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = PRELETY.bud + VID_EXT; document.head.appendChild(l); }, 1200);
+  if (!RM) setTimeout(() => Object.keys(PRELETY).filter(k => k.startsWith('bud')).map(k => PRELETY[k]).forEach(v => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = v + VID_EXT; document.head.appendChild(l); }), 1500);
 });
 </script>
 </body>
