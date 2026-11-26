@@ -178,7 +178,7 @@ header.sc{border-color:var(--line)}
 .std p{color:#B9BFB3;font-size:16px}
 
 /* výstavba */
-.cas{display:grid;grid-template-columns:repeat(5,1fr);padding:0;margin:12px 0 0}
+.cas{display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));padding:0;margin:12px 0 0}
 .cas li{list-style:none;padding:28px 20px 0 0;position:relative}
 .cas li:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--stone2)}
 .cas li.ok:before{background:var(--leaf)}
@@ -782,6 +782,12 @@ const zAsistenta = j => ({ aktualizovane: j.aktualizovane, domy: (j.jednotky || 
 const MES_N = ['januára','februára','marca','apríla','mája','júna','júla','augusta','septembra','októbra','novembra','decembra'];
 const MES_V = ['Január','Február','Marec','Apríl','Máj','Jún','Júl','August','September','Október','November','December'];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+function etapy(z){
+  const ol = document.querySelector('#vystavba .cas'); if (!ol || !Array.isArray(z) || !z.length) return;
+  const e = x => String(x ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  ol.innerHTML = z.map(x => `<li class="${x.stav === 'hotovo' ? 'ok' : x.stav === 'prebieha' ? 'teraz' : ''}"><b>${e(x.nazov)}</b><span>${x.stav === 'prebieha' ? 'práve prebieha' : e(x.kedy || (x.stav === 'hotovo' ? 'hotovo' : ''))}</span></li>`).join('');
+  ol.style.setProperty('--n', Math.min(z.length, 8));
+}
 function novinky(n){
   const el = document.querySelector('#vystavba .fotky-st'); if (!el || !Array.isArray(n) || !n.length) return;
   const mes = s => { const [y, m] = String(s).split('-'); return (MES_V[+m - 1] || '') + ' ' + y; };
@@ -790,7 +796,7 @@ function novinky(n){
   const p = document.querySelector('#vystavba .sec-h p'), [y, m] = String(n[0].datum).split('-');
   if (p && m) p.textContent = `Posledná novinka zo stavby je z ${MES_N[+m - 1]} ${y}.`;
 }
-fetch(API, { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => { const d = zAsistenta(j); if (d.domy.length !== ZALOHA.domy.length) throw 0; start(d); try { novinky(j.novinky); } catch (e) {} })
+fetch(API, { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => { try { novinky(j.novinky); etapy(j.etapy); } catch (e) {} const d = zAsistenta(j); if (d.domy.length !== ZALOHA.domy.length) throw 0; start(d); })
   .catch(() => fetch('projekt.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(start).catch(() => start(ZALOHA)));
 })();
 </script>

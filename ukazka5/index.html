@@ -287,7 +287,7 @@ section.mist{background:var(--mist)}
 .stdl div{border-top:2px solid var(--ink);padding-top:12px}
 .stdl dt{font:700 18px var(--head)}
 .stdl dd{margin:6px 0 0;color:var(--ink2);font-size:15.5px}
-.cas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.cas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr))}
 .cas li{position:relative;padding:30px 16px 0 0}
 .cas li:before{content:"";position:absolute;left:0;right:0;top:7px;height:3px;background:var(--mist2)}
 .cas li:after{content:"";position:absolute;left:0;top:0;width:17px;height:17px;border-radius:50%;background:#fff;border:3px solid var(--mist2)}
@@ -1052,6 +1052,12 @@ $('mapPins').innerHTML = [['Škola', 300, 190], ['Potraviny', 360, 300], ['Stani
 /* ---------- priebeh výstavby: novinky z Realitného asistenta ---------- */
 const MES_V = ['január','február','marec','apríl','máj','jún','júl','august','september','október','november','december'];
 const esc = x => String(x ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+function etapy(z){
+  const ol = document.querySelector('#vystavba .cas'); if (!ol || !Array.isArray(z) || !z.length) return;
+  const e = x => String(x ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  ol.innerHTML = z.map(x => `<li class="${x.stav === 'hotovo' ? 'hot' : x.stav === 'prebieha' ? 'teraz' : ''}"><b>${e(x.nazov)}</b><span>${x.stav === 'prebieha' ? 'práve prebieha' : e(x.kedy || (x.stav === 'hotovo' ? 'hotovo' : ''))}</span></li>`).join('');
+  ol.style.setProperty('--n', Math.min(z.length, 8));
+}
 function novinky(n){
   if (!Array.isArray(n) || !n.length) return;
   const dat = s => { const [y, m, d] = String(s).split('-'); return `${+d}. ${MES_V[+m - 1] || ''} ${y}`; };
@@ -1093,7 +1099,7 @@ const jeOdkaz = zHashu();
 if (jeOdkaz) setTimeout(() => $('prehliadka').scrollIntoView(), 30);
 /* stav a ceny bytov živo z Realitného asistenta – developer ich mení v aplikácii, web ich ukáže hneď */
 fetch('https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pri-parku.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => {
-  try { novinky(j.novinky); } catch (e) {}
+  try { novinky(j.novinky); etapy(j.etapy); } catch (e) {}
   const m = Object.fromEntries((j.jednotky || []).map(x => [x.id, x]));
   let zmena = false;
   D.forEach(d => { const x = m[d.id]; if (!x) return;
