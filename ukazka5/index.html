@@ -439,6 +439,8 @@ const PRELETY = {
   'bud-1':'video/bud-1', 'bud-2':'video/bud-2', 'bud-3':'video/bud-3', 'bud-4':'video/bud-4',
   'izba-A':'video/izba-A', 'izba-B':'video/izba-B', 'izba-C':'video/izba-C', 'izba-D':'video/izba-D'
 };
+/* vlety do ďalších izieb: index podľa poradia izieb s vizualizáciou (fotoIzby) */
+['A-1','A-2','A-3','A-4','B-1','B-2','B-3','B-4','C-1','C-2','C-3','D-1','D-2'].forEach(k => { PRELETY['izba-' + k] = 'video/izba-' + k; });
 const VID_EXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? '.mp4' : '.webm';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -579,10 +581,11 @@ async function chodNaIzbu(i, push = true){
   ukazIzbu(); zapis(push);
   if (z === 'byt') {
     const r = L[S.i], b = bbox(r.p, 30);
-    if (S.i === 0 && PRELETY['izba-' + S.d.t] && !RM) {
+    const kv = 'izba-' + S.d.t + (S.i ? '-' + S.i : '');
+    if (PRELETY[kv] && !RM) {
       $('rezSvg').classList.add('letim'); stage.classList.add('na-izba'); vy.classList.add('na-izba');
       kamera($('camPos'), rVlet(S.d), oblast(false), 'cover', 600); await cakaj(620);
-      await prelet('izba-' + S.d.t, () => { vrstva('vrsIzba', true); trieda(); });
+      await prelet(kv, () => { vrstva('vrsIzba', true); trieda(); });
     } else {
       $('rezSvg').classList.add('letim');
       kamera($('camPos'), b, oblast(false), 'contain', 750);
