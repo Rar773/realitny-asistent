@@ -122,6 +122,7 @@ section{padding:100px 0}
 .izba:hover .pl rect,.izba:focus-visible .pl rect{fill:var(--larch-d)}
 .izba .pl,.izba .pd,.izba .pc{transition:opacity .25s}
 #rezSvg.letim .izba .pl,#rezSvg.letim .izba .pd,#rezSvg.letim .izba .pc{opacity:0}
+#rezSvg.vrc .tien,#rezSvg.vrc .byt polygon{opacity:0;transition:opacity .6s} /* vlet z priblíženej izby: prvý záber videa nemá tieň */
 .vbar{position:absolute;left:24px;top:20px;right:428px;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;pointer-events:none;transition:opacity .4s}
 .vbar>*{pointer-events:auto}
 .crumb{display:flex;gap:4px;align-items:center;flex-wrap:wrap;background:var(--glass);backdrop-filter:blur(10px);color:#AEB8BC;font-size:15px;border-radius:12px;padding:6px 10px}
@@ -656,6 +657,11 @@ const PRELETY = {
 };
 /* vlety do ďalších izieb: index podľa poradia izieb s vizualizáciou (fotoIzby) */
 ['A-1','A-2','A-3','A-4','B-1','B-2','B-3','B-4','C-1','C-2','C-3','D-1','D-2'].forEach(k => { PRELETY['izba-' + k] = 'video/izba-' + k; });
+/* vlety, ktoré začínajú priblížené na konkrétnu izbu (výrez poschodia 2400×1350 = prvý záber videa) */
+const VLET_R = {
+  'izba-A-1':[725.6, 482.7, 1483.4, 912.3], 'izba-B-3':[508.5, 571.4, 1812.5, 1310.6], 'izba-D-1':[1240.5, 383.8, 1985.5, 806.2],
+  'izba-C-3':[488.5, 0.0, 1580.5, 619.1], 'izba-D-2':[1201.8, 107.9, 2008.2, 565.1]
+};
 const VID_EXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? '.mp4' : '.webm';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -720,7 +726,7 @@ let zamok = false;
 function vrstva(id, hned){
   if (hned) ['vrsBud','vrsPos','vrsIzba'].forEach(v => { $(v).style.transition = 'none'; });
   ['vrsBud','vrsPos','vrsIzba'].forEach(v => $(v).classList.toggle('on', v === id));
-  if (hned) { stage.offsetWidth; ['vrsBud','vrsPos','vrsIzba'].forEach(v => { $(v).style.transition = ''; }); } stage.scrollLeft = stage.scrollTop = 0; if (id !== 'vrsIzba') $('rezSvg').classList.remove('letim'); }
+  if (hned) { stage.offsetWidth; ['vrsBud','vrsPos','vrsIzba'].forEach(v => { $(v).style.transition = ''; }); } stage.scrollLeft = stage.scrollTop = 0; if (id !== 'vrsIzba') $('rezSvg').classList.remove('letim', 'vrc'); }
 function trieda(){
   stage.classList.toggle('zoom', S.u !== 'bud'); vy.classList.toggle('zoom', S.u !== 'bud');
   stage.classList.toggle('na-pos', S.u === 'pos' || S.u === 'byt');
@@ -799,7 +805,9 @@ async function chodNaIzbu(i, push = true){
     const kv = 'izba-' + S.d.t + (S.i ? '-' + S.i : '');
     if (PRELETY[kv] && !RM) {
       $('rezSvg').classList.add('letim'); stage.classList.add('na-izba'); vy.classList.add('na-izba');
-      kamera($('camPos'), rVlet(S.d), oblast(false), 'cover', 600); await cakaj(620);
+      const vr = VLET_R[kv];  /* vlet so začiatkom priblíženým na izbu: kamera najprv dôjde na izbu */
+      if (vr) $('rezSvg').classList.add('vrc');
+      kamera($('camPos'), vr || rVlet(S.d), oblast(false), 'cover', vr ? 900 : 600); await cakaj(vr ? 920 : 620);
       await prelet(kv, () => { vrstva('vrsIzba', true); trieda(); });
     } else {
       $('rezSvg').classList.add('letim');
