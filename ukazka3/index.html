@@ -774,7 +774,11 @@ function start(j){
   const mp = document.querySelector('.mapa'); if (mp.scrollWidth > mp.clientWidth) { mp.scrollLeft = (mp.scrollWidth - mp.clientWidth) / 2; $('mapaHint').textContent = 'Posuňte obrázok do strán a ťuknite na dom.'; }
   const m = location.hash.match(/^#dom-([AB]\d)$/); if (m) otvor(m[1], true);
 }
-fetch('projekt.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(start).catch(() => start(ZALOHA));
+/* stav a ceny domov sa načítajú živo z Realitného asistenta (developer ich mení v aplikácii); bez spojenia záložné údaje */
+const API = 'https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pod-lipami.json';
+const zAsistenta = j => ({ aktualizovane: j.aktualizovane, domy: (j.jednotky || []).filter(x => ZALOHA.domy.some(z => z.id === x.id)).map(x => ({ id: x.id, typ: TYPY[x.typ] ? x.typ : ZALOHA.domy.find(z => z.id === x.id).typ, pozemok: x.pozemok ?? ZALOHA.domy.find(z => z.id === x.id).pozemok, cena: x.cena ?? ZALOHA.domy.find(z => z.id === x.id).cena, stav: x.stav })) });
+fetch(API, { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => { const d = zAsistenta(j); if (d.domy.length !== ZALOHA.domy.length) throw 0; start(d); })
+  .catch(() => fetch('projekt.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(start).catch(() => start(ZALOHA)));
 })();
 </script>
 <script type="module">

@@ -825,6 +825,23 @@ tabulka();
 camBud(0);
 const jeOdkaz = zHashu();
 if (jeOdkaz) setTimeout(() => $('prehliadka').scrollIntoView(), 30);
+/* stav a ceny bytov živo z Realitného asistenta – developer ich mení v aplikácii, web ich ukáže hneď */
+fetch('https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pri-parku.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => {
+  const m = Object.fromEntries((j.jednotky || []).map(x => [x.id, x]));
+  let zmena = false;
+  D.forEach(d => { const x = m[d.id]; if (!x) return;
+    if (STAV[x.stav] && x.stav !== d.stav) { d.stav = x.stav; zmena = true; }
+    if (typeof x.cena === 'number' && x.cena > 0 && x.cena !== d.cena) { d.cena = x.cena; zmena = true; } });
+  if (!zmena) return;
+  const v = D.filter(d => d.stav === 'volny');
+  $('cVol').textContent = v.length;
+  if (v.length) $('cOd').textContent = 'od ' + eur(Math.min(...v.map(d => d.cena)));
+  fas.querySelectorAll('.pos').forEach(g => { const p = +g.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length; g.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); });
+  $('pchips').querySelectorAll('.pchip').forEach(b => { const p = +b.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length;
+    b.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); const sm = b.querySelector('small'); if (sm) sm.textContent = n ? n + ' voľné' : 'obsadené'; });
+  tabulka();
+  if (S.u === 'pos' || S.u === 'byt') { kresliRez(); panel(); }
+}).catch(() => {});
 addEventListener('load', () => {
   const im = new Image(); im.src = mobil() ? 'img/poschodie-1400.webp' : 'img/poschodie-2400.webp';
   if (!RM) setTimeout(() => Object.keys(PRELETY).filter(k => k.startsWith('bud')).map(k => PRELETY[k]).forEach(v => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = v + VID_EXT; document.head.appendChild(l); }), 1500);
