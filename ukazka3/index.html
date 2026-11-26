@@ -194,6 +194,7 @@ header.sc{border-color:var(--line)}
 .fotky-st picture{display:block;border-radius:var(--r-l);overflow:hidden;aspect-ratio:16/9;background:var(--stone)}
 .fotky-st img{width:100%;height:100%;object-fit:cover}
 .fotky-st figcaption{display:flex;justify-content:space-between;gap:12px;padding-top:10px;font-size:15px;color:var(--ink2)}
+.fotky-st figcaption p{flex-basis:100%;margin:2px 0 0;color:var(--ink2)}.fotky-st figure.nov figcaption{flex-wrap:wrap}
 .fotky-st figcaption b{color:var(--ink)}
 
 /* lokalita */
@@ -777,7 +778,19 @@ function start(j){
 /* stav a ceny domov sa načítajú živo z Realitného asistenta (developer ich mení v aplikácii); bez spojenia záložné údaje */
 const API = 'https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pod-lipami.json';
 const zAsistenta = j => ({ aktualizovane: j.aktualizovane, domy: (j.jednotky || []).filter(x => ZALOHA.domy.some(z => z.id === x.id)).map(x => ({ id: x.id, typ: TYPY[x.typ] ? x.typ : ZALOHA.domy.find(z => z.id === x.id).typ, pozemok: x.pozemok ?? ZALOHA.domy.find(z => z.id === x.id).pozemok, cena: x.cena ?? ZALOHA.domy.find(z => z.id === x.id).cena, stav: x.stav })) });
-fetch(API, { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => { const d = zAsistenta(j); if (d.domy.length !== ZALOHA.domy.length) throw 0; start(d); })
+/* priebeh výstavby: novinky a fotky, ktoré developer pridá v aplikácii, nahradia pevnú galériu */
+const MES_N = ['januára','februára','marca','apríla','mája','júna','júla','augusta','septembra','októbra','novembra','decembra'];
+const MES_V = ['Január','Február','Marec','Apríl','Máj','Jún','Júl','August','September','Október','November','December'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+function novinky(n){
+  const el = document.querySelector('#vystavba .fotky-st'); if (!el || !Array.isArray(n) || !n.length) return;
+  const mes = s => { const [y, m] = String(s).split('-'); return (MES_V[+m - 1] || '') + ' ' + y; };
+  el.innerHTML = n.slice(0, 6).map(x => { const f = (x.fotky || [])[0];
+    return `<figure class="nov">${f ? `<picture><img src="${esc(f)}" alt="${esc(x.nadpis)}" loading="lazy" width="1400" height="788"></picture>` : ''}<figcaption><b>${esc(mes(x.datum))}</b><span>${esc(x.nadpis)}</span>${x.text ? `<p>${esc(x.text)}</p>` : ''}</figcaption></figure>`; }).join('');
+  const p = document.querySelector('#vystavba .sec-h p'), [y, m] = String(n[0].datum).split('-');
+  if (p && m) p.textContent = `Posledná novinka zo stavby je z ${MES_N[+m - 1]} ${y}.`;
+}
+fetch(API, { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => { const d = zAsistenta(j); if (d.domy.length !== ZALOHA.domy.length) throw 0; start(d); try { novinky(j.novinky); } catch (e) {} })
   .catch(() => fetch('projekt.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(start).catch(() => start(ZALOHA)));
 })();
 </script>
