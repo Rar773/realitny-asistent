@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pri parku – 16 bytov v Seredi (ukážka prémiového webu projektu)</title>
-<meta name="description" content="Ukážka prémiového webu developerského projektu od Realitný asistent. Výber poschodia priamo na budove, 3D pôdorys poschodia a vizualizácie miestností.">
+<meta name="description" content="Ukážka prémiového webu developerského projektu od Realitný asistent. Výber poschodia priamo na budove, 3D pôdorys poschodia, vizualizácie miestností, typy bytov, priebeh výstavby a kalkulačka splátok.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="../ikona.png">
 <meta property="og:type" content="website">
@@ -239,6 +239,94 @@ section{padding:100px 0}
 footer{padding:28px 0;font-size:14px;color:var(--ink3)}
 footer .w{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
 
+/* ===== sekcie pod prehliadkou ===== */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.lead{color:var(--ink2);font-size:18px;line-height:1.55;margin:18px 0 0;max-width:46ch}
+.sec-h{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:end;margin-bottom:44px}
+.sec-h p{margin:0;color:var(--ink2);font-size:18px;line-height:1.55;max-width:52ch}
+section.mist{background:var(--mist)}
+.cesta{padding:88px 0;border-bottom:1px solid var(--line)}
+.cesta-in{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:64px;align-items:center}
+.cesta-vid{border-radius:20px;overflow:hidden;background:#111925;aspect-ratio:16/9}
+.cesta-vid video{width:100%;height:100%;object-fit:cover}
+.cesta h2{font-size:clamp(30px,3.2vw,42px)}
+.kroky{list-style:none;margin:28px 0 30px;padding:0;counter-reset:k}
+.kroky li{counter-increment:k;display:grid;grid-template-columns:40px 1fr;column-gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.kroky li:before{content:counter(k);grid-row:span 2;width:30px;height:30px;border-radius:50%;background:var(--larch-50);color:var(--larch-d);font:700 15px var(--head);display:grid;place-items:center}
+.kroky b{font:700 18px var(--head)}
+.kroky span{color:var(--ink2);font-size:15.5px}
+.tma{background:var(--night);color:#E4E9E7}
+.tma h2{color:#fff}.tma .sec-h p{color:#AEB8BC}
+.gal{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:minmax(0,auto);gap:14px}
+.gal a{position:relative;display:block;overflow:hidden;border-radius:14px;color:#fff;text-decoration:none;background:#1F272C}
+.gal img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.gal a:hover img,.gal a:focus-visible img{transform:scale(1.035)}
+.gal span{position:absolute;left:0;right:0;bottom:0;padding:48px 20px 16px;background:linear-gradient(transparent,rgba(10,14,16,.78));font-size:14.5px;color:#D3DADD}
+.gal span b{display:block;font:700 20px var(--head);color:#fff;letter-spacing:-.01em}
+.g1{grid-column:span 7;grid-row:span 2}.g2,.g3{grid-column:span 5;aspect-ratio:3/2}
+.g4,.g5,.g6{grid-column:span 4;aspect-ratio:3/2}
+.pozn{margin:16px 0 0;font-size:14px;color:#8C979C}
+.typy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:40px}
+.typ{border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px;background:#fff;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.typ:hover,.typ:focus-visible{border-color:var(--ink3);box-shadow:0 10px 30px rgba(28,34,38,.08)}
+.typ[aria-pressed=true]{border-color:var(--larch);box-shadow:inset 0 0 0 1px var(--larch)}
+.typ .mini{background:var(--mist);border-radius:12px;padding:14px;aspect-ratio:16/10;display:grid;place-items:center}
+.typ .mini svg{height:auto;max-width:100%}
+.typ .mini rect.m{fill:#fff;stroke:var(--ink2);stroke-width:.05}
+.typ .mini text{fill:var(--ink)}.typ .mini text.a{fill:var(--ink3)}
+.typ h3{font-size:22px}
+.typ .tp{display:flex;justify-content:space-between;gap:10px;color:var(--ink2);font-size:15px}
+.typ .tc{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.typ .tc b{font:700 21px var(--head);letter-spacing:-.02em}
+.typ .tc span{font-size:14px;color:var(--volny);font-weight:600}
+.tab td.poz{color:var(--larch-d);font-weight:600;font-size:15px;text-align:right;white-space:nowrap}
+.std2{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:64px;align-items:center}
+.std2 figure{margin:0;border-radius:20px;overflow:hidden;aspect-ratio:4/5}
+.std2 figure img{width:100%;height:100%;object-fit:cover}
+.stdl{display:grid;grid-template-columns:1fr 1fr;gap:26px 28px;margin:34px 0 0}
+.stdl div{border-top:2px solid var(--ink);padding-top:12px}
+.stdl dt{font:700 18px var(--head)}
+.stdl dd{margin:6px 0 0;color:var(--ink2);font-size:15.5px}
+.cas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.cas li{position:relative;padding:30px 16px 0 0}
+.cas li:before{content:"";position:absolute;left:0;right:0;top:7px;height:3px;background:var(--mist2)}
+.cas li:after{content:"";position:absolute;left:0;top:0;width:17px;height:17px;border-radius:50%;background:#fff;border:3px solid var(--mist2)}
+.cas li.hot:before{background:var(--larch)}.cas li.hot:after{background:var(--larch);border-color:var(--larch)}
+.cas li.teraz:before{background:linear-gradient(90deg,var(--larch) 50%,var(--mist2) 50%)}.cas li.teraz:after{border-color:var(--larch)}
+.cas b{display:block;font:700 18px var(--head)}
+.cas span{color:var(--ink2);font-size:15px}
+.cas li.teraz span{color:var(--larch-d);font-weight:600}
+.nov{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:48px}
+.nov article{border-top:1px solid var(--line);padding-top:16px}
+.nov figure{margin:0 0 14px;border-radius:14px;overflow:hidden;aspect-ratio:3/2;background:var(--mist)}
+.nov figure img{width:100%;height:100%;object-fit:cover}
+.nov time{font-size:14px;color:var(--ink3)}
+.nov h3{font-size:20px;margin-top:4px}
+.nov p{margin:8px 0 0;color:var(--ink2);font-size:15.5px}
+.fin{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:64px;align-items:start}
+.splatky{margin:30px 0 0;padding:0;counter-reset:s}
+.splatky li{list-style:none;display:grid;grid-template-columns:46px 1fr auto;gap:14px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line);counter-increment:s}
+.splatky li:before{content:counter(s);font:700 15px var(--head);width:32px;height:32px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 1px var(--line)}
+.splatky b{display:block;font:700 18px var(--head)}
+.splatky span{color:var(--ink2);font-size:15px}
+.splatky em{font:700 22px var(--head);font-style:normal;white-space:nowrap}
+.kalk{background:#fff;border-radius:20px;padding:30px;box-shadow:0 20px 50px rgba(28,34,38,.07)}
+.kalk h3{font-size:24px;margin-bottom:8px}
+.kalk label{display:block;font-weight:600;font-size:15px;margin:18px 0 8px}
+.kalk .rw{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.kalk .rw output{font:700 17px var(--head)}
+.kalk select{width:100%;font:600 16px var(--body);padding:12px 14px;border-radius:10px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:#fff;color:var(--ink)}
+.kalk input[type=range]{width:100%;accent-color:var(--larch)}
+.kalk .vys{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.kalk .vys b{display:block;font:700 46px var(--head);letter-spacing:-.03em}
+.kalk .vys span{color:var(--ink2);font-size:14.5px}
+.lok{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:64px;align-items:center}
+.lok h2{margin:0}
+.mapa{border-radius:20px;overflow:hidden;border:1px solid var(--line)}
+.mapa svg{width:100%;height:auto;display:block;font-family:var(--body)}
+.mapa .mp text{font-size:13px;font-weight:600;fill:#3B4448}
+.vzd{margin-top:26px!important}
+
 /* karta bytu na tlač */
 .karta{display:none}
 .mini svg{width:100%;height:auto}
@@ -298,6 +386,32 @@ footer .w{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
   .std{grid-template-columns:1fr}
   .fm{grid-template-columns:1fr;padding:20px}
 }
+@media (max-width:1100px){
+  .sec-h,.cesta-in,.std2,.fin,.lok{grid-template-columns:1fr;gap:28px}
+  .sec-h{align-items:start}
+  .std2 figure{aspect-ratio:16/10}
+  .typy{grid-template-columns:1fr 1fr 1fr;gap:12px}
+}
+@media (max-width:900px){
+  .gal{grid-template-columns:1fr 1fr;gap:10px}
+  .g1{grid-column:span 2;grid-row:auto;aspect-ratio:3/2}.g2,.g3,.g4,.g5,.g6{grid-column:span 1}
+  .gal span{padding:36px 12px 10px;font-size:13px}.gal span b{font-size:16px}
+  .g6{grid-column:span 2;aspect-ratio:2/1}
+  .typy{grid-template-columns:1fr}
+  .cas{grid-template-columns:1fr;gap:0}
+  .cas li{padding:0 0 22px 34px}
+  .cas li:before{left:7px;right:auto;top:0;bottom:0;width:3px;height:auto}
+  .cas li.teraz:before{background:linear-gradient(var(--larch) 50%,var(--mist2) 50%)}
+  .nov{grid-template-columns:1fr}
+  .stdl{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .cesta{padding:64px 0}
+  .lead,.sec-h p{font-size:16.5px}
+  .splatky li{grid-template-columns:40px 1fr}.splatky em{grid-column:2}
+  .kalk{padding:22px}.kalk .vys b{font-size:38px}
+  .tab td{white-space:nowrap}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -306,7 +420,7 @@ footer .w{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
 
 <header class="hl" id="hl"><div class="w nav">
   <a class="logo" href="#"><i aria-hidden="true"></i>Pri parku</a>
-  <nav aria-label="Hlavná navigácia"><a href="#prehliadka">Prehliadka</a><a href="#byty">Byty a ceny</a><a href="#standardy">Štandardy</a><a href="#lokalita">Lokalita</a></nav>
+  <nav aria-label="Hlavná navigácia"><a href="#prehliadka">Prehliadka</a><a href="#interiery">Interiéry</a><a href="#byty">Byty a ceny</a><a href="#vystavba">Výstavba</a><a href="#financovanie">Financovanie</a><a href="#lokalita">Lokalita</a></nav>
   <a class="tel" href="tel:+421900000000">0900 000 000</a>
   <a class="btn lar" href="#kontakt">Dohodnúť obhliadku</a>
 </div></header>
@@ -352,43 +466,144 @@ footer .w{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
  </div>
 </section>
 
+<section class="cesta" aria-labelledby="h-ce">
+  <div class="w cesta-in">
+    <div class="cesta-vid"><video id="cestaVid" muted loop playsinline preload="none" poster="img/poschodie-1400.webp" aria-label="Ukážka prehliadky: poschodie sa vysunie z budovy do 3D pôdorysu"></video></div>
+    <div>
+      <h2 id="h-ce">Celý dom prejdete bez obhliadky</h2>
+      <p class="lead">Prehliadka na začiatku stránky vás prevedie od budovy až do jednotlivých izieb. Stav a ceny bytov sú vždy aktuálne.</p>
+      <ol class="kroky">
+        <li><b>Budova</b><span>Ukážte na poschodie a uvidíte, koľko bytov je na ňom voľných.</span></li>
+        <li><b>Poschodie</b><span>Poschodie sa vysunie z budovy do 3D pôdorysu so všetkými bytmi.</span></li>
+        <li><b>Byt</b><span>Plochy miestností, balkón, orientácia a cena vybraného bytu.</span></li>
+        <li><b>Miestnosť</b><span>Vojdete dnu a pozriete si každú izbu vo vizualizácii.</span></li>
+      </ol>
+      <a class="btn lar" href="#prehliadka">Začať prehliadku</a>
+    </div>
+  </div>
+</section>
+
+<section id="interiery" class="tma" aria-labelledby="h-in">
+  <div class="w">
+    <div class="sec-h"><h2 id="h-in">Interiéry</h2><p>Svetlé byty s výhľadom do parku. Dub, len a šalviová zelená. Kliknite na miestnosť a prejdete do nej v prehliadke.</p></div>
+    <div class="gal">
+      <a class="g1" href="#byt-4.01-1"><img src="img/izby/izba-1.webp" alt="Obývačka s kuchyňou a veľkými oknami do parku" loading="lazy" width="1800" height="1200"><span><b>Obývačka s kuchyňou</b>3-izbový byt, 32,2 m²</span></a>
+      <a class="g2" href="#byt-4.01-3"><img src="img/izby/izba-2.webp" alt="Spálňa s manželskou posteľou a oknom na balkón" loading="lazy" width="1800" height="1200"><span><b>Spálňa</b>3-izbový byt, 11,8 m²</span></a>
+      <a class="g3" href="#byt-4.01-5"><img src="img/izby/izba-8.webp" alt="Balkón so skleneným zábradlím a výhľadom do parku" loading="lazy" width="1800" height="1200"><span><b>Balkón do parku</b>3-izbový byt, 15 m²</span></a>
+      <a class="g4" href="#byt-4.03-1"><img src="img/izby/izba-5.webp" alt="Obývačka s kuchyňou v 2-izbovom byte" loading="lazy" width="1800" height="1200"><span><b>Obývačka s kuchyňou</b>2-izbový byt, 28,5 m²</span></a>
+      <a class="g5" href="#byt-4.01-2"><img src="img/izby/izba-4.webp" alt="Kúpeľňa so sprchou bez vaničky a okrúhlym zrkadlom" loading="lazy" width="1800" height="1200"><span><b>Kúpeľňa</b>sprcha bez vaničky</span></a>
+      <a class="g6" href="#byt-2.04-1"><img src="img/izby/izba-7.webp" alt="Izba s kuchyňou v 1-izbovom byte" loading="lazy" width="1800" height="1200"><span><b>Izba s kuchyňou</b>1-izbový byt, 22,8 m²</span></a>
+    </div>
+    <p class="pozn">Vizualizácie, zariadenie je ilustračné.</p>
+  </div>
+</section>
+
 <section id="byty" aria-labelledby="h-by">
   <div class="w">
-    <h2 id="h-by">Byty a ceny</h2>
+    <div class="sec-h"><h2 id="h-by">Byty a ceny</h2><p>Ceny sú vrátane pivnice. Stav bytov sa mení priamo z predaja, preto tu vidíte vždy aktuálnu ponuku.</p></div>
+    <div class="typy" id="typy"></div>
     <div class="fil">
       <select id="fIz" aria-label="Počet izieb"><option value="">Všetky byty</option><option value="1">1-izbové</option><option value="2">2-izbové</option><option value="3">3-izbové</option></select>
+      <select id="fPo" aria-label="Poschodie"><option value="">Každé poschodie</option><option value="1">1. poschodie</option><option value="2">2. poschodie</option><option value="3">3. poschodie</option><option value="4">4. poschodie</option></select>
       <select id="fSt" aria-label="Stav"><option value="">Každý stav</option><option value="volny">Len voľné</option></select>
       <span class="poc" id="poc"></span>
     </div>
     <table class="tab">
-      <thead><tr><th scope="col">Byt</th><th scope="col">Izby</th><th scope="col" class="m num">Plocha</th><th scope="col" class="m num">Balkón</th><th scope="col" class="num">Cena</th><th scope="col">Stav</th></tr></thead>
+      <thead><tr><th scope="col">Byt</th><th scope="col">Izby</th><th scope="col" class="m num">Plocha</th><th scope="col" class="m num">Balkón</th><th scope="col" class="m">Orientácia</th><th scope="col" class="num">Cena</th><th scope="col">Stav</th><th scope="col" class="m"><span class="vh">Prehliadka</span></th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
 </section>
 
-<section id="standardy" aria-labelledby="h-st" style="padding-top:0">
-  <div class="w">
-    <h2 id="h-st">Štandardy</h2>
-    <div class="std">
-      <div><b>Teplo a vzduch</b><p>Tepelné čerpadlo, podlahové kúrenie a rekuperácia v každom byte.</p></div>
-      <div><b>Okná a balkóny</b><p>Trojsklá v tmavých rámoch, balkóny so skleneným zábradlím a drevenou podlahou.</p></div>
-      <div><b>Podlahy a kúpeľne</b><p>Dubové parkety, veľkoformátová dlažba, sprchy bez vaničky.</p></div>
-      <div><b>K bytu</b><p>Pivnica v suteréne a parkovacie miesto pred domom.</p></div>
+<section id="standardy" aria-labelledby="h-st" class="mist">
+  <div class="w std2">
+    <figure><img src="img/izby/izba-8.webp" alt="Balkón s drevenou podlahou a skleneným zábradlím" loading="lazy" width="1800" height="1200"></figure>
+    <div>
+      <h2 id="h-st">Štandardy</h2>
+      <p class="lead">Všetko v cene bytu, bez príplatkov za lepšie materiály.</p>
+      <dl class="stdl">
+        <div><dt>Kúrenie a vzduch</dt><dd>Tepelné čerpadlo, podlahové kúrenie a rekuperácia v každom byte.</dd></div>
+        <div><dt>Okná</dt><dd>Trojsklá v tmavých rámoch, na južnej strane vonkajšie žalúzie.</dd></div>
+        <div><dt>Balkóny</dt><dd>Sklenené zábradlie a drevená podlaha, pri 3-izbových bytoch po celej šírke.</dd></div>
+        <div><dt>Podlahy</dt><dd>Dubové parkety v izbách, veľkoformátová dlažba v kúpeľni a predsieni.</dd></div>
+        <div><dt>Kúpeľne</dt><dd>Sprcha bez vaničky, závesné WC a zabudované osvetlenie.</dd></div>
+        <div><dt>K bytu</dt><dd>Pivnica v suteréne a parkovacie miesto pred domom.</dd></div>
+      </dl>
     </div>
   </div>
 </section>
 
-<section id="lokalita" aria-labelledby="h-lo" style="padding-top:0">
+<section id="vystavba" aria-labelledby="h-vy">
+  <div class="w">
+    <div class="sec-h"><h2 id="h-vy">Priebeh výstavby</h2><p id="vyP">Kolaudácia v lete 2027. Novinky a fotky zo stavby pridávame priebežne.</p></div>
+    <ol class="cas">
+      <li class="hot"><b>Stavebné povolenie</b><span>vo februári 2026</span></li>
+      <li class="hot"><b>Hrubá stavba</b><span>dokončená v októbri 2026</span></li>
+      <li class="teraz"><b>Strecha a okná</b><span>práve prebieha</span></li>
+      <li><b>Fasáda a interiéry</b><span>jar 2027</span></li>
+      <li><b>Kolaudácia</b><span>leto 2027</span></li>
+    </ol>
+    <div class="nov" id="novinky" hidden></div>
+  </div>
+</section>
+
+<section id="financovanie" aria-labelledby="h-fi" class="mist">
+  <div class="w fin">
+    <div>
+      <h2 id="h-fi">Financovanie</h2>
+      <p class="lead">Platíte postupne, ako stavba napreduje. S hypotékou vám pomôže náš finančný poradca.</p>
+      <ol class="splatky">
+        <li><div><b>Rezervačná zmluva</b><span>byt pre vás podržíme 30 dní</span></div><em>3 000 €</em></li>
+        <li><div><b>Zmluva o budúcej kúpnej zmluve</b><span>do 30 dní od rezervácie</span></div><em>20 %</em></li>
+        <li><div><b>Kúpna zmluva po kolaudácii</b><span>doplatok z vlastných zdrojov alebo hypotékou</span></div><em>80 %</em></li>
+      </ol>
+    </div>
+    <div class="kalk">
+      <h3>Koľko by ste mesačne splácali?</h3>
+      <label for="kByt">Byt</label><select id="kByt"></select>
+      <label for="kVl"><span class="rw"><span>Vlastné zdroje</span><output id="kVlO" for="kVl"></output></span></label>
+      <input type="range" id="kVl" min="10" max="50" step="5" value="20">
+      <label for="kRo"><span class="rw"><span>Doba splácania</span><output id="kRoO" for="kRo"></output></span></label>
+      <input type="range" id="kRo" min="10" max="30" step="5" value="30">
+      <div class="vys"><b id="kVys">–</b><span>mesačne pri úroku 3,9 % ročne. Ide o orientačný výpočet, presnú ponuku pripraví banka.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="lokalita" aria-labelledby="h-lo">
   <div class="w lok">
-    <div><h2 id="h-lo">Lokalita</h2><p style="color:var(--ink2);margin:18px 0 0;max-width:40ch">Tichá ulica na okraji mestského parku, pešo k škole aj obchodom.</p></div>
-    <ul class="vzd">
-      <li>Mestský park<span>hneď za domom</span></li>
-      <li>Materská a základná škola<span>6 min pešo</span></li>
-      <li>Potraviny a lekáreň<span>4 min pešo</span></li>
-      <li>Železničná stanica<span>5 min autom</span></li>
-      <li>Rýchlostná cesta R1<span>8 min autom</span></li>
-    </ul>
+    <div class="mapa">
+      <svg viewBox="0 0 760 520" role="img" aria-labelledby="mapT"><title id="mapT">Schéma okolia projektu Pri parku v Seredi</title>
+        <rect width="760" height="520" fill="#EEF1EE"/>
+        <path d="M-10 420 C 120 380, 170 470, 300 440 S 520 380, 770 430 L770 530 L-10 530Z" fill="#C9DCE6"/>
+        <text x="96" y="488" font-size="14" font-weight="600" fill="#5C7A8A" font-style="italic">Váh</text>
+        <path d="M420 60 C 560 40, 690 90, 700 190 S 620 330, 500 320 S 370 250, 380 160 S 380 70, 420 60Z" fill="#CFDFC6"/>
+        <g fill="#9DBB8C"><circle cx="470" cy="120" r="9"/><circle cx="520" cy="100" r="11"/><circle cx="590" cy="130" r="10"/><circle cx="640" cy="190" r="12"/><circle cx="560" cy="250" r="10"/><circle cx="480" cy="230" r="9"/><circle cx="610" cy="280" r="8"/><circle cx="440" cy="180" r="8"/></g>
+        <text x="560" y="182" font-size="15" font-weight="700" fill="#4E6B45" text-anchor="middle">Mestský park</text>
+        <path d="M0 300 L760 250" stroke="#fff" stroke-width="12"/>
+        <path d="M330 0 C 335 120, 340 220, 350 330 S 360 420, 370 520" stroke="#fff" stroke-width="9" fill="none"/>
+        <path d="M0 360 L760 318" stroke="#B9B4A6" stroke-width="3" stroke-dasharray="2 7"/>
+        <text x="20" y="352" font-size="12.5" font-weight="600" fill="#8A877C">železnica</text>
+        <path d="M150 0 L 110 520" stroke="#D7D2C2" stroke-width="16"/><path d="M150 0 L 110 520" stroke="#fff" stroke-width="2" stroke-dasharray="14 12"/>
+        <text x="160" y="40" font-size="13" font-weight="700" fill="#7D8477">R1</text>
+        <circle cx="250" cy="250" r="58" fill="#F3E2C5" opacity=".7"/><text x="250" y="226" font-size="13" font-weight="600" fill="#7D8477" text-anchor="middle">Centrum Serede</text>
+        <g id="mapPins"></g>
+        <g><circle cx="402" cy="210" r="30" fill="#A8693A" opacity=".18"/><circle cx="402" cy="210" r="14" fill="#A8693A" stroke="#fff" stroke-width="3"/><text x="402" y="254" font-size="17" font-weight="700" fill="#1C2226" text-anchor="middle">Pri parku</text></g>
+      </svg>
+    </div>
+    <div>
+      <h2 id="h-lo">Lokalita</h2>
+      <p class="lead">Tichá ulica na okraji mestského parku v Seredi. Škola, obchody aj vlak sú na pár minút.</p>
+      <ul class="vzd">
+        <li>Mestský park<span>hneď za domom</span></li>
+        <li>Materská a základná škola<span>6 min pešo</span></li>
+        <li>Potraviny a lekáreň<span>4 min pešo</span></li>
+        <li>Centrum Serede<span>10 min pešo</span></li>
+        <li>Železničná stanica<span>5 min autom</span></li>
+        <li>Rýchlostná cesta R1<span>8 min autom</span></li>
+        <li>Bratislava<span>45 min autom</span></li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -782,16 +997,67 @@ function tlac(d){
 
 /* ---------- tabuľka ---------- */
 function tabulka(){
-  const iz = $('fIz').value, st = $('fSt').value;
-  const L = D.filter(d => (!iz || d.izby === +iz) && (!st || d.stav === st));
+  const iz = $('fIz').value, st = $('fSt').value, po = $('fPo').value;
+  const L = D.filter(d => (!iz || d.izby === +iz) && (!st || d.stav === st) && (!po || d.p === +po));
+  document.querySelectorAll('.typ').forEach(b => b.setAttribute('aria-pressed', b.dataset.iz === iz));
   $('poc').textContent = `${L.length} ${plural(L.length,'byt','byty','bytov')}`;
-  $('tbody').innerHTML = L.map(d => `<tr class="${d.stav}" data-id="${d.id}" tabindex="0"><td class="c">${d.id}</td><td>${d.izby}-izbový</td><td class="m num">${m2(d.plocha)}</td><td class="m num">${m2(d.balk)}</td><td class="num">${d.stav === 'predany' ? '–' : eur(d.cena)}</td><td><span class="st ${d.stav}">${STAV[d.stav]}</span></td></tr>`).join('');
-  $('tbody').querySelectorAll('tr').forEach(tr => {
+  $('tbody').innerHTML = L.map(d => `<tr class="${d.stav}" data-id="${d.id}" tabindex="0"><td class="c">${d.id}</td><td>${d.izby}-izbový</td><td class="m num">${m2(d.plocha)}</td><td class="m num">${m2(d.balk)}</td><td class="m">${TYP[d.t].or.split(',')[0]}</td><td class="num">${d.stav === 'predany' ? '–' : eur(d.cena)}</td><td><span class="st ${d.stav}">${STAV[d.stav]}</span></td><td class="m poz">Pozrieť v 3D</td></tr>`).join('') || '<tr><td colspan="8" style="color:var(--ink2);cursor:default">Tejto voľbe nezodpovedá žiadny byt. Skúste iné poschodie alebo počet izieb.</td></tr>';
+  $('tbody').querySelectorAll('tr[data-id]').forEach(tr => {
     const go = () => { const d = D.find(x => x.id === tr.dataset.id); $('prehliadka').scrollIntoView(); setTimeout(() => chodNaByt(d), 350); };
     tr.onclick = go; tr.onkeydown = e => { if (e.key === 'Enter') go(); };
   });
 }
-$('fIz').onchange = tabulka; $('fSt').onchange = tabulka;
+$('fIz').onchange = tabulka; $('fSt').onchange = tabulka; $('fPo').onchange = tabulka;
+
+/* ---------- typy bytov ---------- */
+const TYPY_K = [['3', ['A','B'], '3-izbové byty'], ['2', ['C'], '2-izbové byty'], ['1', ['D'], '1-izbové byty']];
+/* pôdorysy v rovnakej mierke, aby bolo vidno rozdiel vo veľkosti bytov */
+const mierka = d => { const R = G.izby[d.t].map(r => r.r); return Math.round((Math.max(...R.map(r => r[2])) - Math.min(...R.map(r => r[0])) + .4) * 30); };
+function typy(){
+  $('typy').innerHTML = TYPY_K.map(([iz, t, n]) => {
+    const z = D.filter(d => t.includes(d.t)), v = z.filter(d => d.stav === 'volny'), d0 = z[0];
+    return `<button class="typ" type="button" data-iz="${iz}" aria-pressed="${$('fIz').value === iz}"><div class="mini" aria-hidden="true">${miniPlan(d0).replace('<svg ', `<svg style="width:${mierka(d0)}px" `)}</div>
+      <h3>${n}</h3><div class="tp"><span>${m2(d0.plocha)} a balkón ${m2(d0.balk)}</span><span>${TYP[d0.t].or.split(',')[0]}</span></div>
+      <div class="tc"><b>${v.length ? 'od ' + eur(Math.min(...v.map(d => d.cena))) : 'vypredané'}</b><span>${v.length ? v.length + ' ' + plural(v.length, 'voľný', 'voľné', 'voľných') : ''}</span></div></button>`;
+  }).join('');
+  $('typy').querySelectorAll('.typ').forEach(b => b.onclick = () => { $('fIz').value = $('fIz').value === b.dataset.iz ? '' : b.dataset.iz; tabulka(); });
+}
+
+/* ---------- interiéry: klik prejde do miestnosti v prehliadke ---------- */
+document.querySelectorAll('.gal a').forEach(a => a.addEventListener('click', () => setTimeout(() => $('prehliadka').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }), 40)));
+
+/* ---------- ukážka preletu ---------- */
+const cv = $('cestaVid');
+if (!RM && 'IntersectionObserver' in window) new IntersectionObserver((e, o) => { e.forEach(x => { if (x.isIntersecting) { if (!cv.src) cv.src = 'video/bud-2' + VID_EXT; cv.play().catch(() => {}); } else if (cv.src) cv.pause(); }); }, { threshold: .35 }).observe(cv);
+
+/* ---------- kalkulačka ---------- */
+const splatka = (cena, vl, ro) => { const P = cena * (1 - vl / 100), r = 0.039 / 12, n = ro * 12; return P * r / (1 - Math.pow(1 + r, -n)); };
+function kalkByty(){
+  const L = D.filter(d => d.stav !== 'predany'), sk = $('kByt').value;
+  $('kByt').innerHTML = L.map(d => `<option value="${d.id}">Byt ${d.id}, ${d.izby}-izbový, ${eur(d.cena)}${d.stav === 'rezervovany' ? ', rezervovaný' : ''}</option>`).join('');
+  if (L.some(d => d.id === sk)) $('kByt').value = sk;
+  kalk();
+}
+function kalk(){
+  const d = D.find(x => x.id === $('kByt').value) || D[0], vl = +$('kVl').value, ro = +$('kRo').value;
+  $('kVlO').textContent = vl + ' %, ' + eur(Math.round(d.cena * vl / 100));
+  $('kRoO').textContent = ro + ' rokov';
+  $('kVys').textContent = eur(Math.round(splatka(d.cena, vl, ro)));
+}
+['kByt','kVl','kRo'].forEach(i => $(i).addEventListener('input', kalk));
+
+/* ---------- okolie na mape ---------- */
+$('mapPins').innerHTML = [['Škola', 300, 190], ['Potraviny', 360, 300], ['Stanica', 205, 330]].map(([n, x, y]) => `<g class="mp"><circle cx="${x}" cy="${y}" r="7" fill="#fff" stroke="#1C2226" stroke-width="3"/><text x="${x + 12}" y="${y + 4.5}">${n}</text></g>`).join('');
+
+/* ---------- priebeh výstavby: novinky z Realitného asistenta ---------- */
+const MES_V = ['január','február','marec','apríl','máj','jún','júl','august','september','október','november','december'];
+const esc = x => String(x ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+function novinky(n){
+  if (!Array.isArray(n) || !n.length) return;
+  const dat = s => { const [y, m, d] = String(s).split('-'); return `${+d}. ${MES_V[+m - 1] || ''} ${y}`; };
+  $('novinky').innerHTML = n.slice(0, 6).map(x => `<article>${(x.fotky || [])[0] ? `<figure><img src="${esc(x.fotky[0])}" alt="${esc(x.nadpis)}" loading="lazy"></figure>` : ''}<time datetime="${esc(x.datum)}">${dat(x.datum)}</time><h3>${esc(x.nadpis)}</h3>${x.text ? `<p>${esc(x.text)}</p>` : ''}</article>`).join('');
+  $('novinky').hidden = false;
+}
 
 /* ---------- formulár ---------- */
 $('fByt').innerHTML = '<option value="">Ešte neviem</option>' + D.filter(d => d.stav !== 'predany').map(d => `<option>${d.id}</option>`).join('');
@@ -821,12 +1087,13 @@ addEventListener('popstate', zHashu);
 addEventListener('hashchange', zHashu);
 let rzT, poslW = innerWidth;
 new ResizeObserver(() => { clearTimeout(rzT); rzT = setTimeout(() => { if (zamok) return; camBud(0); if (S.u === 'pos' || S.u === 'byt') { camPos(0); kresliRez(); } }, 120); }).observe(stage);
-tabulka();
+typy(); tabulka(); kalkByty();
 camBud(0);
 const jeOdkaz = zHashu();
 if (jeOdkaz) setTimeout(() => $('prehliadka').scrollIntoView(), 30);
 /* stav a ceny bytov živo z Realitného asistenta – developer ich mení v aplikácii, web ich ukáže hneď */
 fetch('https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pri-parku.json', { cache:'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).then(j => {
+  try { novinky(j.novinky); } catch (e) {}
   const m = Object.fromEntries((j.jednotky || []).map(x => [x.id, x]));
   let zmena = false;
   D.forEach(d => { const x = m[d.id]; if (!x) return;
@@ -839,7 +1106,7 @@ fetch('https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pri-parku.json'
   fas.querySelectorAll('.pos').forEach(g => { const p = +g.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length; g.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); });
   $('pchips').querySelectorAll('.pchip').forEach(b => { const p = +b.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length;
     b.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); const sm = b.querySelector('small'); if (sm) sm.textContent = n ? n + ' voľné' : 'obsadené'; });
-  tabulka();
+  typy(); tabulka(); kalkByty();
   if (S.u === 'pos' || S.u === 'byt') { kresliRez(); panel(); }
 }).catch(() => {});
 addEventListener('load', () => {
