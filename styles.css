@@ -280,6 +280,10 @@ section{padding:96px 0}
 
 /* ---------- Ukážky webov a konfigurátor ---------- */
 .ukz2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.ukz3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.webhero-prices.p3>div:last-child{grid-column:1/-1}
+@media (max-width:980px){.ukz3{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.ukz3{grid-template-columns:1fr}}
 .ukc{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:var(--sh);transition:box-shadow .2s,transform .2s,border-color .2s}
 .ukc:hover{box-shadow:var(--sh2);transform:translateY(-3px);border-color:var(--brand-200);color:var(--ink)}
 .ukc-img{display:block;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:var(--bg)}

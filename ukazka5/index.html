@@ -663,12 +663,26 @@ function kresliRez(){
       `<g class="blab"><rect x="${c[0] - lw / 2}" y="${c[1] - lh / 2}" width="${lw}" height="${lh}" rx="${10 * K}"/><text x="${c[0]}" y="${c[1] - lh * .05}" style="font-size:${fs}px">Byt ${d.id}</text><text class="s" x="${c[0]}" y="${c[1] + lh * .32}" style="font-size:${fs2}px;fill:${d.stav === 'volny' ? '#9FD8B4' : d.stav === 'rezervovany' ? '#F2CD7A' : '#AEB8BC'}">${STAV[d.stav]}</text></g>`}</g>`;
   }).join('');
   if (S.d) {
+    /* popisy izieb: vpravo od bodu, ak sa nezmestia alebo by sa prekryli, skúsime vľavo, potom posunieme nižšie/vyššie */
+    const o = oblast(true), rb = rByt(S.d), cxb = (rb[0] + rb[2]) / 2, cyb = (rb[1] + rb[3]) / 2, m0 = 8 * K;
+    const bb = [cxb - o.w / 2 * K + m0, cyb - o.h / 2 * K / KY + m0, cxb + o.w / 2 * K - m0, cyb + o.h / 2 * K / KY - m0]; /* viditeľná časť obrazu */
+    const obs = [], prekryv = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+    const piny = fotoIzby(S.d).map(r => stred(r.p)), pinR = piny.map(c => [c[0] - 13 * K, c[1] - 13 * K, c[0] + 13 * K, c[1] + 13 * K]);
     h += fotoIzby(S.d).map((r, i) => {
-      const c = stred(r.p), n = r.n.replace(' s kuchyňou', ' a kuchyňa'), tw = (n.length * 7.6 + 26) * K, th = 30 * K;
-      const bb = rByt(S.d), vlavo = c[0] + 16 * K + tw > bb[2], lx = vlavo ? c[0] - 16 * K - tw : c[0] + 16 * K;
+      const c = piny[i], n = r.n.replace(' s kuchyňou', ' a kuchyňa'), tw = (n.length * 7.6 + 26) * K, th = 30 * K;
+      const kand = [];
+      [0, 1, -1, 2, -2].forEach(dy => { kand.push([c[0] + 16 * K, c[1] + dy * (th + 4 * K)]); kand.push([c[0] - 16 * K - tw, c[1] + dy * (th + 4 * K)]); });
+      let lx = kand[0][0], ly = c[1];
+      for (const [x, y] of kand) {
+        const rr = [x, y - th / 2, x + tw, y + th / 2];
+        if (x < bb[0] || x + tw > bb[2]) continue;
+        if (obs.some(o => prekryv(rr, o)) || pinR.some((o, j) => j !== i && prekryv(rr, o))) continue;
+        lx = x; ly = y; break;
+      }
+      obs.push([lx, ly - th / 2, lx + tw, ly + th / 2]);
       return `<g class="izba" data-i="${i}" tabindex="0" role="button" aria-label="Pozrieť miestnosť: ${r.n}, ${m2(r.m2)}"><polygon points="${bodyStr(r.p)}" vector-effect="non-scaling-stroke" stroke-width="2"/>
         <circle class="pd" cx="${c[0]}" cy="${c[1]}" r="${11 * K}"/><circle class="pc" cx="${c[0]}" cy="${c[1]}" r="${6 * K}"/>
-        <g class="pl"><rect x="${lx}" y="${c[1] - th / 2}" width="${tw}" height="${th}" rx="${th / 2}"/><text x="${lx + 13 * K}" y="${c[1] + 5 * K}" style="font-size:${13.5 * K}px">${n}</text></g></g>`;
+        <g class="pl"><rect x="${lx}" y="${ly - th / 2}" width="${tw}" height="${th}" rx="${th / 2}"/><text x="${lx + 13 * K}" y="${ly + 5 * K}" style="font-size:${13.5 * K}px">${n}</text></g></g>`;
     }).join('');
   }
   const svg = $('rezSvg'); svg.innerHTML = h;
