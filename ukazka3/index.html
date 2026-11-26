@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ukážka webu developerského projektu – Rodinné domy Pod Lipami</title>
+<meta name="description" content="Ukážka webu developerského projektu od Realitný asistent. Vymyslený projekt, domy aj ceny.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16231c;--mut:#5d6b63;--acc:#2f6b4f;--acc2:#e8f1ec;--line:#e3e8e5;--bg:#fbfaf7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Manrope,system-ui,sans-serif}
+a{color:inherit}img{max-width:100%;display:block}
+.w{max-width:1160px;margin:0 auto;padding:0 22px}
+.demo{background:var(--acc);color:#fff;font-size:13.5px;text-align:center;padding:8px 14px;font-weight:600}.demo a{color:#fff}
+header{position:sticky;top:0;z-index:5;background:rgba(251,250,247,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:26px;height:68px}.logo{font-weight:800;font-size:20px;text-decoration:none;letter-spacing:-.3px}.logo span{color:var(--acc)}
+.nav .bt{margin-left:auto}.nav nav{display:flex;gap:22px;margin-left:auto;font-weight:600;font-size:15px}.nav nav a{text-decoration:none;color:var(--mut)}.nav nav a:hover{color:var(--ink)}.nav nav+.bt{margin-left:0}
+.bt{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:999px;border:0;font:700 15px Manrope,sans-serif;cursor:pointer}
+.bt.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.hero{position:relative;min-height:560px;display:flex;align-items:flex-end;color:#fff;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,14,.05) 20%,rgba(10,20,14,.78))}
+.hero .w{position:relative;z-index:1;padding-bottom:56px;width:100%}
+.hero .k{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.4px}
+.hero h1{font-size:clamp(34px,5vw,58px);line-height:1.05;margin:14px 0 12px;letter-spacing:-1.2px;max-width:760px}
+.hero p{font-size:18px;max-width:620px;margin:0 0 24px;opacity:.92}
+.stats{display:flex;gap:14px;flex-wrap:wrap}.stats div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:12px 18px}.stats b{display:block;font-size:24px}.stats span{font-size:13.5px;opacity:.9}
+section{padding:80px 0}.alt{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+h2{font-size:clamp(28px,3.4vw,38px);letter-spacing:-.8px;margin:0 0 10px}.sub{color:var(--mut);margin:0 0 30px;max-width:640px}
+.fil{display:flex;gap:8px;margin:0 0 18px;flex-wrap:wrap}.fil button{font:600 14px Manrope,sans-serif;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;cursor:pointer}.fil button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tab th,.tab td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);font-size:15px}.tab th{font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);background:#f6f7f5}
+.tab tr:last-child td{border-bottom:0}.tab td b{font-weight:800}
+.st{display:inline-block;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px}.st.v{background:#e3f4ea;color:#1e7a46}.st.r{background:#fff1d6;color:#9a6200}.st.p{background:#eceeed;color:#6b746f}
+.tab tr.pred td{color:#8a938e}
+.std{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.std div{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:22px}.std b{display:block;font-size:17px;margin-bottom:4px}.std p{margin:0;color:var(--mut);font-size:15px}
+.gal{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:220px 220px;gap:12px}.gal img{width:100%;height:100%;object-fit:cover;border-radius:14px}.gal img:first-child{grid-row:1/3}
+.et{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;counter-reset:e}.et div{border-top:4px solid var(--line);padding-top:14px}.et .ok{border-color:var(--acc)}.et .now{border-color:#e0a21a}
+.et b{display:block}.et span{color:var(--mut);font-size:14px}
+.lok{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}.lok ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}.lok li{display:flex;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px}.lok li span{color:var(--mut)}
+.kont{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}.fm{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:12px}
+.fm input,.fm select,.fm textarea{width:100%;font:15px Manrope,sans-serif;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+footer{padding:28px 0;color:var(--mut);font-size:14px;border-top:1px solid var(--line)}footer .w{display:flex;gap:18px;flex-wrap:wrap}
+@media (max-width:860px){.nav nav{display:none}.nav nav+.bt{margin-left:auto}.std{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-template-rows:180px 180px 180px}.gal img:first-child{grid-column:1/3;grid-row:auto}.et{grid-template-columns:1fr 1fr}.lok,.kont{grid-template-columns:1fr}.tab .m,.tab .m2{display:none}.tab th,.tab td{padding:12px 12px;font-size:14px;white-space:nowrap}section{padding:56px 0}.hero{min-height:520px}}
+</style>
+</head>
+<body>
+<div class="demo">Toto je <b>ukážka webu developerského projektu</b> – projekt, domy aj ceny sú vymyslené. <a href="../projekty.html">← Späť na Weby pre developerov</a></div>
+<header><div class="w nav"><a class="logo" href="#">Pod <span>Lipami</span></a>
+  <nav><a href="#domy">Domy a ceny</a><a href="#standardy">Štandardy</a><a href="#vystavba">Výstavba</a><a href="#lokalita">Lokalita</a></nav>
+  <a class="bt" href="#kontakt">Mám záujem</a></div></header>
+
+<section class="hero" style="padding:0"><img src="../ukazka/hero.jpg" alt="Bungalov s veľkými oknami a záhradou"><div class="w">
+  <span class="k">SENEC · KOLAUDÁCIA JAR 2027</span>
+  <h1>12 rodinných domov v tichej časti Senca</h1>
+  <p>Bungalovy 4+kk s garážou, terasou a pozemkom od 520 m². Kľúče do ruky, 10 minút od jazier.</p>
+  <div class="stats"><div><b>12</b><span>domov v projekte</span></div><div><b>5</b><span>voľných</span></div><div><b>od 289 000 €</b><span>vrátane pozemku</span></div></div>
+</div></section>
+
+<section id="domy"><div class="w">
+  <h2>Domy a ceny</h2><p class="sub">Aktuálna dostupnosť a ceny. Pôdorys a podrobnosti k domu vám radi pošleme.</p>
+  <div class="fil"><button type="button" class="on" data-f="all">Všetky domy</button><button type="button" data-f="v">Len voľné</button></div>
+  <table class="tab" id="tab"><thead><tr><th>Dom</th><th class="m2">Dispozícia</th><th class="m">Úžitková plocha</th><th class="m">Pozemok</th><th>Cena</th><th>Stav</th></tr></thead><tbody></tbody></table>
+</div></section>
+
+<section id="standardy" class="alt"><div class="w">
+  <h2>Štandardy</h2><p class="sub">Dom odovzdáme na kľúč – stačí sa nasťahovať.</p>
+  <div class="std">
+    <div><b>Tepelné čerpadlo</b><p>Podlahové kúrenie vo všetkých miestnostiach, príprava na fotovoltiku.</p></div>
+    <div><b>Trojsklá okná</b><p>Veľké posuvné steny na terasu, vonkajšie žalúzie s elektrickým ovládaním.</p></div>
+    <div><b>Garáž a sekčná brána</b><p>Garáž pre jedno auto a ďalšie dve parkovacie miesta na pozemku.</p></div>
+    <div><b>Kvalitné podlahy</b><p>Vinylové podlahy v dekore dreva, veľkoformátová dlažba v kúpeľni.</p></div>
+    <div><b>Záhrada a oplotenie</b><p>Zatrávnený pozemok, oplotenie a krytá terasa s osvetlením.</p></div>
+    <div><b>Rekuperácia</b><p>Čerstvý vzduch bez otvárania okien a nižšie náklady na kúrenie.</p></div>
+  </div>
+</div></section>
+
+<section><div class="w">
+  <h2>Galéria</h2><p class="sub">Vzorový dom, ktorý si môžete prezrieť po dohode.</p>
+  <div class="gal"><img src="../ukazka/terasa.jpg" alt="Krytá terasa s posuvnými oknami" loading="lazy"><img src="../ukazka/garaz.jpg" alt="Garáž so sekčnou bránou" loading="lazy"><img src="../ukazka/obyvacka.jpg" alt="Obývacia izba" loading="lazy"><img src="../ukazka/kuchyna.jpg" alt="Kuchyňa" loading="lazy"><img src="../ukazka/hero.jpg" alt="Pohľad na dom zo záhrady" loading="lazy"></div>
+</div></section>
+
+<section id="vystavba" class="alt"><div class="w">
+  <h2>Priebeh výstavby</h2><p class="sub">Stav k novembru 2026.</p>
+  <div class="et">
+    <div class="ok"><b>Hrubá stavba</b><span>hotovo · jún 2026</span></div>
+    <div class="ok"><b>Strechy</b><span>hotovo · august 2026</span></div>
+    <div class="now"><b>Okná a fasády</b><span>prebieha</span></div>
+    <div><b>Interiéry</b><span>zima 2026/2027</span></div>
+    <div><b>Kolaudácia</b><span>jar 2027</span></div>
+  </div>
+</div></section>
+
+<section id="lokalita"><div class="w lok">
+  <div><h2>Lokalita</h2><p class="sub" style="margin-bottom:0">Tichá ulica na okraji Senca – pokoj vidieka a všetko potrebné na dosah. Škôlka, škola aj obchody sú do 5 minút autom.</p></div>
+  <ul><li>Slnečné jazerá <span>10 min</span></li><li>Centrum Senca <span>5 min</span></li><li>Diaľnica D1 <span>7 min</span></li><li>Bratislava <span>25 min</span></li></ul>
+</div></section>
+
+<section id="kontakt" class="alt"><div class="w kont">
+  <div><h2>Mám záujem o dom</h2><p class="sub">Pošlite nám správu a ozveme sa do 1 pracovného dňa. Radi vám ukážeme vzorový dom.</p><p><b>Predaj:</b> Ing. Peter Novák · 0900 000 000</p></div>
+  <form class="fm" onsubmit="alert('Toto je len ukážka webu.');return false">
+    <select aria-label="Dom"><option>Mám záujem o dom…</option></select>
+    <input placeholder="Meno a priezvisko" aria-label="Meno a priezvisko"><input type="email" placeholder="E-mail" aria-label="E-mail"><input placeholder="Telefón" aria-label="Telefón">
+    <textarea rows="3" placeholder="Správa" aria-label="Správa"></textarea>
+    <button class="bt" type="submit">Odoslať</button>
+  </form>
+</div></section>
+<footer><div class="w"><b style="color:var(--ink)">Pod Lipami</b><span>Ukážkový developerský projekt</span><span style="margin-left:auto">Web vytvoril Realitný asistent</span></div></footer>
+<script>
+const D=[['A1','4+kk',118,560,289000,'p'],['A2','4+kk',118,535,289000,'p'],['A3','4+kk',124,610,309000,'r'],['A4','4+kk',124,590,305000,'v'],['A5','5+kk',142,680,349000,'p'],['A6','5+kk',142,655,345000,'v'],
+['B1','4+kk',118,520,289000,'v'],['B2','4+kk',118,540,292000,'r'],['B3','4+kk',124,575,305000,'p'],['B4','5+kk',142,700,355000,'v'],['B5','5+kk',142,720,359000,'p'],['B6','4+kk',124,600,309000,'v']];
+const S={v:'voľný',r:'rezervovaný',p:'predaný'},tb=document.querySelector('#tab tbody'),sel=document.querySelector('.fm select');
+const eur=x=>x.toLocaleString('sk-SK')+' €';
+function kresli(f){tb.innerHTML=D.filter(d=>f==='all'||d[5]==='v').map(d=>`<tr class="${d[5]==='p'?'pred':''}"><td><b>Dom ${d[0]}</b></td><td class="m2">${d[1]}</td><td class="m">${d[2]} m²</td><td class="m">${d[3]} m²</td><td>${d[5]==='p'?'–':eur(d[4])}</td><td><span class="st ${d[5]}">${S[d[5]]}</span></td></tr>`).join('')}
+kresli('all');D.filter(d=>d[5]==='v').forEach(d=>sel.insertAdjacentHTML('beforeend',`<option>Dom ${d[0]} · ${eur(d[4])}</option>`));
+document.querySelectorAll('.fil button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.fil button').forEach(x=>x.classList.toggle('on',x===b));kresli(b.dataset.f)});
+</script>
+</body>
+</html>

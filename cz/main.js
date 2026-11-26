@@ -101,6 +101,22 @@ function wOdoslat(ev) {
   location.href = 'mailto:info@realitnyasistent.eu?subject=' + encodeURIComponent('Návrh webu – ' + t) + '&body=' + encodeURIComponent(L.join('\n'));
   return false;
 }
+/* ---------- Dopyt: web projektu / nehnuteľnosti ---------- */
+function pStav() {
+  const f = document.getElementById('pkonf'); const t = f.querySelector('input[name=ptyp]:checked'); const p = !!t.dataset.od;
+  const fm = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Kč';
+  document.getElementById('pCena').textContent = (p ? 'od ' : '') + fm(+t.dataset.c);
+  document.getElementById('pPrev').textContent = p ? 'první rok v ceně' : '6 měsíců v ceně';
+  document.getElementById('pPotom').textContent = p ? '649 Kč měsíčně během prodeje' : '249 Kč měsíčně do prodeje';
+  document.getElementById('pAkt').textContent = p ? 'neomezeně během prodeje' : 'drobné úpravy v ceně';
+}
+function pOdoslat(ev) {
+  ev.preventDefault(); const f = ev.target; const d = new FormData(f); const t = f.querySelector('input[name=ptyp]:checked');
+  const L = ['Typ webu: ' + t.value, 'Orientační cena: ' + document.getElementById('pCena').textContent, '', 'Projekt / nemovitost: ' + d.get('projekt'), 'Počet bytů či domů: ' + (d.get('pocet') || '—'), 'Podklady: ' + (d.get('odkaz') || '—'), '', 'Jméno: ' + d.get('meno'), 'Společnost: ' + (d.get('firma') || '—'), 'E-mail: ' + d.get('email'), 'Telefon: ' + (d.get('tel') || '—'), '', 'Poznámka: ' + (d.get('pozn') || '—')];
+  location.href = 'mailto:info@realitnyasistent.eu?subject=' + encodeURIComponent('Poptávka – ' + t.value) + '&body=' + encodeURIComponent(L.join('\n'));
+  return false;
+}
+(function () { const k = document.getElementById('pkonf'); if (!k) return; k.addEventListener('change', pStav); pStav(); })();
 (function () {
   const k = document.getElementById('konf'); if (!k) return;
   k.addEventListener('change', wStav); wStav();
