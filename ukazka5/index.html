@@ -435,8 +435,9 @@ const FOTO = { A:{'Obývačka s kuchyňou':1,'Spálňa':2,'Detská izba':3,'Kúp
 FOTO.B = FOTO.A;
 /* prelety kamery (videá z Higgsfieldu). Kým tu video nie je, prechod robí priblíženie obrázka. */
 const PRELETY = {
-  /* 'bud-1':'video/bud-1.mp4', ... 'pos-A':'video/pos-A.mp4', ... 'izba-A':'video/izba-A.mp4' */
+  bud:'video/bud'   /* budova → 3D poschodie (Kling 3.0 Omni, Higgsfield); ďalšie: 'bud-3', 'pos-A', 'izba-A' */
 };
+const VID_EXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? '.mp4' : '.webm';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const D = [];
@@ -492,7 +493,10 @@ function camPos(ms, nasob){ return kamera($('camPos'), S.d ? rByt(S.d) : R_PLAN,
 /* ---------- stav ---------- */
 const S = { u:'bud', p:1, d:null, i:0 };
 let zamok = false;
-function vrstva(id){ ['vrsBud','vrsPos','vrsIzba'].forEach(v => $(v).classList.toggle('on', v === id)); stage.scrollLeft = stage.scrollTop = 0; if (id !== 'vrsIzba') $('rezSvg').classList.remove('letim'); }
+function vrstva(id, hned){
+  if (hned) ['vrsBud','vrsPos','vrsIzba'].forEach(v => { $(v).style.transition = 'none'; });
+  ['vrsBud','vrsPos','vrsIzba'].forEach(v => $(v).classList.toggle('on', v === id));
+  if (hned) { stage.offsetWidth; ['vrsBud','vrsPos','vrsIzba'].forEach(v => { $(v).style.transition = ''; }); } stage.scrollLeft = stage.scrollTop = 0; if (id !== 'vrsIzba') $('rezSvg').classList.remove('letim'); }
 function trieda(){
   stage.classList.toggle('zoom', S.u !== 'bud'); vy.classList.toggle('zoom', S.u !== 'bud');
   stage.classList.toggle('na-pos', S.u === 'pos' || S.u === 'byt');
@@ -507,14 +511,19 @@ function hash(){
   return '#byt-' + S.d.id + '-' + (S.i + 1);
 }
 function zapis(push){ const h = hash(); if (h !== (location.hash || location.pathname)) history[push ? 'pushState' : 'replaceState'](null, '', h); }
+const RYCHLOST = 1.5; /* prelet prehráme o niečo rýchlejšie, nech prechod nezdržuje */
 function prelet(kluc, hotovo){
-  const src = PRELETY[kluc]; if (!src || RM) return false;
-  const v = $('vid'); v.src = src; v.hidden = false; v.currentTime = 0;
-  const koniec = () => { v.onended = v.onerror = null; hotovo(); requestAnimationFrame(() => { v.hidden = true; }); };
-  v.onended = koniec; v.onerror = koniec;
-  v.play().catch(koniec);
-  return true;
+  const src = PRELETY[kluc]; if (!src || RM) return null;
+  return new Promise(ok => {
+    const v = $('vid'); let hot = false;
+    const koniec = () => { if (hot) return; hot = true; v.onended = v.onerror = null; hotovo(); requestAnimationFrame(() => { v.hidden = true; v.removeAttribute('src'); v.load(); ok(); }); };
+    v.onended = koniec; v.onerror = koniec;
+    v.src = src + VID_EXT; v.playbackRate = RYCHLOST; v.hidden = false;
+    v.play().then(() => { v.playbackRate = RYCHLOST; }).catch(koniec);
+  });
 }
+/* koniec preletu ukazuje celý obrázok poschodia, odtiaľ kamera plynulo dôjde do cieľa */
+function poPrelete(){ kamera($('camPos'), [0, 0, 2400, 1350], oblast(false), 'cover', 0); vrstva('vrsPos', true); camPos(1000); }
 function cakaj(ms){ return new Promise(r => setTimeout(r, RM ? 0 : ms)); }
 
 async function chodNaPos(p, push = true){
@@ -525,13 +534,14 @@ async function chodNaPos(p, push = true){
     tipSkry();
     fas.querySelectorAll('.pos').forEach(g => g.classList.toggle('svieti', +g.dataset.p === p));
     trieda();
-    const hotovo = () => { camPos(0); vrstva('vrsPos'); };
-    if (!prelet('bud-' + p, hotovo)) {
+    const pl = prelet('bud-' + p, poPrelete) || prelet('bud', poPrelete);
+    if (pl) { await pl; await cakaj(1000); }
+    else {
       kamera($('camBud'), rPos(p), oblast(false), 'contain', 1100);
       await cakaj(750);
       camPos(0, 1.22); vrstva('vrsPos'); camPos(1100);
+      await cakaj(1100);
     }
-    await cakaj(1100);
     fas.querySelectorAll('.pos').forEach(g => g.classList.remove('svieti'));
     camBud(0);
   } else if (z === 'izba') {
@@ -549,7 +559,7 @@ async function chodNaByt(d, push = true){
   kresliRez(); ptabs(); panel(); crumb(); zapis(push); trieda();
   if (z === 'bud') { camPos(0); vrstva('vrsPos'); camBud(0); }
   else if (z === 'izba') { camPos(0, 1.5); vrstva('vrsPos'); camPos(900); await cakaj(900); }
-  else if (!prelet('pos-' + d.t, () => camPos(0))) { camPos(ineP ? 0 : 1000); await cakaj(1000); }
+  else { const pl = prelet('pos-' + d.t, () => { camPos(0); vrstva('vrsPos', true); }); if (pl) await pl; else { camPos(ineP ? 0 : 1000); await cakaj(1000); } }
   predNacitaj(d);
   zamok = false;
 }
@@ -559,8 +569,9 @@ async function chodNaIzbu(i, push = true){
   ukazIzbu(); zapis(push);
   if (z === 'byt') {
     const r = L[S.i], b = bbox(r.p, 30);
-    const hotovo = () => { vrstva('vrsIzba'); trieda(); };
-    if (!prelet('izba-' + S.d.t, hotovo)) {
+    const pl = prelet('izba-' + S.d.t, () => { vrstva('vrsIzba', true); trieda(); });
+    if (pl) await pl;
+    else {
       $('rezSvg').classList.add('letim');
       kamera($('camPos'), b, oblast(false), 'contain', 750);
       await cakaj(500); vrstva('vrsIzba'); trieda(); await cakaj(600);
@@ -782,7 +793,10 @@ tabulka();
 camBud(0);
 const jeOdkaz = zHashu();
 if (jeOdkaz) setTimeout(() => $('prehliadka').scrollIntoView(), 30);
-addEventListener('load', () => { const im = new Image(); im.src = mobil() ? 'img/poschodie-1400.webp' : 'img/poschodie-2400.webp'; });
+addEventListener('load', () => {
+  const im = new Image(); im.src = mobil() ? 'img/poschodie-1400.webp' : 'img/poschodie-2400.webp';
+  if (!RM && PRELETY.bud) setTimeout(() => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = PRELETY.bud + VID_EXT; document.head.appendChild(l); }, 1200);
+});
 </script>
 </body>
 </html>
