@@ -58,7 +58,7 @@ for f, s in list(pages.items()) + [('main.js', (ROOT / 'main.js').read_text(enco
 povinne = {
     'weby.html': ['konf', 'wAsist', 'wCena', 'wPozn', 'wAsR', 'wZlR', 'wZl', 'navrh'],
     'asistent.html': ['shotImg', 'shotWebp', 'shotCap', 'cennik', 'pick', 'pickGo'],
-    'index.html': ['shotImg', 'sluzby', 'baliky', 'kontakt'],
+    'index.html': ['kontakt'],  # rozcestník Som maklér / Som developer
 }
 for f, zoznam in povinne.items():
     for i in zoznam:
