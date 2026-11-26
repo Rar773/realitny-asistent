@@ -87,7 +87,8 @@ function wStav() {
   if (!c) { e.textContent = 'dohodou'; p.textContent = a ? 'slevu 20 % na web uplatníme i u webu na míru' : 'připravíme podle zadání'; return; }
   const k = a ? Math.round(c * 0.8) : c;
   const kc = (x) => String(x).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + '\u00a0Kč';
-  e.innerHTML = kc(k) + (a ? '<span class="old">' + kc(c) + '</span>' : '');
+  const od = t.dataset.od ? 'od ' : '';
+  e.innerHTML = od + kc(k) + (a ? '<span class="old">' + od + kc(c) + '</span>' : '');
   p.textContent = 'jednorázově za web';
   document.getElementById('wZl').textContent = '−' + kc(c - k);
 }

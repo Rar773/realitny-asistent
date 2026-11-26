@@ -86,7 +86,8 @@ function wStav() {
   document.getElementById('wAsR').hidden = !a; document.getElementById('wZlR').hidden = !(a && c);
   if (!c) { e.textContent = 'dohodou'; p.textContent = a ? 'zľavu 20 % na web uplatníme aj pri webe na mieru' : 'pripravíme podľa zadania'; return; }
   const k = a ? Math.round(c * 0.8) : c;
-  e.innerHTML = k + ' €' + (a ? '<span class="old">' + c + ' €</span>' : '');
+  const od = t.dataset.od ? 'od ' : '';
+  e.innerHTML = od + k + ' €' + (a ? '<span class="old">' + od + c + ' €</span>' : '');
   p.textContent = 'jednorazovo za web';
   document.getElementById('wZl').textContent = '−' + (c - k) + ' €';
 }
