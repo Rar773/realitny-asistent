@@ -1234,3 +1234,23 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .jlista button:hover,.jlista button:focus-visible{background:rgba(255,255,255,.12)}
 .nav-cta .btn,.menu>a,.dd>button{white-space:nowrap}
 @media (min-width:981px) and (max-width:1180px){.nav{gap:12px}.menu{gap:0}.menu>a,.dd>button{padding:9px 7px;font-size:14px}.nav-cta{gap:6px;margin-left:6px}.nav-cta .btn{padding:9px 12px;font-size:14px}.jazyk{padding:0 9px;margin-right:2px}}
+
+/* súhlas s cookies */
+.cklista{position:fixed;left:16px;right:16px;bottom:16px;z-index:80;max-width:680px;margin:0 auto;background:#1D1530;color:#fff;border-radius:16px;padding:16px 18px;display:flex;gap:16px;align-items:center;box-shadow:0 14px 40px rgba(20,12,40,.4);font-size:14.5px;line-height:1.5}
+.cklista p{margin:0;flex:1}
+.cklista a{color:#D2B8FF;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.ck-b{display:flex;gap:8px;flex:none}
+.ck-b button{border:0;border-radius:10px;padding:11px 16px;font:600 14.5px var(--body);cursor:pointer;white-space:nowrap;background:#fff;color:#1D1530}
+.ck-b button:hover{background:#EDE4FF}
+.ck-b button:focus-visible{outline:3px solid #D2B8FF;outline-offset:2px}
+body.ma-ck .jlista{display:none}
+footer .ck-nast{display:block;background:none;border:0;padding:4px 0;margin:0;font:inherit;font-size:15px;line-height:inherit;color:var(--ink2);cursor:pointer;text-align:left}
+footer .ck-nast:hover{color:var(--brand)}
+body.ma-ck #rac-btn{bottom:calc(var(--ck-h,0px) + 28px)!important}
+body.ma-ck #rac-tip{display:none!important}
+@media (max-width:640px){.cklista{flex-direction:column;align-items:stretch;left:10px;right:10px;bottom:10px;padding:14px}.ck-b button{flex:1}}
+.tbl-wrap{overflow-x:auto;margin:10px 0 14px}
+.ck-tab{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+.ck-tab th,.ck-tab td{border:1px solid #E4DDF0;padding:8px 10px;text-align:left;vertical-align:top}
+.ck-tab th{background:#F6F2FD;font-weight:700}
+.ck-tab td:first-child{font-family:ui-monospace,Consolas,monospace;font-size:13px;width:24%}

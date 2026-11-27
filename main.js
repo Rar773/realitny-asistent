@@ -157,8 +157,6 @@ document.querySelectorAll('.ba').forEach(ba => {
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => ba.addEventListener(t, () => { d = false; }));
 });
 
-// odkaz ambasádora (?amb=KOD) – zapamätáme na 60 dní
-(() => { try { const k = new URLSearchParams(location.search).get('amb'); if (k && /^AMB-[A-Za-z0-9]{3,20}$/.test(k)) localStorage.setItem('ra_amb', JSON.stringify({ k: k.toUpperCase(), t: Date.now() })); } catch (e) { /* nič */ } })();
 
 // balíky na mobile: posúvateľný pás s bodkami, na začiatku v strede najobľúbenejší balík
 (() => {
@@ -236,4 +234,47 @@ document.querySelectorAll('.ba').forEach(ba => {
   a.textContent = doCZ ? 'Přejít na českou verzi' : 'Prejsť na slovenskú verziu';
   l.querySelector('button').addEventListener('click', () => { l.remove(); try { localStorage.setItem('ra_jazyk_lista', '1'); } catch (e) {} });
   document.body.appendChild(l);
+})();
+
+// súhlas s cookies: nevyhnutné vždy, kód ambasádora (?amb=) len so súhlasom
+(() => {
+  const CZ = (document.documentElement.lang || '').startsWith('cs');
+  const T = CZ ? {
+    text: 'Používáme jen nezbytné cookies a údaje v prohlížeči – pro přihlášení, objednávky a chat. S vaším souhlasem si na 60 dní zapamatujeme i kód ambasadora, přes kterého jste přišli.',
+    viac: 'Více o soukromí', ano: 'Souhlasím', nie: 'Jen nezbytné', nast: 'Nastavení cookies', url: '/cz/sukromie.html#cookies', aria: 'Souhlas s cookies'
+  } : {
+    text: 'Používame len nevyhnutné cookies a údaje v prehliadači – na prihlásenie, objednávky a chat. S vaším súhlasom si na 60 dní zapamätáme aj kód ambasádora, cez ktorého ste prišli.',
+    viac: 'Viac o súkromí', ano: 'Súhlasím', nie: 'Len nevyhnutné', nast: 'Nastavenia cookies', url: '/sukromie.html#cookies', aria: 'Súhlas s cookies'
+  };
+  const ls = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }, del: (k) => { try { localStorage.removeItem(k); } catch (e) {} } };
+  const stav = () => { const v = ls.get('ra_cookies'); return v === 'vsetko' || v === 'nutne' ? v : ''; };
+  let amb = null;
+  try { const k = new URLSearchParams(location.search).get('amb'); if (k && /^AMB-[A-Za-z0-9]{3,20}$/.test(k)) amb = JSON.stringify({ k: k.toUpperCase(), t: Date.now() }); } catch (e) {}
+  const uloz = (v) => { ls.set('ra_cookies', v); if (v === 'vsetko') { if (amb) ls.set('ra_amb', amb); } else ls.del('ra_amb'); };
+  if (stav() === 'vsetko' && amb) ls.set('ra_amb', amb);
+  let lista = null;
+  function ukaz() {
+    if (lista) return;
+    lista = document.createElement('div');
+    lista.className = 'cklista'; lista.setAttribute('role', 'region'); lista.setAttribute('aria-label', T.aria);
+    lista.innerHTML = '<p></p><div class="ck-b"><button type="button" class="ck-nie"></button><button type="button" class="ck-ano"></button></div>';
+    const p = lista.querySelector('p'); p.textContent = T.text + ' ';
+    const a = document.createElement('a'); a.href = T.url; a.textContent = T.viac; p.appendChild(a);
+    lista.querySelector('.ck-ano').textContent = T.ano; lista.querySelector('.ck-nie').textContent = T.nie;
+    lista.querySelector('.ck-ano').addEventListener('click', () => { uloz('vsetko'); zavri(); });
+    lista.querySelector('.ck-nie').addEventListener('click', () => { uloz('nutne'); zavri(); });
+    document.body.appendChild(lista);
+    document.body.classList.add('ma-ck');
+    vyska(); addEventListener('resize', vyska);
+  }
+  function vyska() { if (lista) document.body.style.setProperty('--ck-h', lista.offsetHeight + 'px'); }
+  function zavri() { if (lista) { lista.remove(); lista = null; } removeEventListener('resize', vyska); document.body.classList.remove('ma-ck'); }
+  if (!stav()) ukaz();
+  const suk = document.querySelector('footer a[href$="sukromie.html"]');
+  if (suk && !document.querySelector('footer .ck-nast')) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ck-nast'; b.textContent = T.nast;
+    b.addEventListener('click', ukaz);
+    suk.insertAdjacentElement('afterend', b);
+  }
 })();
