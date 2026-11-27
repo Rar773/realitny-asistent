@@ -417,7 +417,7 @@ section.mist{background:var(--mist)}
 </style>
 </head>
 <body>
-<div class="demo">Toto je ukážka prémiového webu projektu. Projekt, byty aj ceny sú vymyslené. <a href="../projekty.html">Späť na Weby pre developerov</a></div>
+<aside class="demo" aria-label="Ukážka">Toto je ukážka prémiového webu projektu. Projekt, byty aj ceny sú vymyslené. <a href="../projekty.html">Späť na Weby pre developerov</a></aside>
 
 <header class="hl" id="hl"><div class="w nav">
   <a class="logo" href="#"><i aria-hidden="true"></i>Pri parku</a>
@@ -854,7 +854,7 @@ fas.querySelectorAll('.pos').forEach(g => {
 });
 $('pchips').insertAdjacentHTML('beforeend', [4,3,2,1].map(p => {
   const v = D.filter(d => d.p === p && d.stav === 'volny').length;
-  return `<button class="pchip" type="button" data-p="${p}" aria-label="${p}. poschodie, ${v} ${plural(v,'voľný byt','voľné byty','voľných bytov')}">${p}. <small>${v ? v + ' voľné' : 'obsadené'}</small></button>`;
+  return `<button class="pchip" type="button" data-p="${p}" ">${p}.<span class="vh"> poschodie,</span> <small>${v ? v + ' voľné' : 'obsadené'}</small></button>`;
 }).join(''));
 $('pchips').querySelectorAll('.pchip').forEach(b => {
   b.onclick = () => chodNaPos(+b.dataset.p);
@@ -1119,7 +1119,7 @@ fetch('https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-pri-parku.json'
   if (v.length) $('cOd').textContent = 'od ' + eur(Math.min(...v.map(d => d.cena)));
   fas.querySelectorAll('.pos').forEach(g => { const p = +g.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length; g.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); });
   $('pchips').querySelectorAll('.pchip').forEach(b => { const p = +b.dataset.p, n = D.filter(d => d.p === p && d.stav === 'volny').length;
-    b.setAttribute('aria-label', `${p}. poschodie, ${n} ${plural(n,'voľný byt','voľné byty','voľných bytov')}`); const sm = b.querySelector('small'); if (sm) sm.textContent = n ? n + ' voľné' : 'obsadené'; });
+    const sm = b.querySelector('small'); if (sm) sm.textContent = n ? n + ' voľné' : 'obsadené'; });
   typy(); tabulka(); kalkByty();
   if (S.u === 'pos' || S.u === 'byt') { kresliRez(); panel(); }
 }).catch(() => {});

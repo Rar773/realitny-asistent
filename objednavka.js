@@ -8,6 +8,9 @@
   const $ = (id) => document.getElementById(id);
   const form = $('obj');
   if (!form) return;
+  // odmena za odporúčanie: objednavka.html?odmena=ID&sluzba=standard|zariadenie[&pocet=3] – len prihlásený majiteľ, cena 0
+  const ODM = (() => { try { const q = new URLSearchParams(location.search); const id = q.get('odmena') || ''; if (!/^[a-f0-9]{8,40}$/.test(id)) return null;
+    return { id, sluzba: q.get('sluzba') === 'zariadenie' ? 'zariadenie' : 'standard', max: Math.min(10, Math.max(1, parseInt(q.get('pocet') || '3', 10) || 3)), tok: localStorage.getItem('ra_ucet') || '' }; } catch (e) { return null; } })();
 
   let fotky = []; // {subor, nahlad, miestnost}
   // trvalé id prehliadača (ochrana zľavy pre nových klientov)
@@ -57,6 +60,7 @@
     }
     $('oSuhrn').innerHTML = r.map(([a, b]) => `<div><span>${a}</span><span>${b}</span></div>`).join('');
     $('oCena').textContent = eur(spolu);
+    if (ODM) { $('oSuhrn').insertAdjacentHTML('beforeend', `<div><span>Odmena za odporúčanie</span><span>−${eur(spolu)}</span></div>`); $('oCena').textContent = '0 €'; }
   }
 
   function vykresli() {
@@ -175,6 +179,7 @@
     if (!fotky.length && !inz) return chyba('Nahrajte fotky alebo vložte odkaz na inzerát.');
     if ($('oNovy').checked && sluzba === 'zariadenie' && !form.telefon.value.trim()) return chyba('Pre zľavu pre nových klientov vyplňte telefónne číslo.'), form.telefon.focus();
     if (form.kod.value.trim() && $('oNovy').checked) { $('oNovy').checked = false; prepocitaj(); }
+    if (ODM && ODM.sluzba === 'zariadenie' && pocet() > ODM.max) return chyba('Odmena platí najviac na {n} fotky.'.replace('{n}', ODM.max));
     if (!form.suhlas.checked) return chyba('Potvrďte súhlas s obchodnými podmienkami.');
     if (zadarmo() && !tsToken) { robot(); return chyba('Potvrďte, prosím, že nie ste robot (políčko nad tlačidlom).'); }
 
@@ -191,7 +196,9 @@
       if (fotky.length) fd.delete('pocet');
       for (const f of fotky) { const ph = await dHash(f.subor); if (ph) fd.append('ph', ph); fd.append('fotky', await zmensi(f.subor)); fd.append('miestnost', f.miestnost); }
       btn.textContent = 'Odosielame…';
-      const r = await fetch(API, { method: 'POST', body: fd });
+      const hl = {};
+      if (ODM) { fd.set('odmena', ODM.id); fd.delete('kod'); ['novy', 'predplatne', 's_videom', 'reels'].forEach((k) => fd.delete(k)); if (ODM.tok) hl.Authorization = 'Bearer ' + ODM.tok; }
+      const r = await fetch(API, { method: 'POST', body: fd, headers: hl });
       const j = await r.json().catch(() => ({}));
       resetRobot();
       if (!r.ok || !j.ok) throw new Error(j.chyba || 'Objednávku sa nepodarilo odoslať.');
@@ -217,5 +224,15 @@
   const q = new URLSearchParams(location.search).get('sluzba');
   const opt = q && form.querySelector(`[name="sluzba"][value="${q}"]`);
   if (opt) opt.checked = true;
+  if (ODM) {
+    const radio = form.querySelector(`input[name=sluzba][value=${ODM.sluzba}]`); if (radio) radio.checked = true;
+    form.querySelectorAll('input[name=sluzba]').forEach((x) => { if (x !== radio) x.closest('label').hidden = true; });
+    ['oNovy', 'oPredpl', 'oSVideom', 'oReels'].forEach((id) => { const el = $(id); if (el) { el.checked = false; const l = el.closest('label'); if (l) l.hidden = true; } });
+    const kod = form.querySelector('[name=kod]'); if (kod) { kod.value = ''; const l = kod.closest('label'); if (l) l.hidden = true; }
+    if (ODM.sluzba === 'zariadenie' && form.pocet) { form.pocet.value = ODM.max; form.pocet.max = ODM.max; }
+    const b = document.createElement('p'); b.className = 'odm-ban';
+    b.innerHTML = ODM.tok ? '<b>Odmena za odporúčanie</b> – túto objednávku máte zadarmo.' : 'Na použitie odmeny sa najprv prihláste v <a class="link" href="ucet.html#odmeny">Môj účet</a>.';
+    form.prepend(b);
+  }
   prepocitaj();
 })();

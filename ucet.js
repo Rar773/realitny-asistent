@@ -159,6 +159,34 @@
     if (preApp) return appKrok(U.ucet.email);
     if (sprava) msg('oMsg', sprava, true);
   }
+
+  // odmeny za odporúčanie kolegu
+  const odmPopis = (o) => o.druh === 'mesiace' ? (o.mnozstvo === 1 ? '1 mesiac asistenta zadarmo' : '{n} mesiace asistenta zadarmo'.replace('{n}', o.mnozstvo)) : o.druh === 'fotky' ? '{n} virtuálne zariadené fotky zadarmo'.replace('{n}', o.mnozstvo) : 'Video Štandard zadarmo';
+  async function odmeny() {
+    const box = $('dOdm'); if (!box) return;
+    const r = await post('/ucet/odmeny', {}, true);
+    const z = (r && r.ok && r.odmeny) || [];
+    if (!z.length) { box.innerHTML = '<p class="mut" style="margin:0">Zatiaľ žiadne odmeny. Pošlite kolegovi svoj kód z aplikácie (časť Odporučte kolegu). <a class="link" href="odporucanie.html">Ako to funguje</a></p>'; return; }
+    box.innerHTML = '<table><thead><tr><th>Odmena</th><th>Stav</th><th><span class="vh">Akcia</span></th></tr></thead><tbody>' + z.map((o) => {
+      let st = '', bt = '';
+      if (o.stav === 'caka') st = 'pripíšeme {d}'.replace('{d}', datum(o.dostupna_od));
+      else if (o.stav === 'dostupna') {
+        st = 'aktivujte do {d}'.replace('{d}', datum(o.platna_do));
+        bt = o.druh === 'mesiace' ? `<button class="btn sm" type="button" data-odm="${esc(o.id)}">Aktivovať</button>`
+          : `<a class="btn sm" href="objednavka.html?odmena=${encodeURIComponent(o.id)}&sluzba=${o.druh === 'fotky' ? 'zariadenie&pocet=' + o.mnozstvo : 'standard'}">Použiť</a>`;
+      } else if (o.stav === 'aktivovana') st = o.objednavka && o.objednavka !== 'odmena' ? 'použitá v objednávke {c}'.replace('{c}', esc(o.objednavka)) : 'aktivovaná {d}'.replace('{d}', datum(o.aktivovana));
+      else if (o.stav === 'prepadnuta') st = 'prepadla';
+      return `<tr><td>${esc(odmPopis(o))}</td><td>${st}</td><td>${bt}</td></tr>`;
+    }).join('') + '</tbody></table>';
+    box.querySelectorAll('[data-odm]').forEach((b) => { b.onclick = async () => {
+      if (!confirm('Aktivovať odmenu teraz? Predplatné sa hneď predĺži.')) return;
+      b.disabled = true;
+      const x = await post('/ucet/odmena-aktivuj', { id: b.dataset.odm }, true);
+      msg('odmMsg', x.ok ? 'Hotovo – predplatné platí do {d}.'.replace('{d}', datum(x.platna_do)) : (x.chyba || 'Odmenu sa nepodarilo aktivovať.'), x.ok);
+      if (x.ok) nacitaj(); else b.disabled = false;
+    }; });
+    if (location.hash === '#odmeny' && !window._hashOdm) { window._hashOdm = 1; $('odmeny').scrollIntoView({ block: 'start' }); }
+  }
   async function nacitaj() {
     const j = await post('/ucet/ja', {}, true);
     if (!j.ok) { if (!j.odhlaseny) info('Účet sa nepodarilo načítať', esc(j.chyba || ''), [['Skúsiť znova', nacitaj]]); U = null; return; }
@@ -182,6 +210,7 @@
     if ($('dOdApp')) $('dOdApp').onclick = async (e) => { e.preventDefault(); if (!confirm('Odhlásiť aplikáciu na tom počítači?')) return; await post('/ucet/odhlas-aplikaciu', {}, true); nacitaj(); };
     const ST = { nova: 'prijatá', caka_platbu: 'čaká na platbu', v_procese: 'spracúva sa', hotova: 'vybavená', dodana: 'vybavená' };
     $('dObj').innerHTML = U.objednavky.length ? `<table><thead><tr><th>Číslo</th><th>Dátum</th><th>Služba</th><th>Cena</th><th>Stav</th></tr></thead><tbody>${U.objednavky.map((o) => `<tr><td><a class="link" href="${esc(o.stav_url)}">${esc(o.cislo)}</a></td><td>${datum(o.datum)}</td><td>${esc(o.popis)}</td><td>${o.mena === 'CZK' ? Math.round(o.cena) + ' Kč' : eur(o.cena)}</td><td>${o.zaplatene ? 'zaplatená' : ''}${o.zaplatene && ST[o.stav] ? ', ' : ''}${ST[o.stav] || (o.zaplatene ? '' : esc(o.stav))}</td></tr>`).join('')}</tbody></table>` : '<p class="mut" style="margin:0">Zatiaľ žiadne objednávky.</p>';
+    odmeny();
     ['Meno', 'Tel', 'Firma', 'Ico', 'Dic', 'Adresa'].forEach((k) => { $('u' + k).value = u[{ Meno: 'meno', Tel: 'telefon', Firma: 'firma', Ico: 'ico', Dic: 'dic', Adresa: 'adresa' }[k]] || ''; });
     ukaz('zStareW', U.ma_heslo); $('zNad').textContent = U.ma_heslo ? 'Zmena hesla' : 'Nastaviť heslo pre aplikáciu';
     view('vUcet');

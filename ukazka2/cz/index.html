@@ -24,6 +24,7 @@ a{color:inherit}
 h1,h2,h3{font-family:var(--disp);line-height:1.05;letter-spacing:-.02em;margin:0;font-weight:700}
 h2{font-size:clamp(32px,4.2vw,52px)}
 .obal{max-width:1200px;margin:0 auto;padding:0 24px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ukazka-pas{background:var(--atrament);color:#DDE7E3;font-size:13.5px;text-align:center;padding:8px 16px}
 .ukazka-pas a{color:var(--mosadz2);font-weight:600}
 :focus-visible{outline:3px solid var(--mosadz2);outline-offset:2px}
@@ -222,10 +223,10 @@ dialog::backdrop{background:rgba(9,25,23,.62)}
 </style>
 </head>
 <body>
-<div class="ukazka-pas">Toto je <b>ukázka webu pro realitní kancelář</b> – kancelář, lidé i ceny jsou smyšlené. <a href="../../cz/weby.html">Zpět na Weby pro makléře</a></div>
+<aside class="ukazka-pas" aria-label="Ukážka">Toto je <b>ukázka webu pro realitní kancelář</b> – kancelář, lidé i ceny jsou smyšlené. <a href="../../cz/weby.html">Zpět na Weby pro makléře</a></aside>
 
 <header class="hlavicka"><div class="obal">
-  <a class="znak" href="#" aria-label="Kalvia Reality – úvod"><svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#0F4C47"/><path d="M6 13 17 6l11 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21c4-3.2 8-3.2 12 0s8 3.2 12 0M5 27c4-3.2 8-3.2 12 0s8 3.2 12 0" stroke="#E9B95A" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><span>kalvia reality<small>realitní kancelář</small></span></a>
+  <a class="znak" href="#"><svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#0F4C47"/><path d="M6 13 17 6l11 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21c4-3.2 8-3.2 12 0s8 3.2 12 0M5 27c4-3.2 8-3.2 12 0s8 3.2 12 0" stroke="#E9B95A" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><span>kalvia reality<span class="vh"> – úvod</span><small>realitní kancelář</small></span></a>
   <nav class="menu" id="menu" aria-label="Hlavní menu">
     <a href="#ponuka">Nabídka</a><a href="#novostavba">Novostavby</a><a href="#ocenenie">Ocenění</a><a href="#tim">Náš tým</a><a href="#kontakt">Kontakt</a>
   </nav>
@@ -420,7 +421,7 @@ function vyber() {
 function kresli() {
   const L = vyber();
   $("pocet").textContent = L.length === 1 ? "1 nemovitost" : `${L.length} ${L.length >= 2 && L.length <= 4 ? "nemovitosti" : "nemovitostí"}`;
-  $("mriezka").innerHTML = L.length ? L.map((x) => `<button class="karta" type="button" data-id="${x.id}" aria-label="${esc(x.nadpis)}, ${esc(x.lok)}, ${esc(cenaT(x))}">
+  $("mriezka").innerHTML = L.length ? L.map((x) => `<button class="karta" type="button" data-id="${x.id}">
     <div class="foto"><img src="${esc(x.pp ? x.pp[1] : x.foto[0])}" alt="" loading="lazy">${x.st.length ? `<div class="stitky">${x.st.map(([k, t]) => `<span class="st ${k}">${esc(t)}</span>`).join("")}</div>` : ""}</div>
     <h3>${esc(x.nadpis)}</h3><div class="lok">${esc(x.lok)}</div>
     <div class="dole"><span class="cena">${esc(cenaT(x))}</span><span class="par">${par(x).map((p) => `<span>${esc(p)}</span>`).join("")}</span></div></button>`).join("")
