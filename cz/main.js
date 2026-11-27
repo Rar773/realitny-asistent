@@ -211,3 +211,30 @@ document.querySelectorAll('.ba').forEach(ba => {
   if (!('IntersectionObserver' in window)) { v.preload = 'auto'; v.play().catch(function () {}); return; }
   new IntersectionObserver(function (z) { z.forEach(function (e) { if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(function () {}); } else v.pause(); }); }, { threshold: 0.35 }).observe(v);
 })();
+
+/* ---------- Jazyk: prepínač aj v mobilnom menu, ponuka podľa jazyka prehliadača ---------- */
+(function () {
+  const j = document.querySelector('.nav-cta .jazyk'); if (!j) return;
+  const doCZ = j.getAttribute('hreflang') === 'cs';
+  const GLOBUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  if (!j.querySelector('svg')) j.insertAdjacentHTML('afterbegin', GLOBUS);
+  const m = document.getElementById('menu');
+  if (m && !m.querySelector('.mjazyk')) {
+    const a = document.createElement('a');
+    a.className = 'mjazyk'; a.href = j.getAttribute('href'); a.hreflang = j.getAttribute('hreflang'); a.lang = j.getAttribute('lang');
+    a.textContent = doCZ ? '🇨🇿 Česká verze' : '🇸🇰 Slovenská verzia';
+    m.appendChild(a);
+  }
+  let skryta = false;
+  try { skryta = localStorage.getItem('ra_jazyk_lista') === '1'; } catch (e) {}
+  const jaz = String((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+  const chce = jaz.startsWith('cs') ? 'cs' : jaz.startsWith('sk') ? 'sk' : '';
+  if (skryta || !chce || chce !== j.getAttribute('hreflang')) return;
+  const l = document.createElement('div');
+  l.className = 'jlista'; l.lang = chce;
+  l.innerHTML = (doCZ ? 'Jste z Česka? <a></a>' : 'Ste zo Slovenska? <a></a>') + '<button type="button" aria-label="' + (doCZ ? 'Zavřít' : 'Zavrieť') + '">×</button>';
+  const a = l.querySelector('a'); a.href = j.getAttribute('href'); a.hreflang = chce;
+  a.textContent = doCZ ? 'Přejít na českou verzi' : 'Prejsť na slovenskú verziu';
+  l.querySelector('button').addEventListener('click', () => { l.remove(); try { localStorage.setItem('ra_jazyk_lista', '1'); } catch (e) {} });
+  document.body.appendChild(l);
+})();
