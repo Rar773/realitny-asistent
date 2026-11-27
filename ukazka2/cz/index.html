@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ukázka webu pro realitní kancelář – Kalvia Reality</title>
+<meta name="description" content="Ukázka webu pro realitní kancelář: nabídka s vyhledáváním, detail nemovitosti s galerií, online ocenění, novostavba s 3D prohlídkou a tým makléřů.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F4C47'/%3E%3Cpath d='M5 19c3.5-3 7-3 11 0s7.5 3 11 0' stroke='%23E9B95A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="../fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../img/hero.webp" as="image" media="(min-width:701px)">
+<style>
+@font-face{font-family:"Bricolage";src:url(../fonts/bricolage-grotesque-latin-ext-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Bricolage";src:url(../fonts/bricolage-grotesque-latin-wght-normal.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument";src:url(../fonts/instrument-sans-latin-ext-wght-normal.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Instrument";src:url(../fonts/instrument-sans-latin-wght-normal.woff2) format("woff2");font-weight:400 700;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--rieka:#0F4C47;--rieka2:#17655E;--atrament:#13201E;--sivo:#5C6D69;--hmla:#EAF1EE;--papier:#FAFBF9;--ciara:#D5E0DB;--mosadz:#B9822A;--mosadz2:#E9B95A;--cervena:#B5452F;
+  --disp:"Bricolage",ui-sans-serif,system-ui,sans-serif;--text:"Instrument",ui-sans-serif,system-ui,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--papier);color:var(--atrament);font-family:var(--text);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:var(--disp);line-height:1.05;letter-spacing:-.02em;margin:0;font-weight:700}
+h2{font-size:clamp(32px,4.2vw,52px)}
+.obal{max-width:1200px;margin:0 auto;padding:0 24px}
+.ukazka-pas{background:var(--atrament);color:#DDE7E3;font-size:13.5px;text-align:center;padding:8px 16px}
+.ukazka-pas a{color:var(--mosadz2);font-weight:600}
+:focus-visible{outline:3px solid var(--mosadz2);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:13px 20px;font:600 16px/1 var(--text);cursor:pointer;text-decoration:none;transition:background .15s}
+.btn-r{background:var(--rieka);color:#fff}.btn-r:hover{background:var(--rieka2)}
+.btn-m{background:var(--mosadz2);color:var(--atrament)}.btn-m:hover{background:#F2C86F}
+.btn-o{background:transparent;color:var(--rieka);box-shadow:inset 0 0 0 1.5px var(--rieka)}.btn-o:hover{background:var(--hmla)}
+
+/* hlavička */
+.hlavicka{position:sticky;top:0;z-index:40;background:rgba(250,251,249,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--ciara)}
+.hlavicka .obal{display:flex;align-items:center;gap:28px;height:72px}
+.znak{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.03em}
+.znak svg{width:34px;height:34px}
+.znak small{display:block;font-family:var(--text);font-weight:500;font-size:11.5px;letter-spacing:.01em;color:var(--sivo);margin-top:-3px}
+.menu{display:flex;gap:4px;margin-left:auto}
+.menu a{text-decoration:none;font-weight:500;padding:8px 12px;border-radius:8px;color:#2A3A37}
+.menu a:hover{background:var(--hmla)}
+.tel{font-weight:600;text-decoration:none;white-space:nowrap}
+.mnu-btn{display:none;margin-left:auto;background:none;border:1.5px solid var(--ciara);border-radius:10px;width:44px;height:44px;cursor:pointer}
+.mnu-btn span{display:block;width:18px;height:2px;background:var(--atrament);margin:4px auto}
+
+/* hero */
+.hero{position:relative;min-height:min(78vh,720px);display:flex;align-items:flex-end;color:#fff;overflow:hidden}
+.hero picture,.hero picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,30,28,.05) 25%,rgba(9,30,28,.75) 100%),linear-gradient(90deg,rgba(9,30,28,.35),transparent 60%)}
+.hero .obal{position:relative;z-index:1;width:100%;padding-bottom:132px}
+.hero h1{font-size:clamp(40px,6vw,80px);max-width:15ch;font-weight:750;letter-spacing:-.035em}
+.vlna{display:block;width:min(340px,60vw);height:22px;margin:18px 0 14px}
+.vlna path{stroke:var(--mosadz2);stroke-width:4;fill:none;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:kresli 1.6s .3s ease-out forwards}
+@keyframes kresli{to{stroke-dashoffset:0}}
+.hero p{font-size:19px;max-width:46ch;margin:0;color:#E6EFEC}
+
+/* vyhľadávanie */
+.hladanie{position:relative;z-index:2;margin-top:-84px}
+.hl-karta{background:#fff;border:1px solid var(--ciara);border-radius:16px;padding:18px;display:grid;grid-template-columns:1.1fr 1.2fr 1fr auto;gap:12px;align-items:end;box-shadow:0 18px 50px rgba(15,76,71,.16)}
+.pole label{display:block;font-size:13px;font-weight:600;color:var(--sivo);margin:0 0 6px 2px}
+.pole select,.pole input{width:100%;height:48px;border:1.5px solid var(--ciara);border-radius:10px;padding:0 12px;font:500 16px var(--text);color:var(--atrament);background:#fff}
+.pole select:focus,.pole input:focus{border-color:var(--rieka);outline:none}
+.hl-karta .btn{height:48px;white-space:nowrap}
+.cisla{display:flex;gap:56px;padding:34px 4px 6px;flex-wrap:wrap}
+.cisla b{display:block;font-family:var(--disp);font-size:40px;letter-spacing:-.03em;line-height:1;color:var(--rieka)}
+.cisla span{color:var(--sivo);font-size:14.5px}
+
+/* sekcie */
+section{padding:96px 0}
+.uvod{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.uvod p{margin:10px 0 0;color:var(--sivo);max-width:52ch}
+
+/* ponuka */
+.filtre{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1.5px solid var(--ciara);background:#fff;border-radius:999px;padding:8px 15px;font:600 14.5px var(--text);cursor:pointer;color:#2A3A37}
+.chip[aria-pressed="true"]{background:var(--rieka);border-color:var(--rieka);color:#fff}
+.zoradit{margin-left:8px}
+.zoradit select{height:40px;border:1.5px solid var(--ciara);border-radius:999px;padding:0 12px;font:600 14.5px var(--text);background:#fff}
+.pocet{color:var(--sivo);font-size:15px;margin:0 0 18px}
+.mriezka{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 24px}
+.karta{all:unset;cursor:pointer;display:flex;flex-direction:column;border-radius:14px;outline-offset:4px}
+.karta:focus-visible{outline:3px solid var(--mosadz2)}
+.foto{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:var(--hmla)}
+.foto img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.karta:hover .foto img{transform:scale(1.04)}
+.stitky{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
+.st{font:700 12.5px var(--text);padding:5px 10px;border-radius:999px;background:#fff;color:var(--atrament)}
+.st.d3{background:var(--mosadz2)}.st.vz{background:var(--rieka);color:#fff}.st.rez{background:var(--cervena);color:#fff}.st.nov{background:#fff;color:var(--rieka)}
+.karta h3{font-size:21px;margin:14px 0 4px;letter-spacing:-.015em;font-weight:650}
+.lok{color:var(--sivo);font-size:15px}
+.dole{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:10px;border-top:1px solid var(--ciara)}
+.cena{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;color:var(--rieka)}
+.par{display:flex;gap:14px;color:#3B4B48;font-size:14.5px}
+.prazdne{grid-column:1/-1;text-align:center;padding:48px 16px;border:1.5px dashed var(--ciara);border-radius:14px;color:var(--sivo)}
+
+/* novostavba */
+.nove{background:var(--rieka);color:#fff}
+.nove .obal{display:grid;grid-template-columns:1.15fr 1fr;gap:56px;align-items:center}
+.nove .obr{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/10}
+.nove .obr img,.nove .obr video{width:100%;height:100%;object-fit:cover}
+.nove h2{color:#fff}
+.nove p{color:#D6E6E1;font-size:17.5px;max-width:44ch}
+.fakty{display:grid;grid-template-columns:repeat(3,auto);gap:10px 36px;margin:26px 0 30px;justify-content:start}
+.fakty b{display:block;font-family:var(--disp);font-size:30px;letter-spacing:-.02em;color:var(--mosadz2)}
+.fakty span{font-size:14px;color:#BFD5CF}
+.nove .tlac{display:flex;gap:12px;flex-wrap:wrap}
+.nove .btn-o{color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6)}.nove .btn-o:hover{background:rgba(255,255,255,.08)}
+
+/* ocenenie */
+.ocen .obal{display:grid;grid-template-columns:1fr 1.05fr;gap:64px;align-items:start}
+.ocen .text p{color:var(--sivo);font-size:17.5px;max-width:42ch}
+.ocen ul{padding:0;margin:26px 0 0;list-style:none;display:grid;gap:12px}
+.ocen li{display:flex;gap:12px;align-items:flex-start}
+.ocen li svg{flex:none;width:22px;height:22px;color:var(--rieka);margin-top:2px}
+.kalk{background:#fff;border:1px solid var(--ciara);border-radius:16px;padding:28px}
+.kalk .riadok{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.prepinac{display:flex;border:1.5px solid var(--ciara);border-radius:10px;padding:3px;height:48px}
+.prepinac button{flex:1;border:0;background:none;border-radius:7px;font:600 15px var(--text);cursor:pointer;color:#3B4B48}
+.prepinac button[aria-pressed="true"]{background:var(--hmla);color:var(--rieka)}
+.vysl{margin-top:20px;padding:20px;border-radius:12px;background:var(--hmla)}
+.vysl small{color:var(--sivo);font-size:13.5px}
+.vysl b{display:block;font-family:var(--disp);font-size:clamp(28px,3.4vw,38px);letter-spacing:-.025em;color:var(--rieka);margin:2px 0 6px}
+.kalk form{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:16px;align-items:end}
+.ok{color:var(--rieka);font-weight:600;margin:12px 0 0}
+
+/* postup */
+.postup{background:var(--hmla)}
+.kroky{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:34px 0 0;padding:0;list-style:none;counter-reset:k}
+.kroky li{counter-increment:k;border-top:2px solid var(--rieka);padding-top:18px}
+.kroky li::before{content:counter(k,decimal-leading-zero);font-family:var(--disp);font-weight:700;color:var(--mosadz);font-size:15px}
+.kroky h3{font-size:22px;margin:8px 0 8px;font-weight:650}
+.kroky p{margin:0;color:#3B4B48;font-size:15.5px}
+
+/* tím */
+.tim-m{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.clen img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:14px;background:var(--hmla)}
+.clen h3{font-size:21px;margin:14px 0 2px;font-weight:650}
+.clen .obl{color:var(--sivo);font-size:15px}
+.clen a{display:inline-block;margin-top:8px;font-weight:600;color:var(--rieka);text-decoration:none}
+.clen a:hover{text-decoration:underline}
+
+/* kontakt */
+.kontakt .obal{display:grid;grid-template-columns:1fr 1.1fr;gap:64px}
+.kontakt dl{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;margin:28px 0 0}
+.kontakt dt{color:var(--sivo)}.kontakt dd{margin:0;font-weight:600}
+.forma{background:#fff;border:1px solid var(--ciara);border-radius:16px;padding:28px;display:grid;gap:14px}
+.forma .riadok{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.forma textarea{width:100%;min-height:110px;border:1.5px solid var(--ciara);border-radius:10px;padding:12px;font:500 16px var(--text);resize:vertical}
+.forma textarea:focus{border-color:var(--rieka);outline:none}
+
+/* pätička */
+footer{background:var(--atrament);color:#C9D6D2;padding:48px 0 36px;font-size:15px}
+footer .obal{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+footer .znak{color:#fff}
+footer .znak small{color:#9FB3AE}
+footer a{color:#fff}
+footer p{margin:6px 0 0;max-width:46ch}
+
+/* detail */
+dialog{border:0;padding:0;border-radius:18px;width:min(1040px,calc(100% - 24px));max-height:calc(100dvh - 24px);background:#fff;color:var(--atrament);overflow:auto}
+dialog::backdrop{background:rgba(9,25,23,.62)}
+.det{display:grid;grid-template-columns:1.25fr 1fr}
+.gal{position:relative;background:#0b1a18;display:flex;flex-direction:column}
+.gal .hl{aspect-ratio:4/3;position:relative;overflow:hidden;flex:1;min-height:0}
+.gal .hl img,.gal .hl video{width:100%;height:100%;object-fit:cover}
+.palce{display:flex;gap:8px;padding:10px;overflow-x:auto}
+.palce button{flex:none;width:84px;height:62px;border:2px solid transparent;border-radius:8px;padding:0;overflow:hidden;cursor:pointer;background:#223}
+.palce button[aria-current="true"]{border-color:var(--mosadz2)}
+.palce img{width:100%;height:100%;object-fit:cover}
+.palce .pp{display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px var(--text);background:var(--rieka);text-align:center;line-height:1.2}
+.info{padding:30px 30px 26px;position:relative}
+.zavri{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--ciara);background:#fff;font-size:22px;cursor:pointer;line-height:1}
+.info h3{font-size:28px;margin:0 46px 4px 0}
+.info .cena{font-size:30px;display:block;margin:12px 0 16px}
+.tab{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ciara);border:1px solid var(--ciara);border-radius:12px;overflow:hidden;margin:0 0 16px}
+.tab div{background:#fff;padding:10px 12px}
+.tab small{display:block;color:var(--sivo);font-size:12.5px}
+.tab b{font-size:15.5px}
+.popis{color:#2E3E3B;font-size:15.5px;margin:0 0 18px;white-space:pre-line}
+.mk{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--ciara);border-radius:12px;margin:0 0 16px}
+.mk img{width:52px;height:52px;border-radius:50%;object-fit:cover}
+.mk small{display:block;color:var(--sivo)}
+.info .akcie{display:flex;gap:10px;flex-wrap:wrap}
+.obhl{display:none;margin-top:16px;gap:10px}
+.obhl.ukaz{display:grid}
+/* pred / po */
+.pp-wrap{position:absolute;inset:0}
+.pp-wrap img{position:absolute;inset:0}
+.pp-wrap .po{clip-path:inset(0 0 0 var(--x,50%))}
+.pp-ciara{position:absolute;top:0;bottom:0;left:var(--x,50%);width:3px;margin-left:-1.5px;background:#fff;pointer-events:none}
+.pp-ciara::after{content:"";position:absolute;top:50%;left:50%;width:38px;height:38px;margin:-19px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.pp-wrap input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.pp-st{position:absolute;bottom:12px;font:700 12.5px var(--text);padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.92)}
+.pp-st.l{left:12px}.pp-st.r{right:12px}
+
+@media (max-width:980px){
+  .menu,.tel,.hlavicka .btn{display:none}.mnu-btn{display:block}
+  .menu.otv{display:flex;position:fixed;top:72px;left:0;right:0;flex-direction:column;background:var(--papier);padding:12px 16px 20px;border-bottom:1px solid var(--ciara)}
+  .menu.otv a{padding:14px 12px;font-size:18px}
+  .hl-karta{grid-template-columns:1fr 1fr}.hl-karta .btn{grid-column:1/-1}
+  .mriezka{grid-template-columns:1fr 1fr}
+  .nove .obal,.ocen .obal,.kontakt .obal{grid-template-columns:1fr;gap:36px}
+  .kroky{grid-template-columns:1fr 1fr}
+  .tim-m{grid-template-columns:1fr 1fr}
+  .det{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  section{padding:68px 0}
+  .hero{min-height:84vh}.hero .obal{padding-bottom:110px}
+  .hl-karta{grid-template-columns:1fr;padding:14px}
+  .cisla{gap:22px 34px}.cisla b{font-size:32px}
+  .mriezka{grid-template-columns:1fr}
+  .kalk .riadok,.forma .riadok,.kalk form{grid-template-columns:1fr}
+  .kroky{grid-template-columns:1fr}
+  .fakty{grid-template-columns:repeat(3,1fr);gap:10px 16px}.fakty b{font-size:24px}
+  .info{padding:24px 18px}
+  .tab{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.vlna path{stroke-dashoffset:0}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="ukazka-pas">Toto je <b>ukázka webu pro realitní kancelář</b> – kancelář, lidé i ceny jsou smyšlené. <a href="../../cz/weby.html">Zpět na Weby pro makléře</a></div>
+
+<header class="hlavicka"><div class="obal">
+  <a class="znak" href="#" aria-label="Kalvia Reality – úvod"><svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#0F4C47"/><path d="M6 13 17 6l11 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21c4-3.2 8-3.2 12 0s8 3.2 12 0M5 27c4-3.2 8-3.2 12 0s8 3.2 12 0" stroke="#E9B95A" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><span>kalvia reality<small>realitní kancelář</small></span></a>
+  <nav class="menu" id="menu" aria-label="Hlavní menu">
+    <a href="#ponuka">Nabídka</a><a href="#novostavba">Novostavby</a><a href="#ocenenie">Ocenění</a><a href="#tim">Náš tým</a><a href="#kontakt">Kontakt</a>
+  </nav>
+  <a class="tel" href="#kontakt">+420 000 000 000</a>
+  <a class="btn btn-r" href="#ocenenie">Prodat nemovitost</a>
+  <button class="mnu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<main>
+<div class="hero">
+  <picture><source media="(max-width:700px)" srcset="../img/hero-m.webp"><img src="../img/hero.webp" alt="Bytové domy na nábřeží řeky při západu slunce"></picture>
+  <div class="obal">
+    <h1>Bydlení u Vltavy, od Holešovic po Zbraslav.</h1>
+    <svg class="vlna" viewBox="0 0 340 22" aria-hidden="true"><path d="M2 11c20-12 40-12 60 0s40 12 60 0 40-12 60 0 40 12 60 0 40-12 60 0 40 12 36 0"/></svg>
+    <p>Čtyři makléři, kteří znají každou ulici. Ke každé nemovitosti video, u novostaveb i 3D prohlídka.</p>
+  </div>
+</div>
+
+<div class="obal hladanie">
+  <form class="hl-karta" id="hl" role="search" aria-label="Hledat nemovitost">
+    <div class="pole"><label for="hTyp">Co hledáte</label>
+      <select id="hTyp"><option value="">Vše</option><option value="byt">Byt</option><option value="dom">Dům</option><option value="pozemok">Pozemek</option><option value="prenajom">Pronájem</option></select></div>
+    <div class="pole"><label for="hLok">Lokalita</label>
+      <select id="hLok"><option value="">Kdekoli</option></select></div>
+    <div class="pole"><label for="hCena">Cena do</label>
+      <select id="hCena"><option value="">Bez limitu</option><option value="5000000">5 000 000 Kč</option><option value="8000000">8 000 000 Kč</option><option value="12000000">12 000 000 Kč</option><option value="20000000">20 000 000 Kč</option></select></div>
+    <button class="btn btn-m" type="submit" id="hBtn">Zobrazit nabídku</button>
+  </form>
+  <div class="cisla">
+    <div><b>340+</b><span>prodaných nemovitostí</span></div>
+    <div><b>14</b><span>let na trhu</span></div>
+    <div><b>47 dní</b><span>průměrná doba prodeje</span></div>
+    <div><b>4</b><span>makléři v týmu</span></div>
+  </div>
+</div>
+
+<section id="ponuka"><div class="obal">
+  <div class="uvod"><div><h2>Aktuální nabídka</h2><p>Nabídka se aktualizuje každý den. Klikněte na nemovitost a prohlédněte si fotky, video nebo 3D prohlídku.</p></div>
+    <div class="filtre" role="group" aria-label="Typ nemovitosti">
+      <button class="chip" type="button" data-f="" aria-pressed="true">Vše</button><button class="chip" type="button" data-f="byt" aria-pressed="false">Byty</button><button class="chip" type="button" data-f="dom" aria-pressed="false">Domy</button><button class="chip" type="button" data-f="pozemok" aria-pressed="false">Pozemky</button><button class="chip" type="button" data-f="prenajom" aria-pressed="false">Pronájem</button>
+      <label class="zoradit"><span class="sr" style="position:absolute;left:-9999px">Seřadit</span><select id="zor"><option value="nove">Nejnovější</option><option value="lac">Nejlevnější</option><option value="dra">Nejdražší</option></select></label>
+    </div></div>
+  <p class="pocet" id="pocet" aria-live="polite"></p>
+  <div class="mriezka" id="mriezka"></div>
+</div></section>
+
+<section class="nove" id="novostavba"><div class="obal">
+  <div class="obr"><video autoplay muted loop playsinline poster="../../ukazka5/img/budova-1400.jpg" aria-label="Průlet kolem bytového domu U parku"><source src="../../ukazka5/video/bud-1.webm" type="video/webm"><source src="../../ukazka5/video/bud-1.mp4" type="video/mp4"></video></div>
+  <div>
+    <h2>Novostavba U parku</h2>
+    <p>Prodáváme novostavbu se 16 byty na kraji parku. Vyberte si patro přímo na budově a projděte si byt ve 3D ještě před dokončením stavby.</p>
+    <div class="fakty"><div><b>9</b><span>volných bytů</span></div><div><b>1+kk–3+kk</b><span>dispozice</span></div><div><b>léto 2027</b><span>kolaudace</span></div></div>
+    <div class="tlac"><a class="btn btn-m" href="../../ukazka5/">Otevřít 3D prohlídku</a><a class="btn btn-o" href="#kontakt">Domluvit schůzku</a></div>
+  </div>
+</div></section>
+
+<section class="ocen" id="ocenenie"><div class="obal">
+  <div class="text">
+    <h2>Kolik stojí váš byt?</h2>
+    <p>Orientační cenu uvidíte hned. Přesné ocenění se srovnáním prodaných nemovitostí v okolí vám pošleme do 48 hodin, zdarma a nezávazně.</p>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Fotografie, video i virtuální zařízení prázdných pokojů v ceně</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Inzerát na všech velkých portálech a na našem webu</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Smlouvy, katastr a úschova peněz u notáře</span></li>
+    </ul>
+  </div>
+  <div class="kalk">
+    <div class="riadok">
+      <div class="pole"><label id="lTyp">Typ</label><div class="prepinac" role="group" aria-labelledby="lTyp"><button type="button" data-t="byt" aria-pressed="true">Byt</button><button type="button" data-t="dom" aria-pressed="false">Dům</button></div></div>
+      <div class="pole"><label for="kLok">Lokalita</label><select id="kLok"></select></div>
+    </div>
+    <div class="riadok">
+      <div class="pole"><label for="kPl">Plocha (m²)</label><input id="kPl" type="number" inputmode="numeric" min="15" max="600" value="68"></div>
+      <div class="pole"><label for="kSt">Stav</label><select id="kSt"><option value="0.88">Původní stav</option><option value="1" selected>Částečná rekonstrukce</option><option value="1.1">Po rekonstrukci</option><option value="1.16">Novostavba</option></select></div>
+    </div>
+    <div class="vysl" aria-live="polite"><small>Orientační tržní cena</small><b id="kVys">–</b><small>Odhad z průměrných cen v lokalitě. Přesnou cenu vám řekne makléř.</small></div>
+    <form id="kForm">
+      <div class="pole"><label for="kMeno">Jméno</label><input id="kMeno" required autocomplete="name"></div>
+      <div class="pole"><label for="kTel">Telefon</label><input id="kTel" type="tel" required autocomplete="tel"></div>
+      <button class="btn btn-r" type="submit">Chci přesné ocenění</button>
+    </form>
+    <p class="ok" id="kOk" hidden>Děkujeme, ozveme se vám do 48 hodin. (V této ukázce se nic neodeslalo.)</p>
+  </div>
+</div></section>
+
+<section class="postup" id="postup"><div class="obal">
+  <h2>Jak prodáváme</h2>
+  <ol class="kroky">
+    <li><h3>Ocenění</h3><p>Přijedeme, prohlédneme si nemovitost a navrhneme cenu podle skutečných prodejů v okolí.</p></li>
+    <li><h3>Příprava</h3><p>Fotky, video na šířku i na výšku a prázdné pokoje virtuálně zařídíme.</p></li>
+    <li><h3>Inzerce</h3><p>Inzerát je do dvou dnů na portálech i na našem webu. Poptávky vyřídíme ještě týž den.</p></li>
+    <li><h3>Prodej</h3><p>Rezervační a kupní smlouva, katastr a úschova. Předáme klíče i s protokolem.</p></li>
+  </ol>
+</div></section>
+
+<section id="tim"><div class="obal">
+  <div class="uvod"><div><h2>Náš tým</h2><p>Každý z nás má na starosti své lokality. Zavolejte přímo tomu, kdo je zná.</p></div></div>
+  <div class="tim-m" id="timM"></div>
+</div></section>
+
+<section class="kontakt" id="kontakt" style="padding-top:0"><div class="obal">
+  <div>
+    <h2>Zastavte se u nás</h2>
+    <dl>
+      <dt>Kancelář</dt><dd>Na Nábřeží 12, Praha 7 – Holešovice</dd>
+      <dt>Otevřeno</dt><dd>Po–Pá 9:00–18:00, So po domluvě</dd>
+      <dt>Telefon</dt><dd>+420 000 000 000</dd>
+    </dl>
+  </div>
+  <form class="forma" id="fForm">
+    <div class="riadok">
+      <div class="pole"><label for="fMeno">Jméno</label><input id="fMeno" required autocomplete="name"></div>
+      <div class="pole"><label for="fTel">Telefon nebo e-mail</label><input id="fTel" required></div>
+    </div>
+    <div class="pole"><label for="fSpr">Zpráva</label><textarea id="fSpr" placeholder="Například: Hledám byt 3+kk v Holešovicích do 12 milionů Kč."></textarea></div>
+    <button class="btn btn-r" type="submit">Odeslat zprávu</button>
+    <p class="ok" id="fOk" hidden>Děkujeme, ozveme se ještě dnes. (V této ukázce se nic neodeslalo.)</p>
+  </form>
+</div></section>
+</main>
+
+<footer><div class="obal">
+  <div><a class="znak" href="#"><svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#17655E"/><path d="M6 13 17 6l11 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21c4-3.2 8-3.2 12 0s8 3.2 12 0M5 27c4-3.2 8-3.2 12 0s8 3.2 12 0" stroke="#E9B95A" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><span>kalvia reality<small>ukázková realitní kancelář</small></span></a>
+    <p>Nabídka na tomto webu se plní sama z aplikace Realitní asistent – každá změna ceny se tu projeví do půl hodiny.</p></div>
+  <p>Web vytvořil <a href="../../cz/weby.html">Realitní asistent</a></p>
+</div></footer>
+
+<dialog id="det" aria-labelledby="dNadpis"><div class="det">
+  <div class="gal"><div class="hl" id="dHl"></div><div class="palce" id="dPalce"></div></div>
+  <div class="info">
+    <button class="zavri" type="button" aria-label="Zavřít" id="dZavri">×</button>
+    <div class="stitky" id="dSt" style="position:static;margin-bottom:10px"></div>
+    <h3 id="dNadpis"></h3><div class="lok" id="dLok"></div>
+    <span class="cena" id="dCena"></span>
+    <div class="tab" id="dTab"></div>
+    <p class="popis" id="dPopis"></p>
+    <div class="mk" id="dMk"></div>
+    <div class="akcie" id="dAkcie"></div>
+    <form class="obhl" id="dObhl">
+      <div class="pole"><label for="oMeno">Jméno</label><input id="oMeno" required autocomplete="name"></div>
+      <div class="pole"><label for="oTel">Telefon</label><input id="oTel" type="tel" required autocomplete="tel"></div>
+      <button class="btn btn-r" type="submit">Odeslat</button>
+      <p class="ok" id="oOk" hidden>Děkujeme, makléř vám zavolá a domluví termín. (V této ukázce se nic neodeslalo.)</p>
+    </form>
+  </div>
+</div></dialog>
+
+<script>
+"use strict";
+const TIM = {
+  mk: { meno: "Michal Král", obl: "Holešovice a Staré Město", foto: "../img/makler1.webp", tel: "+420 000 000 001" },
+  zb: { meno: "Zuzana Bílková", obl: "Říčany a okolí", foto: "../img/maklerka1.webp", tel: "+420 000 000 002" },
+  ps: { meno: "Patrik Svoboda", obl: "Mělník a Beroun", foto: "../img/makler2.webp", tel: "+420 000 000 003" },
+  em: { meno: "Eva Minaříková", obl: "Pronájmy a novostavby", foto: "../img/maklerka2.webp", tel: "+420 000 000 004" },
+};
+const U5 = "../../ukazka5/img/izby/";
+const P = [
+  { id: 1, typ: "byt", nadpis: "Byt 3+kk s výhledem na Vltavu", lok: "Praha 7 – Holešovice", cena: 12490000, izby: 3, plocha: 89, ine: ["Patro", "6. z 8"], st: [["nov", "Novinka"]], mk: "mk", dni: 2,
+    foto: ["../img/obyvacka-dunaj.webp"], popis: "Světlý byt s okny od podlahy po strop a výhledem na řeku a město. Kuchyně spojená s obývacím pokojem, dvě ložnice, lodžie a sklep.\nNa nábřeží a do Stromovky to máte pěšky za pět minut." },
+  { id: 2, typ: "byt", nadpis: "Mezonet se střešní terasou", lok: "Praha 1 – Staré Město", cena: 32900000, izby: 4, plocha: 145, ine: ["Terasa", "62 m²"], st: [], mk: "mk", dni: 5,
+    foto: ["../img/penthouse.webp"], popis: "Dvoupodlažní byt v nejvyšším patře s terasou nad střechami Starého Města. Večerní slunce a výhled na Vltavu.\nDvě koupelny, šatna a dvě parkovací místa v domě." },
+  { id: 3, typ: "dom", nadpis: "Rodinný dům s terasou a zahradou", lok: "Říčany", cena: 14900000, izby: 4, plocha: 132, ine: ["Pozemek", "640 m²"], st: [], mk: "zb", dni: 8,
+    foto: ["../img/bungalov.webp"], popis: "Zděný dům z roku 2019 v klidné ulici, dvacet minut od Prahy. Krytá terasa, tepelné čerpadlo a podlahové topení.\nVšechny sítě, zavlažování zahrady a místo pro dvě auta." },
+  { id: 4, typ: "byt", nadpis: "Byt 2+kk po rekonstrukci", lok: "Beroun", cena: 5490000, izby: 2, plocha: 58, ine: ["Patro", "3. ze 4"], st: [["vz", "Virtuálně zařízeno"]], mk: "ps", dni: 11,
+    pp: ["../../img/pred-prazdna.webp", "../../img/po-zariadena.webp"], foto: ["../img/kuchyna.webp", "../img/obyvacka.webp"],
+    popis: "Kompletně zrekonstruovaný byt s novou kuchyní a koupelnou. Prázdné pokoje jsme virtuálně zařídili – posuňte jezdec na fotce a uvidíte rozdíl.\nNízké poplatky, zateplený dům, výtah." },
+  { id: 5, typ: "byt", nadpis: "Byt 3+kk v novostavbě U parku", lok: "Novostavba U parku", cena: 7290000, izby: 3, plocha: 70, ine: ["Kolaudace", "léto 2027"], st: [["d3", "3D prohlídka"]], mk: "em", dni: 3, d3: "../../ukazka5/#byt-3.02",
+    foto: [U5 + "izba-1.webp", U5 + "izba-2.webp", U5 + "izba-5.webp"], popis: "Byt 3.02 ve třetím patře s balkonem do parku. Obývací pokoj s kuchyní, dvě ložnice a koupelna s oknem.\nProjděte si byt ve 3D – klikněte na pokoj a kamera vás do něj provede." },
+  { id: 6, typ: "dom", nadpis: "Rodinný dům s dvojgaráží", lok: "Mělník", cena: 9890000, izby: 4, plocha: 128, ine: ["Pozemek", "520 m²"], st: [["rez", "Rezervováno"]], mk: "ps", dni: 30,
+    foto: ["../img/garaz.webp", "../img/terasa.webp"], popis: "Bungalov s dvojgaráží a terasou na jih. Rezervováno – ozvěte se, pokud chcete být náhradník." },
+  { id: 7, typ: "pozemok", nadpis: "Stavební pozemek se sítěmi", lok: "Ořech", cena: 6900000, izby: null, plocha: 812, ine: ["Sítě", "u pozemku"], st: [], mk: "zb", dni: 14,
+    foto: ["../img/pozemok.webp"], popis: "Rovinatý pozemek v nové části obce, vhodný pro rodinný dům. Voda, elektřina, plyn a kanalizace na hranici pozemku.\nÚzemní rozhodnutí pro rodinné domy je vydané." },
+  { id: 8, typ: "prenajom", nadpis: "Byt 1+kk v historickém domě", lok: "Praha 1 – Staré Město", cena: 21900, mes: true, izby: 1, plocha: 38, ine: ["Volný od", "1. ledna"], st: [["nov", "Novinka"]], mk: "em", dni: 1,
+    foto: ["../img/garsonka.webp"], popis: "Zařízený byt s vysokými stropy ve zrekonstruovaném měšťanském domě, pár kroků od Prašné brány.\nCena je včetně energií a internetu, kauce jeden nájem." },
+];
+const LOK_KALK = [["Praha 1 – Staré Město", 165000], ["Praha 7 – Holešovice", 135000], ["Praha 5 – Smíchov", 125000], ["Říčany", 95000], ["Ořech", 85000], ["Beroun", 78000], ["Mělník", 62000], ["Kladno", 60000]];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const eur = (n) => Math.round(n).toLocaleString("cs-CZ").replace(/\s/g, " ") + " Kč";
+const cenaT = (x) => eur(x.cena) + (x.mes ? " / měs." : "");
+const par = (x) => [x.izby ? `${x.izby === 1 ? "1+kk" : x.izby + "+kk"}` : null, `${x.plocha} m²`].filter(Boolean);
+
+/* lokality do vyhľadávania */
+[...new Set(P.map((x) => x.lok))].sort((a, b) => a.localeCompare(b, "cs")).forEach((l) => $("hLok").add(new Option(l, l)));
+const F = { typ: "", lok: "", cena: 0, zor: "nove" };
+function vyber() {
+  let L = P.filter((x) => (!F.typ || x.typ === F.typ) && (!F.lok || x.lok === F.lok) && (!F.cena || x.mes || x.cena <= F.cena));
+  L = L.slice().sort((a, b) => F.zor === "lac" ? a.cena - b.cena : F.zor === "dra" ? b.cena - a.cena : a.dni - b.dni);
+  return L;
+}
+function kresli() {
+  const L = vyber();
+  $("pocet").textContent = L.length === 1 ? "1 nemovitost" : `${L.length} ${L.length >= 2 && L.length <= 4 ? "nemovitosti" : "nemovitostí"}`;
+  $("mriezka").innerHTML = L.length ? L.map((x) => `<button class="karta" type="button" data-id="${x.id}" aria-label="${esc(x.nadpis)}, ${esc(x.lok)}, ${esc(cenaT(x))}">
+    <div class="foto"><img src="${esc(x.pp ? x.pp[1] : x.foto[0])}" alt="" loading="lazy">${x.st.length ? `<div class="stitky">${x.st.map(([k, t]) => `<span class="st ${k}">${esc(t)}</span>`).join("")}</div>` : ""}</div>
+    <h3>${esc(x.nadpis)}</h3><div class="lok">${esc(x.lok)}</div>
+    <div class="dole"><span class="cena">${esc(cenaT(x))}</span><span class="par">${par(x).map((p) => `<span>${esc(p)}</span>`).join("")}</span></div></button>`).join("")
+    : `<div class="prazdne">Pro tento výběr teď nic v nabídce nemáme. Změňte filtr nebo nám <a href="#kontakt">napište, co hledáte</a> – dáme vám vědět jako prvním.</div>`;
+  const n = vyberPocetHl(); $("hBtn").textContent = n ? `Zobrazit ${n} ${n === 1 ? "nabídku" : n <= 4 ? "nabídky" : "nabídek"}` : "Žádná shoda";
+}
+function vyberPocetHl() { return vyber().length; }
+function nastavChip(t) { document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.f === t))); }
+document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => { F.typ = c.dataset.f; $("hTyp").value = F.typ; nastavChip(F.typ); kresli(); }));
+$("zor").addEventListener("change", (e) => { F.zor = e.target.value; kresli(); });
+["hTyp", "hLok", "hCena"].forEach((id) => $(id).addEventListener("change", () => { F.typ = $("hTyp").value; F.lok = $("hLok").value; F.cena = +$("hCena").value || 0; nastavChip(F.typ); kresli(); }));
+$("hl").addEventListener("submit", (e) => { e.preventDefault(); $("ponuka").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); });
+
+/* detail */
+const D = $("det");
+let otvorilo = null;
+function galeria(x, i) {
+  const polozky = [...(x.pp ? [{ pp: true }] : []), ...x.foto.map((f) => ({ f }))];
+  const p = polozky[i] || polozky[0];
+  $("dHl").innerHTML = p.pp
+    ? `<div class="pp-wrap" style="--x:50%"><img src="${esc(x.pp[0])}" alt="Pokoj před zařízením"><img class="po" src="${esc(x.pp[1])}" alt="Tentýž pokoj virtuálně zařízený"><div class="pp-ciara"></div><span class="pp-st l">Před</span><span class="pp-st r">Po</span><input type="range" min="0" max="100" value="50" aria-label="Porovnání před a po zařízení"></div>`
+    : `<img src="${esc(p.f)}" alt="${esc(x.nadpis)}">`;
+  const r = $("dHl").querySelector("input[type=range]");
+  if (r) r.addEventListener("input", () => r.parentElement.style.setProperty("--x", r.value + "%"));
+  $("dPalce").innerHTML = polozky.length > 1 ? polozky.map((q, k) => `<button type="button" data-i="${k}" aria-label="${q.pp ? "Před a po zařízení" : "Fotka " + (k + 1)}" aria-current="${k === i}">${q.pp ? `<span class="pp">Před / po</span>` : `<img src="${esc(q.f)}" alt="">`}</button>`).join("") : "";
+  $("dPalce").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => galeria(x, +b.dataset.i)));
+}
+function otvor(x, z) {
+  otvorilo = z;
+  $("dNadpis").textContent = x.nadpis; $("dLok").textContent = x.lok; $("dCena").textContent = cenaT(x);
+  $("dSt").innerHTML = x.st.map(([k, t]) => `<span class="st ${k}">${esc(t)}</span>`).join("");
+  const riadky = [["Cena za m²", x.mes ? "–" : eur(x.cena / x.plocha)], ["Plocha", x.plocha + " m²"], ["Dispozice", x.izby ? (x.izby === 1 ? "1+kk" : x.izby + "+kk") : "–"], [x.ine[0], x.ine[1]], ["Typ", { byt: "Byt", dom: "Dům", pozemok: "Pozemek", prenajom: "Pronájem" }[x.typ]], ["V nabídce", x.dni === 1 ? "od včera" : `${x.dni} dní`]];
+  $("dTab").innerHTML = riadky.map(([a, b]) => `<div><small>${esc(a)}</small><b>${esc(b)}</b></div>`).join("");
+  $("dPopis").textContent = x.popis;
+  const m = TIM[x.mk];
+  $("dMk").innerHTML = `<img src="${esc(m.foto)}" alt=""><div><b>${esc(m.meno)}</b><small>${esc(m.obl)} · ${esc(m.tel)}</small></div>`;
+  $("dAkcie").innerHTML = (x.d3 ? `<a class="btn btn-m" href="${esc(x.d3)}">Otevřít 3D prohlídku</a>` : "") + `<button class="btn btn-r" type="button" id="dChcem">${x.typ === "prenajom" ? "Chci si byt prohlédnout" : "Domluvit prohlídku"}</button>`;
+  $("dObhl").classList.remove("ukaz"); $("oOk").hidden = true; $("dObhl").reset();
+  $("dChcem").addEventListener("click", () => { $("dObhl").classList.add("ukaz"); $("oMeno").focus(); });
+  galeria(x, 0);
+  D.showModal(); document.body.style.overflow = "hidden";
+}
+$("mriezka").addEventListener("click", (e) => { const k = e.target.closest(".karta"); if (k) otvor(P.find((x) => x.id === +k.dataset.id), k); });
+$("dZavri").addEventListener("click", () => D.close());
+D.addEventListener("click", (e) => { if (e.target === D) D.close(); });
+D.addEventListener("close", () => { document.body.style.overflow = ""; if (otvorilo) otvorilo.focus(); });
+$("dObhl").addEventListener("submit", (e) => { e.preventDefault(); $("oOk").hidden = false; });
+
+/* ocenenie */
+LOK_KALK.forEach(([l, c]) => $("kLok").add(new Option(l, c)));
+$("kLok").value = "135000";
+let typK = "byt";
+document.querySelectorAll(".prepinac button").forEach((b) => b.addEventListener("click", () => { typK = b.dataset.t; document.querySelectorAll(".prepinac button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); if (typK === "dom" && +$("kPl").value < 90) $("kPl").value = 120; else if (typK === "byt" && +$("kPl").value > 160) $("kPl").value = 68; pocitaj(); }));
+function pocitaj() {
+  const pl = Math.min(600, Math.max(15, +$("kPl").value || 0)), m2 = +$("kLok").value, st = +$("kSt").value;
+  const z = pl * m2 * st * (typK === "dom" ? 0.92 : 1);
+  $("kVys").textContent = pl >= 15 ? `${eur(Math.round(z * 0.93 / 10000) * 10000)} – ${eur(Math.round(z * 1.07 / 10000) * 10000)}` : "–";
+}
+["kLok", "kPl", "kSt"].forEach((id) => $(id).addEventListener("input", pocitaj));
+$("kForm").addEventListener("submit", (e) => { e.preventDefault(); $("kOk").hidden = false; });
+$("fForm").addEventListener("submit", (e) => { e.preventDefault(); $("fOk").hidden = false; });
+
+/* tím */
+$("timM").innerHTML = Object.values(TIM).map((m) => `<div class="clen"><img src="${esc(m.foto)}" alt="${esc(m.meno)}" loading="lazy"><h3>${esc(m.meno)}</h3><div class="obl">${esc(m.obl)}</div><a href="#kontakt">${esc(m.tel)}</a></div>`).join("");
+
+/* mobilné menu */
+const mb = document.querySelector(".mnu-btn"), mn = $("menu");
+mb.addEventListener("click", () => { const o = mn.classList.toggle("otv"); mb.setAttribute("aria-expanded", String(o)); });
+mn.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => { mn.classList.remove("otv"); mb.setAttribute("aria-expanded", "false"); }));
+
+kresli(); pocitaj();
+</script>
+</body>
+</html>
