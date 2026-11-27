@@ -12,7 +12,7 @@
 <link rel="preload" as="image" href="img/letecky-2400.webp" imagesrcset="img/letecky-1400.webp 1400w, img/letecky-2400.webp 2400w" imagesizes="100vw">
 <style>
 :root{
-  --ink:#23271F;--ink2:#555C50;--ink3:#7D8477;
+  --ink:#23271F;--ink2:#555C50;--ink3:#61685c;
   --paper:#FFFFFF;--stone:#EEF0EA;--stone2:#E3E6DE;--line:#DADDD3;
   --leaf:#3E6B3A;--leaf-d:#2D5229;--leaf-50:#E6EEE2;
   --larch:#A9672F;--blossom:#E3D06A;
@@ -104,7 +104,7 @@ header.sc{border-color:var(--line)}
 /* chip stavu */
 .st{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;padding:4px 10px 4px 9px;border-radius:999px;white-space:nowrap}
 .st:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-.st.volny{background:#E3F1E5;color:#2F7440}.st.rezervovany{background:#F8EDCB;color:#8A6608}.st.predany{background:var(--stone);color:#6E746B}
+.st.volny{background:#E3F1E5;color:#2F7440}.st.rezervovany{background:#F8EDCB;color:#8A6608}.st.predany{background:var(--stone);color:#565c53}
 
 /* zoznam domov */
 #domy{background:var(--stone);margin-top:112px}
@@ -500,12 +500,12 @@ footer b{color:var(--ink)}
         <g fill="#E4E8DC"><path d="M0 0h250l40 110-70 140L0 280z"/><path d="M540 400l220-50v170H480z"/></g>
         <path transform="translate(120,-6)" d="M430 40c60-10 150 20 170 80s-30 110-100 110-120-40-120-100 0-80 50-90z" fill="#BFD6E2"/>
                 <path d="M0 470 L760 410" stroke="#C9CCC2" stroke-width="16" stroke-linecap="round"/><path d="M0 470 L760 410" stroke="#fff" stroke-width="2" stroke-dasharray="14 12"/>
-        <text x="740" y="396" font-family="Figtree, system-ui, sans-serif" font-size="13" font-weight="700" fill="#7D8477" text-anchor="end">Diaľnica D1</text>
+        <text x="740" y="396" font-family="Figtree, system-ui, sans-serif" font-size="13" font-weight="700" fill="#61685c" text-anchor="end">Diaľnica D1</text>
         <path d="M120 520 C 180 400, 260 330, 360 300 S 560 250, 760 230" stroke="#fff" stroke-width="10" fill="none"/>
         <path d="M200 0 C 230 120, 300 220, 360 300" stroke="#fff" stroke-width="8" fill="none"/>
         <path d="M0 215 L760 175" stroke="#B8B2A2" stroke-width="3" stroke-dasharray="2 6"/>
         <circle cx="360" cy="300" r="64" fill="#F7E9A8" opacity=".55"/>
-        <text x="360" y="252" font-family="Figtree, system-ui, sans-serif" font-size="13" font-weight="600" fill="#7D8477" text-anchor="middle">Centrum Senca</text>
+        <text x="360" y="252" font-family="Figtree, system-ui, sans-serif" font-size="13" font-weight="600" fill="#61685c" text-anchor="middle">Centrum Senca</text>
         <g><circle cx="210" cy="380" r="30" fill="#3E6B3A" opacity=".16"/><circle cx="210" cy="380" r="14" fill="#3E6B3A" stroke="#fff" stroke-width="3"/><text x="210" y="425" font-family="Familjen Grotesk, system-ui, sans-serif" font-size="17" font-weight="700" fill="#23271F" text-anchor="middle">Pod Lipami</text></g>
         <g id="mapPins"></g>
       </svg>

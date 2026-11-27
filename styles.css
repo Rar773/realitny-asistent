@@ -102,7 +102,7 @@ header.top.scrolled{border-bottom-color:var(--line);box-shadow:0 1px 8px rgba(15
 .ic svg{width:22px;height:22px}
 .ic.lg{width:56px;height:56px;border-radius:14px}.ic.lg svg{width:26px;height:26px}
 .badge,.tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--brand-50);color:var(--brand);line-height:1.4;white-space:nowrap}
-.tag{background:var(--line2);color:var(--muted);letter-spacing:.06em;font-size:11.5px}
+.tag{background:var(--line2);color:#525b6e;letter-spacing:.06em;font-size:11.5px}
 .soon,.badge.soon{background:var(--warnbg);color:var(--warn);border:1px solid var(--warnline);font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;vertical-align:middle}
 .badge.save{background:var(--okbg);color:var(--ok)}
 .kicker{display:inline-flex;align-items:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 18px}
@@ -238,7 +238,7 @@ section{padding:96px 0}
 .feats,.wcard ul{list-style:none;padding:0;margin:18px 0 26px;display:grid;gap:10px;flex:1}
 .feats li,.wcard ul li{position:relative;padding-left:28px;font-size:15px;line-height:1.5;color:var(--ink2)}
 .feats li::before,.wcard ul li::before{content:"";position:absolute;left:0;top:3px;width:18px;height:18px;border-radius:50%;background:var(--brand-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237728E6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/11px no-repeat}
-.feats li.no{color:#94a3b8}
+.feats li.no{color:#64748b}
 .feats li.no::before{background:var(--line2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E") center/10px no-repeat}
 .plan>.btn,.wcard>.btn{margin-top:auto}
 .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
@@ -306,7 +306,7 @@ section{padding:96px 0}
 .opt:has(input:checked){border-color:var(--brand);background:var(--brand-50)}
 .opt input{margin:3px 0 0;accent-color:var(--brand);width:17px;height:17px;flex-shrink:0}
 .opt span{font-weight:600;font-size:15px;line-height:1.35}
-.opt small{display:block;font-weight:400;color:var(--muted);font-size:13.5px;margin-top:3px}
+.opt small{display:block;font-weight:400;color:#565f73;font-size:13.5px;margin-top:3px}
 .fld{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .fld label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--ink2)}
 .fld .full{grid-column:1/-1}
@@ -385,7 +385,7 @@ footer{background:#fff;border-top:1px solid var(--line);padding:60px 0 28px;marg
 .phero .lead{max-width:720px;font-size:19px}
 .phero-g{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .crumb{font-size:14px;color:var(--muted);margin-bottom:22px}
-.crumb a{color:var(--muted);text-decoration:none}
+.crumb a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 .crumb a:hover{color:var(--brand)}
 .doc{max-width:820px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:52px 56px;box-shadow:var(--sh)}
 .doc h1{font-size:clamp(30px,4vw,42px);margin-bottom:10px}
@@ -1052,7 +1052,7 @@ header.top.menu-otvorene{backdrop-filter:none!important;-webkit-backdrop-filter:
 .oopt,.ostyl{position:relative;cursor:pointer}
 .oopt input,.ostyl input{position:absolute;opacity:0;pointer-events:none}
 .oopt>span,.ostyl>span{display:flex;flex-direction:column;gap:4px;height:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px;transition:border-color .15s,background .15s}
-.oopt small,.ostyl small{color:var(--muted);font-size:13px}
+.oopt small,.ostyl small{color:#565f73;font-size:13px}
 .oopt input:checked+span,.ostyl input:checked+span{border-color:var(--brand);background:#F6F0FF;box-shadow:0 0 0 3px rgba(119,40,230,.12)}
 .oopt input:focus-visible+span,.ostyl input:focus-visible+span{outline:3px solid var(--brand);outline-offset:2px}
 .opole{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14.5px;color:var(--ink);margin-bottom:12px}
