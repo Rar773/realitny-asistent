@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128j">
+<link rel="stylesheet" href="styl.css?v=20261128k">
 <link rel="preload" as="image" href="img/budova.webp">
 <style>
 body.prem{background:#0F1420;color:#E8ECF2}
@@ -55,29 +55,37 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .fp .t2.nic{fill:#576059}
 /* byty na 3D podlaží */
 .fb{cursor:pointer;outline:none}
-.fb polygon{stroke-width:4;transition:fill .2s,opacity .3s,stroke-width .2s}
-.fb.volny polygon{fill:rgba(46,180,110,.30);stroke:#3DDC84}
-.fb.rez polygon{fill:rgba(232,170,40,.32);stroke:#F5B83D}
-.fb.pred polygon{fill:rgba(40,46,58,.62);stroke:#8792A4}
-.fb:hover polygon,.fb:focus-visible polygon{stroke-width:9}
-.fb:focus-visible polygon{stroke:#fff}
+.fb>polygon{stroke-width:4;transition:fill .2s,opacity .3s,stroke-width .2s}
+.fb.volny>polygon{fill:rgba(46,180,110,.30);stroke:#3DDC84}
+.fb.rez>polygon{fill:rgba(232,170,40,.32);stroke:#F5B83D}
+.fb.pred>polygon{fill:rgba(40,46,58,.62);stroke:#8792A4}
+.fb:hover>polygon,.fb:focus-visible>polygon{stroke-width:9}
+.fb:focus-visible>polygon{stroke:#fff}
 .fb .lb rect{fill:rgba(15,20,32,.86)}
 .fb .lb text{fill:#fff;text-anchor:middle}
 .fb .lb .l1{font:650 30px var(--head)}
 .fb .lb .l2{font:500 22px var(--body);fill:#C9D1DC}
 .byt-on .fb{opacity:.18;pointer-events:none}
 .byt-on .fb.akt{opacity:1;pointer-events:auto}
-.byt-on .fb.akt polygon{fill:rgba(255,255,255,0);stroke:#fff;stroke-width:5}
+.byt-on .fb.akt>polygon{fill:rgba(255,255,255,0);stroke:#fff;stroke-width:5}
 .byt-on .fb .lb{display:none}
+.tma{fill:rgba(10,14,24,.62);pointer-events:none;animation:tma .5s ease both}
+@keyframes tma{from{opacity:0}to{opacity:1}}
 .fi{display:none;cursor:pointer;outline:none}
 .byt-on .fb.akt .fi{display:block}
-.fi polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,.55);stroke-width:2;transition:fill .2s}
-.fi:hover polygon,.fi:focus-visible polygon{fill:rgba(111,149,214,.35);stroke:#fff;stroke-width:4}
-.fi text{font:650 20px var(--body);fill:#fff;text-anchor:middle;paint-order:stroke;stroke:rgba(15,20,32,.85);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+.fi polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,0);stroke-width:3;transition:fill .2s,stroke .2s}
+.fi:hover polygon,.fi:focus-visible polygon,.fi.hov polygon{fill:rgba(111,149,214,.32);stroke:#fff;stroke-width:4}
+.fi.bez{pointer-events:none}
+.pin .pd{fill:#fff}
+.pin .pc{fill:#27406B;transition:fill .2s}
+.pin .pr{fill:rgba(15,20,32,.86);transition:fill .2s}
+.pin text{font:650 14.5px var(--body);fill:#fff;text-anchor:middle;pointer-events:none}
+.fi:hover .pr,.fi:focus-visible .pr,.fi.hov .pr,.fi.vyb .pr{fill:#3D66B8}
+.pin{transition:opacity .25s}
+.vstup .pin{opacity:0}
+.fi:hover .pc,.fi:focus-visible .pc,.fi.hov .pc,.fi.vyb .pc{fill:#F2C14E}
 .fi.vyb polygon{fill:rgba(111,149,214,.5);stroke:#fff;stroke-width:6;animation:vyb 1s ease-in-out infinite alternate}
-@keyframes vyb{from{fill:rgba(111,149,214,.35)}to{fill:rgba(111,149,214,.6)}}
-.fi.bez{cursor:default}
-.fi.bez text{fill:#C9D1DC;font-weight:500}
+@keyframes vyb{from{fill:rgba(111,149,214,.35)}to{fill:rgba(111,149,214,.62)}}
 /* ovládanie na scéne */
 .crumb2{position:absolute;left:16px;top:14px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .crumb2 button,.crumb2 span{font:600 14px var(--body);color:#fff;background:rgba(15,20,32,.78);border:0;border-radius:99px;padding:7px 13px;cursor:pointer}
@@ -123,7 +131,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
   .panel{border-left:0;border-top:1px solid #232B3B;max-height:none}
   .tip{display:none}
 }
-@media (prefers-reduced-motion:reduce){.scena,.izba-f,.izba-f img{transition:none}.fi.vyb polygon{animation:none}}
+@media (prefers-reduced-motion:reduce){.scena,.izba-f,.izba-f img{transition:none}.fi.vyb polygon,.tma{animation:none}}
 </style>
 </head>
 <body class="prem">
@@ -153,7 +161,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
 <footer class="premium-pas">Chcete si radšej prezerať byty v tabuľke? <a href="./#cennik">Cenník bytov</a> · <a href="./">Štandardný web projektu</a></footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128j';
+import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128k';
 
 const $ = (s) => document.querySelector(s);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -168,6 +176,7 @@ function kamera(el, [x0, y0, x1, y1], ms = 0, [W, H]) {
   const s = Math.min(st.width / (x1 - x0), st.height / (y1 - y0));
   const tx = st.width / 2 - ((x0 + x1) / 2) * s, ty = st.height / 2 - ((y0 + y1) / 2) * s;
   el.style.width = W + 'px'; el.style.height = H + 'px';
+  el.style.setProperty('--inv', (1 / s).toFixed(4));
   el.style.transition = ms && !RM ? `transform ${ms}ms cubic-bezier(.65,0,.25,1), opacity .45s ease` : 'opacity .45s ease';
   el.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
 }
@@ -193,8 +202,12 @@ function kresliPodlazie(p) {
     const b = bytNa(p, +poz); if (!b) return '';
     const st = STAV[b.stav], [bx0, by0, bx1, by1] = bbox(z.p), cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
     const cena = b.stav === 'predany' ? 'predaný' : eur(b.cena);
-    const izby = z.izby.map(([n, pts], i) => { const f = fotoIzby(n), [a, c, e, g] = bbox(pts);
-      return `<g class="fi${f ? '' : ' bez'}" data-i="${i}" ${f ? `role="button" tabindex="-1" aria-label="${esc(n)} – zobraziť vizualizáciu"` : ''}><polygon points="${pts.map((q) => q.join(',')).join(' ')}"/><text x="${(a + e) / 2}" y="${(c + g) / 2 + 7}">${esc(n.replace(' s kuchyňou', ''))}</text></g>`; }).join('');
+    // miestnosti s vizualizáciou majú špendlík s názvom (ako v ukážke Pri parku), ostatné len tichý obrys
+    const izby = z.izby.map(([n, pts], i) => { const f = fotoIzby(n), [a, c, e, g] = bbox(pts), px = (a + e) / 2 - 24, py = (c + g) / 2;
+      const nz = n.replace(' s kuchyňou', ''), w = Math.round(nz.length * 8.6 + 26);
+      // špendlík má stálu veľkosť na obrazovke (--inv = 1 / priblíženie kamery)
+      const pin = f ? `<g class="pin" style="transform:translate(${px}px,${py}px) scale(var(--inv,1))"><circle r="10" class="pd"/><circle r="4.5" class="pc"/><rect x="16" y="-15" width="${w}" height="30" rx="15" class="pr"/><text x="${16 + w / 2}" y="5">${esc(nz)}</text></g>` : '';
+      return `<g class="fi${f ? '' : ' bez'}" data-i="${i}" ${f ? `role="button" tabindex="-1" aria-label="${esc(n)} – zobraziť vizualizáciu"` : 'aria-hidden="true"'}><polygon points="${pts.map((q) => q.join(',')).join(' ')}"/>${pin}</g>`; }).join('');
     return `<g class="fb ${st.c}" data-b="${esc(b.id)}" role="button" tabindex="0" aria-label="Byt ${esc(b.id)} · ${b.izby}-izb. ${cena}, ${st.t.toLowerCase()}, ${m2(b.plocha)}">
       <polygon points="${z.p.map((q) => q.join(',')).join(' ')}"/>${izby}
       <g class="lb" aria-hidden="true"><rect x="${cx - 120}" y="${cy - 46}" width="240" height="92" rx="16"/><text x="${cx}" y="${cy - 8}"><tspan class="l1">${esc(b.id)} · ${b.izby}-izb.</tspan> <tspan x="${cx}" dy="36" class="l2">${cena}</tspan></text></g></g>`;
@@ -332,6 +345,11 @@ async function naByt(id) {
   const z = D.premium.byty[b.pozicia];
   $('#sPod').classList.add('byt-on');
   document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
+  $('#svgPod').classList.remove('vstup');
+  // stmaví všetko okrem vybraného bytu a jeho balkóna
+  const tma = (pts) => 'M' + pts.map((q) => q.join(' ')).join('L') + 'Z';
+  $('#svgPod .tma')?.remove();
+  $('#svgPod').insertAdjacentHTML('afterbegin', `<path class="tma" fill-rule="evenodd" d="M-200 -200H1872V1141H-200Z ${tma(z.p)} ${z.balk && z.balk.length ? tma(z.balk) : ''}"/>`);
   document.querySelectorAll('#svgPod .fb').forEach((g) => {
     const a = g.dataset.b === b.id; g.classList.toggle('akt', a);
     if (a) { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-label'); } else g.setAttribute('tabindex', '-1');
@@ -353,6 +371,7 @@ async function naIzbu(i) {
     document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
     const g = document.querySelector(`#svgPod .fb.akt .fi[data-i="${i}"]`); if (g) g.classList.add('vyb');
     await cakaj(350);
+    $('#svgPod').classList.add('vstup');
     kamera($('#sPod'), pad(bbox(poly), 18), 900, [1672, 941]);
     await cakaj(750);
   }
@@ -397,6 +416,9 @@ document.addEventListener('keydown', (e) => {
   if (S.u === 'pod' && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && !e.target.closest('#panel')) { e.preventDefault(); naPodlazie(S.p + (e.key === 'ArrowUp' ? 1 : -1), false); }
 });
 $('#izbaF').addEventListener('click', () => naByt(S.b.id));
+const hov = (e, on) => { const b = e.target.closest && e.target.closest('#panel [data-i]'); if (!b || S.u !== 'byt') return; const g = document.querySelector(`#svgPod .fb.akt .fi[data-i="${b.dataset.i}"]`); if (g) g.classList.toggle('hov', on); };
+$('#panel').addEventListener('mouseover', (e) => hov(e, true));
+$('#panel').addEventListener('mouseout', (e) => hov(e, false));
 let sx = null;
 $('#izbaF').addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
 $('#izbaF').addEventListener('touchend', (e) => { if (sx === null) return; const d = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(d) > 50) { e.preventDefault(); dalsiaIzba(d < 0 ? 1 : -1); } });
