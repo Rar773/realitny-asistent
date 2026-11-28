@@ -40,8 +40,9 @@ section{padding:88px 0}
 .nav nav a{white-space:nowrap;text-decoration:none;color:var(--ink2);font-weight:500;font-size:15.5px;padding:8px 12px;border-radius:8px}
 .nav nav a:hover,.nav nav a[aria-current]{color:var(--ink);background:var(--mist)}
 .nav .tel{margin-left:auto;font-weight:600;text-decoration:none;white-space:nowrap}
-@media (max-width:1240px){.nav .tel{display:none}}
-@media (max-width:1060px){.nav nav{display:none}.nav .btn{display:none}}
+@media (min-width:861px){.nav .tel{display:none}}
+@media (max-width:1220px){.nav nav{display:none}}
+@media (max-width:1060px){.nav .btn{display:none}}
 @media (max-width:860px){.nav .tel{display:inline;font-size:15px;margin-left:8px}}
 
 /* úvod */
@@ -462,7 +463,7 @@ section.mist{background:var(--mist)}
 .karta .spl small{display:block;color:var(--ink3);font-size:13.5px;margin-top:2px}
 .dhl .pod .tag{font-size:13px}
 
-.tab-wrap{overflow-x:auto}
+.tab-wrap{overflow-x:auto;position:relative}
 .tab .mi{display:none}
 @media (max-width:860px){.nav .tel{display:none}}
 @media (max-width:520px){.tab .m2{display:none}.tab .mi{display:block;font-size:13px;color:var(--ink3)}.tab td,.tab th{padding:10px 6px}.tab .stav{font-size:13px;padding:2px 8px}}

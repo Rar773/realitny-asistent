@@ -15,14 +15,14 @@
 <link rel="preload" as="image" href="img/exterier.webp" imagesrcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" imagesizes="(max-width:980px) 100vw, 55vw">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128f">
+<link rel="stylesheet" href="styl.css?v=20261128g">
 </head>
 <body>
 <aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
 <header class="hl">
   <div class="w nav">
     <a class="logo" href="./">Javorová <small>Hlohovec</small></a>
-    <nav aria-label="Hlavné menu"><a href="#vyber">Výber bytu</a><a href="#cennik">Cenník</a><a href="#standard">Štandard</a><a href="#financovanie">Financovanie</a><a href="#vystavba">Výstavba</a><a href="#lokalita">Lokalita</a></nav>
+    <nav aria-label="Hlavné menu"><a href="#vyber">Výber bytu</a><a href="premium.html">3D prehliadka</a><a href="#cennik">Cenník</a><a href="#standard">Štandard</a><a href="#financovanie">Financovanie</a><a href="#vystavba">Výstavba</a><a href="#lokalita">Lokalita</a></nav>
     <button type="button" class="obl-btn" id="oblBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg><span>Obľúbené</span><b id="oblPoc">0</b></button>
     <a class="tel" href="tel:+421900123456">+421 900 123 456</a>
     <a class="btn" href="#kontakt">Mám záujem</a>
@@ -37,7 +37,7 @@
       <ul class="odznaky" id="odznaky" aria-label="To najdôležitejšie"></ul>
       <h1 id="h1">Rezidencia Javorová</h1>
       <p class="lead">Bytový dom so 6 podlažiami v tichej ulici pri lesoparku v Hlohovci. Byty od 1 do 4 izieb, garáž v suteréne a nasťahovanie v lete 2027.</p>
-      <div class="uvod-cta"><a class="btn" href="#vyber">Vybrať byt na budove</a><a class="btn sec" href="#cennik">Cenník bytov</a></div>
+      <div class="uvod-cta"><a class="btn" href="#vyber">Vybrať byt na budove</a><a class="btn sec" href="#cennik">Cenník bytov</a><a class="btn sec" href="premium.html">3D prehliadka</a></div>
     </div>
     <figure class="uvod-f"><img src="img/exterier.webp" srcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" sizes="(max-width:980px) 100vw, 55vw" width="1600" height="900" alt="Rezidencia Javorová z ulice pri západe slnka: biela fasáda, drevené lamely a balkóny so skleneným zábradlím" fetchpriority="high"><figcaption>Vizualizácia</figcaption></figure>
   </div>
@@ -231,7 +231,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128f';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128g';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);

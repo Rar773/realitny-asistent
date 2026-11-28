@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128f">
+<link rel="stylesheet" href="styl.css?v=20261128g">
 <link rel="preload" as="image" href="img/budova.webp">
 <style>
 body.prem{background:#0F1420;color:#E8ECF2}
@@ -29,7 +29,8 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .scena{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;transition:opacity .45s ease}
 .scena img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
 .scena svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.scena.skryta{opacity:0;pointer-events:none}
+.scena.skryta,.scena.skryta *{pointer-events:none!important}
+.scena.skryta{opacity:0}
 .prelet{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0F1420;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:3}
 .prelet.on{opacity:1;pointer-events:auto}
 .prelet-skip{position:absolute;right:16px;bottom:16px;z-index:4;background:rgba(15,20,32,.72);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:8px 16px;font:600 14px var(--body);cursor:pointer}
@@ -148,7 +149,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
 <footer class="premium-pas">Chcete si radšej prezerať byty v tabuľke? <a href="./#cennik">Cenník bytov</a> · <a href="./">Štandardný web projektu</a></footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128f';
+import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128g';
 
 const $ = (s) => document.querySelector(s);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
