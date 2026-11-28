@@ -242,16 +242,17 @@ function hash() {
 const VID = { 1: 'video/prelet-1.mp4', 2: 'video/prelet-2.mp4' };
 const videl = {}; let bezVidea = true, preskoc = null;
 async function prelet(n) {
-  if (RM || bezVidea || videl[n]) return;
-  videl[n] = true;
+  if (RM || bezVidea) return;
   const v = $('#prelet'), sk = $('#preletSkip');
   if (v.getAttribute('src') !== VID[n]) v.src = VID[n];
   v.currentTime = 0;
+  v.playbackRate = videl[n] ? 2 : 1; // prvý raz celý, potom zrýchlene
+  videl[n] = true;
   // keď sa video nespustí do 4 s (pomalé pripojenie, nepodporovaný formát), prehliadka ide ďalej bez neho
   const hra = await Promise.race([v.play().then(() => true, () => false), new Promise((ok) => setTimeout(() => ok(false), 4000))]);
   if (!hra) { v.pause(); return; }
   v.classList.add('on'); sk.hidden = false;
-  await new Promise((ok) => { preskoc = ok; v.onended = ok; setTimeout(ok, ((v.duration || 6) + 1.5) * 1000); });
+  await new Promise((ok) => { preskoc = ok; v.onended = ok; setTimeout(ok, ((v.duration || 6) / v.playbackRate + 1.5) * 1000); });
   preskoc = null; v.onended = null; sk.hidden = true;
   v.classList.remove('on'); setTimeout(() => v.pause(), 400);
 }
@@ -264,7 +265,12 @@ async function naBudovu() {
   if (zamok) return; zamok = true;
   const z = S.u !== 'bud';
   $('#izbaF').classList.remove('on');
-  if (z) { kamera($('#sBud'), pad([D.fasada.x[0], D.fasada.podlazia[S.p][0], D.fasada.x[1], D.fasada.podlazia[S.p][1]], 40), 0, [1448, 1086]); $('#sPod').classList.add('skryta'); $('#sBud').classList.remove('skryta'); await cakaj(80); }
+  if (z) {
+    // najprv zhasne podlažie, až potom sa ukáže budova – bez prelínania dvoch rôznych pohľadov
+    $('#sPod').classList.add('skryta'); await cakaj(RM ? 0 : 320);
+    kamera($('#sBud'), pad([D.fasada.x[0], D.fasada.podlazia[S.p][0], D.fasada.x[1], D.fasada.podlazia[S.p][1]], 40), 0, [1448, 1086]);
+    $('#sBud').classList.remove('skryta'); await cakaj(80);
+  }
   kamera($('#sBud'), RB(), z ? 800 : 0, [1448, 1086]);
   S = { u: 'bud', p: S.p, b: null, i: -1 }; obnov(); zamok = false;
 }
@@ -274,7 +280,7 @@ async function naPodlazie(p, zBudovy = S.u === 'bud') {
   $('#izbaF').classList.remove('on');
   $('#svgPod').classList.remove('byt-on'); $('#sPod').classList.remove('byt-on');
   kresliPodlazie(p);
-  if (zBudovy && !videl[1] && !bezVidea && !RM) {
+  if (zBudovy && !bezVidea && !RM) {
     await prelet(1);
     kamera($('#sPod'), RP(), 0, [1672, 941]);
     $('#sPod').classList.remove('skryta'); $('#sBud').classList.add('skryta');
