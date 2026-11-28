@@ -539,15 +539,16 @@ section.mist{background:var(--mist)}
 .cas li.teraz{border-top-color:#C9921E}
 .cas li.teraz .cas-d{color:var(--rez)}
 .nov-h{font-size:22px;margin:40px 0 14px}
-.nov{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.nov li{display:grid;grid-template-columns:220px 1fr;gap:16px;background:#fff;border-radius:12px;padding:14px;align-items:start}
-.nov-f{padding:0;border:0;border-radius:8px;overflow:hidden;cursor:zoom-in;position:relative;background:var(--mist)}
-.nov-f img{width:100%;aspect-ratio:4/3;object-fit:cover}
-.nov-f span{position:absolute;right:6px;bottom:6px;font-size:12px;font-weight:600;color:#fff;background:rgba(24,34,28,.6);padding:2px 7px;border-radius:6px}
-.nov b{display:block;font:650 18px var(--head);margin:2px 0 4px}
+.nov{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.nov li{display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden}
+.nov li>div{padding:16px 20px 20px}
+.nov-f{display:block;width:100%;padding:0;border:0;overflow:hidden;cursor:zoom-in;position:relative;background:var(--mist)}
+.nov-f img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;transition:transform .4s}
+.nov-f:hover img{transform:scale(1.03)}
+.nov-f span{position:absolute;right:10px;bottom:10px;font-size:13px;font-weight:600;color:#fff;background:rgba(24,34,28,.65);padding:3px 9px;border-radius:7px}
+.nov b{display:block;font:650 20px var(--head);margin:4px 0 6px}
 .nov p{margin:0;color:var(--ink2);font-size:15.5px}
-@media (max-width:1000px){.nov{grid-template-columns:1fr}}
-@media (max-width:520px){.nov li{grid-template-columns:1fr}}
+@media (max-width:760px){.nov{grid-template-columns:1fr}}
 .pasca{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
 .fm .chyba-f{grid-column:1/-1;background:#FDECEC;color:#9B1C1C;padding:12px 14px;border-radius:9px;font-weight:600;margin:0}
 /* dom rastie pri posúvaní */
