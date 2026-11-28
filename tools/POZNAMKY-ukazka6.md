@@ -21,3 +21,6 @@ Ceny a stavy: server /projekt/ukazka-javorova.json (účet rarex731@gmail.com), 
   `ffmpeg -i ORIG.mp4 -an -vf "scale=1920:-2:flags=lanczos,unsharp=5:5:0.5:5:5:0" -c:v libx264 -crf 22 -preset slow -tune film -pix_fmt yuv420p -movflags +faststart OUT.mp4`
   (izby crf 22, budova prelet-1 crf 24). Staré 1024 px / crf 27 bolo rozmazané.
 - Vlety do izieb: MAGI-2 na webe Higgsfield (účet 2, plán Lite), Frames start = výrez z vlety_vyrez, koniec = fotka izby, 4–5 s, zvuk Off, 16:9, 1080p. Hotové: 3-0.
+- Prelety poschodí (28.11.): video/poschodie-1..6.mp4, MAGI-2 4–5 s. Štart = celá šírka budova.webp 16:9 okolo poschodia s teplým zvýraznením (poschodia_vyrez v projekt.json), koniec = 1-koniec-podlazie.jpg (podlazie-3d na tmavom). Prompt: zvýraznené N. poschodie sa vysunie z budovy, budova zmizne do tmavomodrého pozadia, kamera do izometrie, poschodie sa zmení na 3D model. Zábery: vetva GitHub `zabery` (do Higgsfieldu cez <img crossOrigin> + canvas → File → input).
+- Nefungovalo: Kling 3.0 s tesným výrezom a modrým zvýraznením (modré pásy, žiadne vysunutie). Kľúč: širší záber s okrajmi budovy a teplé svetlé zvýraznenie ako v Pri parku.
+- Kamera pred videom ide na výrez v režime cover (ako object-fit:cover videa), po videu sa 3D poschodie plynulo oddiali z celého záberu.

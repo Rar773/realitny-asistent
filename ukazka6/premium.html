@@ -44,6 +44,8 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .izba-f figcaption small{display:block;font-weight:500;color:#B7C0CE;font-size:13px}
 /* podlažia na budove */
 .fp .h{fill:rgba(255,255,255,0);transition:fill .2s}
+.fp.svieti .h{fill:rgba(255,196,110,.47);filter:drop-shadow(0 0 10px rgba(255,196,110,.8))}
+.stage.zoomuje .fp .st{opacity:0!important}
 .fp{cursor:pointer;outline:none}
 .fp:hover .h,.fp:focus-visible .h{fill:rgba(111,149,214,.42)}
 .fp:focus-visible .h{stroke:#fff;stroke-width:6}
@@ -172,9 +174,9 @@ const fotoIzby = (n) => (FOTO.find(([r]) => r.test(n)) || [])[1] || '';
 let D, byty, S = { u: 'bud', p: 0, b: null, i: -1 };
 
 // ---------- kamera: výrez obrázka (v pixeloch obrázka) zobrazí v scéne ----------
-function kamera(el, [x0, y0, x1, y1], ms = 0, [W, H]) {
+function kamera(el, [x0, y0, x1, y1], ms = 0, [W, H], cover = false) {
   const st = $('#stage').getBoundingClientRect();
-  const s = Math.min(st.width / (x1 - x0), st.height / (y1 - y0));
+  const s = (cover ? Math.max : Math.min)(st.width / (x1 - x0), st.height / (y1 - y0)); // cover = ako video (object-fit:cover)
   const tx = st.width / 2 - ((x0 + x1) / 2) * s, ty = st.height / 2 - ((y0 + y1) / 2) * s;
   el.style.width = W + 'px'; el.style.height = H + 'px';
   el.style.setProperty('--inv', (1 / s).toFixed(4));
@@ -259,6 +261,9 @@ function hash() {
 
 // ---------- prelety (krátke videá medzi scénami, prvý raz v návšteve) ----------
 const VID = { 1: 'video/prelet-1.mp4' };
+// prelet z budovy na konkrétne poschodie (zvýraznené poschodie sa vysunie a zmení na 3D model) – ako v ukážke Pri parku
+const POSCHODIA = [1, 2, 3, 4, 5, 6];
+POSCHODIA.forEach((p) => { VID['pod-' + p] = `video/poschodie-${p}.mp4`; });
 // vlety do konkrétnych izieb (pozícia bytu-index izby) – pridávajú sa, ako vzniknú; bez videa ide priblíženie + prelínanie
 const VLETY = ['3-0'];
 VLETY.forEach((k) => { VID['izba-' + k] = `video/izba-${k}.mp4`; });
@@ -325,7 +330,19 @@ async function naPodlazie(p, zBudovy = S.u === 'bud') {
   $('#izbaF').classList.remove('on');
   $('#svgPod').classList.remove('byt-on'); $('#sPod').classList.remove('byt-on');
   kresliPodlazie(p);
-  if (zBudovy && !bezVidea && !RM && await prelet(1)) {
+  const vyrezP = D.premium.poschodia_vyrez && D.premium.poschodia_vyrez[p];
+  if (zBudovy && !bezVidea && !RM && VID['pod-' + p] && vyrezP) {
+    // zvýraznené poschodie, kamera na presný prvý záber videa, potom sa poschodie vysunie do 3D
+    const fp = document.querySelector(`#svgBud .fp[data-p="${p}"]`); if (fp) fp.classList.add('svieti');
+    $('#stage').classList.add('zoomuje'); video('pod-' + p);
+    kamera($('#sBud'), vyrezP, 800, [1448, 1086], true);
+    await cakaj(850);
+    const ok = await prelet('pod-' + p);
+    if (fp) fp.classList.remove('svieti'); $('#stage').classList.remove('zoomuje');
+    kamera($('#sPod'), ok ? [0, 0, 1672, 941] : RP(), 0, [1672, 941], ok); // posledný záber videa = celý 3D model (cover), potom plynulo na bežný pohľad
+    $('#sPod').classList.remove('skryta'); $('#sBud').classList.add('skryta');
+    if (!ok) await cakaj(30);
+  } else if (zBudovy && !bezVidea && !RM && !POSCHODIA.length && await prelet(1)) {
     kamera($('#sPod'), RP(), 0, [1672, 941]);
     $('#sPod').classList.remove('skryta'); $('#sBud').classList.add('skryta');
   } else if (zBudovy) {
@@ -379,7 +396,7 @@ async function naIzbu(i) {
     video(kv);
     await cakaj(300);
     $('#svgPod').classList.add('vstup');
-    kamera($('#sPod'), vyrez, 800, [1672, 941]);
+    kamera($('#sPod'), vyrez, 800, [1672, 941], true);
     await cakaj(850);
     await prelet(kv);
   } else if (zByt && poly && !RM) {
@@ -455,7 +472,7 @@ async function start() {
   obnov(); bezVidea = false;
   // prvý prelet sa načíta vopred, aby po kliknutí hneď hral
   // prelety sa sťahujú hneď na začiatku, prvý ako prvý, aby po kliknutí hrali plynulo
-  if (!RM) video(1);
+  if (!RM) { if (POSCHODIA.length) POSCHODIA.forEach((p) => video('pod-' + p)); else video(1); } // prelety poschodí sa stiahnu vopred
 }
 start();
 </script>
