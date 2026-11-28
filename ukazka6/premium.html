@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D prehliadka – Rezidencia Javorová (ukážka webu Premium)</title>
+<meta name="description" content="Ukážka webu projektu Premium od Realitného asistenta: výber podlažia na fotke budovy, 3D model podlažia s bytmi podľa stavu predaja, priblíženie bytu a vizualizácie izieb.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rezidencia Javorová – 3D prehliadka bytov">
+<meta property="og:description" content="Vyberte si podlažie na budove, pozrite si byt v 3D a nazrite do izieb.">
+<meta property="og:image" content="https://realitnyasistent.eu/ukazka6/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../fonts/familjen-grotesk.css">
+<link rel="stylesheet" href="../fonts/figtree.css">
+<link rel="stylesheet" href="styl.css?v=20261128c">
+<link rel="preload" as="image" href="img/budova.webp">
+<style>
+body.prem{background:#0F1420;color:#E8ECF2}
+.prem .demo{background:#000}
+.prem .hl{background:rgba(15,20,32,.92);border-bottom-color:#232B3B}
+.prem .logo,.prem .nav .tel{color:#fff}
+.prem .logo small{color:#9AA6B8}
+.prem .nav nav a{color:#B7C0CE}
+.prem .nav nav a:hover,.prem .nav nav a[aria-current]{background:#1B2333;color:#fff}
+.tour{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:0;min-height:calc(100svh - var(--hh) - 37px)}
+.stage{position:relative;overflow:hidden;background:#151B2B;touch-action:pan-y}
+.scena{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;transition:opacity .45s ease}
+.scena img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.scena svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.scena.skryta{opacity:0;pointer-events:none}
+.izba-f{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;background:#0F1420}
+.izba-f.on{opacity:1;pointer-events:auto}
+.izba-f img{width:100%;height:100%;object-fit:cover}
+.izba-f figcaption{position:absolute;left:20px;bottom:20px;background:rgba(15,20,32,.78);color:#fff;padding:10px 14px;border-radius:10px;font-weight:600}
+.izba-f figcaption small{display:block;font-weight:500;color:#B7C0CE;font-size:13px}
+/* podlažia na budove */
+.fp .h{fill:rgba(255,255,255,0);transition:fill .2s}
+.fp{cursor:pointer;outline:none}
+.fp:hover .h,.fp:focus-visible .h{fill:rgba(111,149,214,.42)}
+.fp:focus-visible .h{stroke:#fff;stroke-width:6}
+.fp .st{opacity:0;transition:opacity .2s;pointer-events:none}
+.fp:hover .st,.fp:focus-visible .st{opacity:1}
+.fp .st rect{fill:#fff}
+.fp .t1{font:650 40px var(--head);fill:#18221C;text-anchor:middle}
+.fp .t2{font:600 32px var(--body);fill:#1C7A4C;text-anchor:middle}
+.fp .t2.nic{fill:#576059}
+/* byty na 3D podlaží */
+.fb{cursor:pointer;outline:none}
+.fb polygon{stroke-width:4;transition:fill .2s,opacity .3s,stroke-width .2s}
+.fb.volny polygon{fill:rgba(46,180,110,.30);stroke:#3DDC84}
+.fb.rez polygon{fill:rgba(232,170,40,.32);stroke:#F5B83D}
+.fb.pred polygon{fill:rgba(40,46,58,.62);stroke:#8792A4}
+.fb:hover polygon,.fb:focus-visible polygon{stroke-width:9}
+.fb:focus-visible polygon{stroke:#fff}
+.fb .lb rect{fill:rgba(15,20,32,.86)}
+.fb .lb text{fill:#fff;text-anchor:middle}
+.fb .lb .l1{font:650 30px var(--head)}
+.fb .lb .l2{font:500 22px var(--body);fill:#C9D1DC}
+.byt-on .fb{opacity:.18;pointer-events:none}
+.byt-on .fb.akt{opacity:1;pointer-events:auto}
+.byt-on .fb.akt polygon{fill:rgba(255,255,255,0);stroke:#fff;stroke-width:5}
+.byt-on .fb .lb{display:none}
+.fi{display:none;cursor:pointer;outline:none}
+.byt-on .fb.akt .fi{display:block}
+.fi polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,.55);stroke-width:2;transition:fill .2s}
+.fi:hover polygon,.fi:focus-visible polygon{fill:rgba(111,149,214,.35);stroke:#fff;stroke-width:4}
+.fi text{font:650 20px var(--body);fill:#fff;text-anchor:middle;paint-order:stroke;stroke:rgba(15,20,32,.85);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+.fi.bez{cursor:default}
+.fi.bez text{fill:#C9D1DC;font-weight:500}
+/* ovládanie na scéne */
+.crumb2{position:absolute;left:16px;top:14px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.crumb2 button,.crumb2 span{font:600 14px var(--body);color:#fff;background:rgba(15,20,32,.78);border:0;border-radius:99px;padding:7px 13px;cursor:pointer}
+.crumb2 span{cursor:default;background:#3B5A93}
+.crumb2 i{color:#8792A4;font-style:normal}
+.nav-st{position:absolute;right:16px;top:14px;z-index:5;display:flex;gap:6px}
+.nav-st button{width:42px;height:42px;border-radius:50%;border:0;background:rgba(15,20,32,.78);color:#fff;display:grid;place-items:center;cursor:pointer}
+.nav-st button:disabled{opacity:.35;cursor:default}
+.nav-st svg{width:20px;height:20px}
+.tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;font-size:14px;color:#fff;background:rgba(15,20,32,.78);padding:7px 14px;border-radius:99px;pointer-events:none;white-space:nowrap}
+/* panel */
+.panel{background:#151B2B;border-left:1px solid #232B3B;padding:24px;overflow:auto;max-height:calc(100svh - var(--hh) - 37px)}
+.panel h1{font-size:30px;color:#fff;margin-bottom:6px}
+.panel h2{font-size:24px;color:#fff;margin-bottom:6px}
+.panel p{color:#B7C0CE;font-size:15.5px}
+.panel .lst{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.panel .lst button{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;background:#1B2333;border:1px solid #273044;border-radius:12px;padding:11px 14px;color:#E8ECF2;font:500 15px var(--body);cursor:pointer}
+.panel .lst button:hover,.panel .lst button:focus-visible{border-color:#6F95D6}
+.panel .lst b{font:650 17px var(--head);color:#fff}
+.panel .lst small{color:#9AA6B8;font-size:13.5px}
+.panel .lst .r{text-align:right}
+.panel .stav{font-size:13px}
+.panel .stav.volny{background:#173826;color:#7FE3A8}.panel .stav.rez{background:#3A2E12;color:#F5C76A}.panel .stav.pred{background:#2A303C;color:#B7C0CE}
+.panel .cena{font:650 32px var(--head);color:#fff;margin:10px 0 2px}
+.panel dl{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:16px 0;font-size:15px}
+.panel dt{color:#9AA6B8}.panel dd{margin:0;color:#fff;font-weight:600;text-align:right}
+.panel .akc{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.panel .btn.sec{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px #344058}
+.panel .btn.sec:hover{box-shadow:inset 0 0 0 1.5px #6F95D6}
+.panel .izby{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.panel .izby button{font:600 13.5px var(--body);background:#1B2333;border:1px solid #273044;color:#E8ECF2;border-radius:99px;padding:6px 11px;cursor:pointer}
+.panel .izby button[disabled]{opacity:.45;cursor:default}
+.panel .izby button[aria-current]{background:#6F95D6;border-color:#6F95D6;color:#0F1420}
+.panel .pozn{font-size:13px;color:#8792A4;margin-top:18px}
+.panel .spat{background:none;border:0;color:#9DB8E8;font:600 14.5px var(--body);padding:0;margin-bottom:12px;cursor:pointer}
+.legenda2{display:flex;gap:14px;margin:14px 0 0;padding:0;list-style:none;font-size:13.5px;color:#B7C0CE}
+.legenda2 i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px}
+.premium-pas{background:#1B2333;color:#C9D1DC;font-size:14px;text-align:center;padding:8px 16px}
+.premium-pas a{color:#fff;font-weight:600}
+@media (max-width:980px){
+  .tour{grid-template-columns:1fr;min-height:0}
+  .stage{height:min(82vw,62svh);min-height:300px}
+  .panel{border-left:0;border-top:1px solid #232B3B;max-height:none}
+  .tip{display:none}
+}
+@media (prefers-reduced-motion:reduce){.scena,.izba-f{transition:none}}
+</style>
+</head>
+<body class="prem">
+<aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu Premium. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
+<header class="hl">
+  <div class="w nav">
+    <a class="logo" href="./">Javorová <small>Hlohovec</small></a>
+    <nav aria-label="Hlavné menu"><a href="premium.html" aria-current="page">3D prehliadka</a><a href="./#cennik">Cenník</a><a href="./#galeria">Vizualizácie</a><a href="./#lokalita">Lokalita</a></nav>
+    <a class="tel" href="tel:+421900123456">+421 900 123 456</a>
+    <a class="btn" href="./#kontakt">Mám záujem</a>
+  </div>
+</header>
+
+<main class="tour">
+  <h1 class="vh">3D prehliadka bytov – Rezidencia Javorová</h1>
+  <div class="stage" id="stage" aria-label="3D prehliadka budovy">
+    <div class="scena" id="sBud"><img src="img/budova.webp" alt="Južná fasáda Rezidencie Javorová" width="1448" height="1086"><svg id="svgBud" viewBox="0 0 1448 1086" role="group" aria-label="Podlažia budovy"></svg></div>
+    <div class="scena skryta" id="sPod"><img src="img/podlazie-3d.webp" alt="3D model podlažia s bytmi" width="1672" height="941"><svg id="svgPod" viewBox="0 0 1672 941" role="group" aria-label="Byty na podlaží"></svg></div>
+    <figure class="izba-f" id="izbaF" aria-live="polite"><img id="izbaImg" alt=""><figcaption id="izbaCap"></figcaption></figure>
+    <nav class="crumb2" id="crumb" aria-label="Kde ste"></nav>
+    <div class="nav-st" id="navSt"></div>
+    <p class="tip" id="tip">Kliknite na podlažie</p>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</main>
+<footer class="premium-pas">Chcete si radšej prezerať byty v tabuľke? <a href="./#cennik">Cenník bytov</a> · <a href="./">Štandardný web projektu</a></footer>
+
+<script type="module">
+import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128c';
+
+const $ = (s) => document.querySelector(s);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const volneText = (n) => n === 1 ? '1 voľný' : n >= 2 && n <= 4 ? n + ' voľné' : n + ' voľných';
+const FOTO = [[/Obývačka|Izba s kuch/, 'obyvacka'], [/Spálňa/, 'spalna'], [/Detská/, 'detska'], [/Kúpeľňa/, 'kupelna']];
+const fotoIzby = (n) => (FOTO.find(([r]) => r.test(n)) || [])[1] || '';
+let D, byty, S = { u: 'bud', p: 0, b: null, i: -1 };
+
+// ---------- kamera: výrez obrázka (v pixeloch obrázka) zobrazí v scéne ----------
+function kamera(el, [x0, y0, x1, y1], ms = 0, [W, H]) {
+  const st = $('#stage').getBoundingClientRect();
+  const s = Math.min(st.width / (x1 - x0), st.height / (y1 - y0));
+  const tx = st.width / 2 - ((x0 + x1) / 2) * s, ty = st.height / 2 - ((y0 + y1) / 2) * s;
+  el.style.width = W + 'px'; el.style.height = H + 'px';
+  el.style.transition = ms && !RM ? `transform ${ms}ms cubic-bezier(.65,0,.25,1), opacity .45s ease` : 'opacity .45s ease';
+  el.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+}
+const cakaj = (ms) => new Promise((r) => setTimeout(r, RM ? 0 : ms));
+const bbox = (pts) => { const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; };
+const pad = ([a, b, c, d], k) => [a - k, b - k, c + k, d + k];
+const RB = () => [0, 0, 1448, 1086], RP = () => [40, 0, 1632, 941];
+const bytNa = (p, poz) => byty.find((b) => b.podlazie === p && b.pozicia === poz);
+
+// ---------- vykreslenie scén ----------
+function kresliBudovu() {
+  const F = D.fasada, [x0, x1] = F.x;
+  $('#svgBud').innerHTML = Object.entries(F.podlazia).sort((a, b) => b[0] - a[0]).map(([p, [y0, y1]]) => {
+    const nap = byty.filter((b) => b.podlazie === +p), v = nap.filter((b) => b.stav === 'volny').length, ly = (y0 + y1) / 2;
+    const t2 = v ? volneText(v) : 'vypredané';
+    return `<g class="fp" data-p="${p}" role="button" tabindex="0" aria-label="${p}. podlažie ${t2} z ${nap.length} bytov"><rect class="h" x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}"/>
+      <g class="st"><rect x="${x1 - 420}" y="${ly - 52}" width="400" height="104" rx="22"/><text x="${x1 - 220}" y="${ly - 8}"><tspan class="t1">${p}. podlažie</tspan> <tspan x="${x1 - 220}" dy="42" class="t2${v ? '' : ' nic'}">${t2}</tspan></text></g></g>`;
+  }).join('');
+}
+function kresliPodlazie(p) {
+  const Z = D.premium.byty;
+  $('#svgPod').innerHTML = Object.entries(Z).map(([poz, z]) => {
+    const b = bytNa(p, +poz); if (!b) return '';
+    const st = STAV[b.stav], [bx0, by0, bx1, by1] = bbox(z.p), cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
+    const cena = b.stav === 'predany' ? 'predaný' : eur(b.cena);
+    const izby = z.izby.map(([n, pts], i) => { const f = fotoIzby(n), [a, c, e, g] = bbox(pts);
+      return `<g class="fi${f ? '' : ' bez'}" data-i="${i}" ${f ? `role="button" tabindex="-1" aria-label="${esc(n)} – zobraziť vizualizáciu"` : ''}><polygon points="${pts.map((q) => q.join(',')).join(' ')}"/><text x="${(a + e) / 2}" y="${(c + g) / 2 + 7}">${esc(n.replace(' s kuchyňou', ''))}</text></g>`; }).join('');
+    return `<g class="fb ${st.c}" data-b="${esc(b.id)}" role="button" tabindex="0" aria-label="Byt ${esc(b.id)} · ${b.izby}-izb. ${cena}, ${st.t.toLowerCase()}, ${m2(b.plocha)}">
+      <polygon points="${z.p.map((q) => q.join(',')).join(' ')}"/>${izby}
+      <g class="lb" aria-hidden="true"><rect x="${cx - 120}" y="${cy - 46}" width="240" height="92" rx="16"/><text x="${cx}" y="${cy - 8}"><tspan class="l1">${esc(b.id)} · ${b.izby}-izb.</tspan> <tspan x="${cx}" dy="36" class="l2">${cena}</tspan></text></g></g>`;
+  }).join('');
+}
+
+// ---------- panel a navigácia ----------
+function crumb() {
+  const c = [`<button type="button" data-go="bud">Budova</button>`];
+  if (S.u !== 'bud') c.push('<i>›</i>', S.u === 'pod' ? `<span>${S.p}. podlažie</span>` : `<button type="button" data-go="pod">${S.p}. podlažie</button>`);
+  if (S.b) c.push('<i>›</i>', S.u === 'byt' ? `<span>Byt ${esc(S.b.id)}</span>` : `<button type="button" data-go="byt">Byt ${esc(S.b.id)}</button>`);
+  if (S.u === 'izba') c.push('<i>›</i>', `<span>${esc(D.premium.byty[S.b.pozicia].izby[S.i][0])}</span>`);
+  $('#crumb').innerHTML = c.join('');
+  const sip = (smer, lbl, d) => `<button type="button" data-sip="${smer}" aria-label="${lbl}" ${d ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="${smer > 0 ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'}"/></svg></button>`;
+  $('#navSt').innerHTML = S.u === 'pod' ? sip(-1, 'O podlažie nižšie', S.p === 1) + sip(1, 'O podlažie vyššie', S.p === D.podlazia) : '';
+  $('#tip').textContent = { bud: 'Kliknite na podlažie', pod: 'Kliknite na byt', byt: 'Kliknite na izbu', izba: 'Šípkami prechádzate izby' }[S.u];
+}
+function panel() {
+  const P = $('#panel');
+  if (S.u === 'bud') {
+    P.innerHTML = `<h2>3D prehliadka</h2><p>Vyberte si podlažie priamo na budove. Potom uvidíte celé podlažie v 3D a byty podľa toho, či sú voľné.</p>
+      <ul class="lst">${Array.from({ length: D.podlazia }, (_, k) => D.podlazia - k).map((p) => { const n = byty.filter((b) => b.podlazie === p), v = n.filter((b) => b.stav === 'volny').length;
+        return `<li><button type="button" data-p="${p}"><b>${p}. podlažie</b><span class="r">${v ? volneText(v) : 'vypredané'}</span><small>${n.length} bytov${p === D.podlazia ? ' s terasou' : ''}</small><small class="r">${(() => { const c = n.filter((b) => b.stav !== 'predany').map((b) => b.cena); return c.length ? 'od ' + eur(Math.min(...c)) : ''; })()}</small></button></li>`; }).join('')}</ul>`;
+  } else if (S.u === 'pod') {
+    const n = byty.filter((b) => b.podlazie === S.p);
+    P.innerHTML = `<button type="button" class="spat" data-go="bud">‹ Späť na budovu</button><h2>${S.p}. podlažie</h2><p>${volneText(n.filter((b) => b.stav === 'volny').length)} z ${n.length} bytov. Kliknite na byt v 3D alebo v zozname.</p>
+      <ul class="legenda2"><li><i style="background:#3DDC84"></i>voľný</li><li><i style="background:#F5B83D"></i>rezervovaný</li><li><i style="background:#8792A4"></i>predaný</li></ul>
+      <ul class="lst">${n.map((b) => `<li><button type="button" data-b="${esc(b.id)}"><b>Byt ${esc(b.id)}</b><span class="r"><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></span><small>${izbyText(b.izby)} · ${m2(b.plocha)}</small><small class="r">${b.stav === 'predany' ? '' : eur(b.cena)}</small></button></li>`).join('')}</ul>`;
+  } else {
+    const b = S.b, z = D.premium.byty[b.pozicia], obl = oblubene().includes(b.id), pred = b.stav === 'predany';
+    P.innerHTML = `<button type="button" class="spat" data-go="pod">‹ Späť na ${b.podlazie}. podlažie</button><h2>Byt ${esc(b.id)}</h2><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span>
+      <div class="cena">${pred ? 'Predaný' : eur(b.cena)}</div>${pred ? '' : `<p style="margin:0">${eur(Math.round(b.cena / b.plocha))} za m²</p>`}
+      <dl><dt>Dispozícia</dt><dd>${izbyText(b.izby)}</dd><dt>Plocha bytu</dt><dd>${m2(b.plocha)}</dd><dt>${b.vonkajsia_druh === 'terasa' ? 'Terasa' : 'Balkón'}</dt><dd>${m2(b.vonkajsia)}</dd><dt>Orientácia</dt><dd>${esc(b.orientacia.join(', '))}</dd></dl>
+      <p style="margin:0">Izby s vizualizáciou:</p>
+      <div class="izby">${z.izby.map(([n], i) => `<button type="button" data-i="${i}" ${fotoIzby(n) ? '' : 'disabled'} ${S.u === 'izba' && S.i === i ? 'aria-current="true"' : ''}>${esc(n)}</button>`).join('')}</div>
+      <div class="akc"><a class="btn" href="${pred ? './#kontakt' : './?byt=' + encodeURIComponent(b.id) + '#kontakt'}">${pred ? 'Napíšte nám' : 'Mám záujem o tento byt'}</a>
+      <a class="btn sec" href="byt.html?id=${encodeURIComponent(b.id)}">Pôdorys s rozmermi a rozpis ceny</a>
+      <a class="btn sec" href="karta.html?id=${encodeURIComponent(b.id)}&tlac=1" target="_blank" rel="noopener">Karta bytu (PDF)</a>
+      <button type="button" class="btn sec" id="oblP" aria-pressed="${obl}">${obl ? 'V obľúbených' : 'Uložiť do obľúbených'}</button></div>
+      <p class="pozn">Vizualizácie sú ilustračné. Cena a stav sa aktualizujú priamo z predaja.</p>`;
+  }
+}
+function obnov() { crumb(); panel(); hash(); }
+function hash() {
+  const h = S.u === 'bud' ? '' : S.u === 'pod' ? '#podlazie-' + S.p : '#byt-' + S.b.id + (S.u === 'izba' ? '-' + (S.i + 1) : '');
+  if ((location.hash || '') !== h) history.replaceState(null, '', location.pathname + location.search + h);
+}
+
+// ---------- prechody ----------
+let zamok = false;
+async function naBudovu() {
+  if (zamok) return; zamok = true;
+  const z = S.u !== 'bud';
+  $('#izbaF').classList.remove('on');
+  if (z) { kamera($('#sBud'), pad([D.fasada.x[0], D.fasada.podlazia[S.p][0], D.fasada.x[1], D.fasada.podlazia[S.p][1]], 40), 0, [1448, 1086]); $('#sPod').classList.add('skryta'); $('#sBud').classList.remove('skryta'); await cakaj(80); }
+  kamera($('#sBud'), RB(), z ? 800 : 0, [1448, 1086]);
+  S = { u: 'bud', p: S.p, b: null, i: -1 }; obnov(); zamok = false;
+}
+async function naPodlazie(p, zBudovy = S.u === 'bud') {
+  if (zamok) return; zamok = true;
+  p = Math.max(1, Math.min(D.podlazia, p));
+  $('#izbaF').classList.remove('on');
+  $('#svgPod').classList.remove('byt-on'); $('#sPod').classList.remove('byt-on');
+  kresliPodlazie(p);
+  if (zBudovy) {
+    const [y0, y1] = D.fasada.podlazia[p];
+    kamera($('#sBud'), pad([D.fasada.x[0], y0, D.fasada.x[1], y1], 30), 900, [1448, 1086]);
+    await cakaj(650);
+    kamera($('#sPod'), [500, 250, 1172, 691], 0, [1672, 941]);
+    $('#sPod').classList.remove('skryta'); $('#sBud').classList.add('skryta');
+    await cakaj(30);
+  } else $('#sPod').classList.remove('skryta');
+  kamera($('#sPod'), RP(), 900, [1672, 941]);
+  S = { u: 'pod', p, b: null, i: -1 }; obnov();
+  await cakaj(300); zamok = false;
+}
+async function naByt(id) {
+  if (zamok) return;
+  const b = byty.find((x) => x.id === id); if (!b) return;
+  if (S.u === 'bud' || S.p !== b.podlazie) { await naPodlazie(b.podlazie, S.u === 'bud'); }
+  zamok = true;
+  $('#izbaF').classList.remove('on');
+  const z = D.premium.byty[b.pozicia];
+  $('#sPod').classList.add('byt-on');
+  document.querySelectorAll('#svgPod .fb').forEach((g) => {
+    const a = g.dataset.b === b.id; g.classList.toggle('akt', a);
+    if (a) { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-label'); } else g.setAttribute('tabindex', '-1');
+  });
+  document.querySelectorAll('#svgPod .fb.akt .fi[role]').forEach((g) => g.setAttribute('tabindex', '0'));
+  kamera($('#sPod'), pad(bbox([...z.p, ...z.balk]), 30), 900, [1672, 941]);
+  S = { u: 'byt', p: b.podlazie, b, i: -1 }; obnov();
+  await cakaj(300); zamok = false;
+}
+function naIzbu(i) {
+  const z = D.premium.byty[S.b.pozicia], [n] = z.izby[i] || [], f = n && fotoIzby(n);
+  if (!f) return;
+  const r = D.galeria.find((g) => g[0] === f);
+  $('#izbaImg').src = `img/${f}.webp`; $('#izbaImg').alt = r ? r[1] : n;
+  $('#izbaCap').innerHTML = `${esc(n)}<small>Byt ${esc(S.b.id)} · ilustračná vizualizácia</small>`;
+  $('#izbaF').classList.add('on');
+  S = { ...S, u: 'izba', i }; obnov();
+}
+function dalsiaIzba(k) {
+  const z = D.premium.byty[S.b.pozicia], s = z.izby.map((x, i) => [i, fotoIzby(x[0])]).filter((x) => x[1]).map((x) => x[0]);
+  const j = s.indexOf(S.i); naIzbu(s[(j + k + s.length) % s.length]);
+}
+
+// ---------- udalosti ----------
+function klik(e) {
+  const g = e.target.closest('[data-go],[data-p],[data-b],[data-i],[data-sip]'); if (!g) return;
+  if (g.dataset.go === 'bud') return naBudovu();
+  if (g.dataset.go === 'pod') return S.u === 'izba' || S.u === 'byt' ? naPodlazie(S.p, false) : null;
+  if (g.dataset.go === 'byt') return naByt(S.b.id);
+  if (g.dataset.sip) return naPodlazie(S.p + +g.dataset.sip, false);
+  if (g.dataset.i !== undefined && S.b) return naIzbu(+g.dataset.i);
+  if (g.dataset.b) return S.u === 'byt' && S.b && S.b.id === g.dataset.b ? null : naByt(g.dataset.b);
+  if (g.dataset.p) return naPodlazie(+g.dataset.p);
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#oblP')) { prepniOblubene(S.b.id); panel(); return; }
+  if (e.target.closest('#stage, #panel')) {
+    const zPanela = e.target.closest('#panel [data-p], #panel [data-b], #panel [data-i], #panel [data-go]');
+    klik(e);
+    if (zPanela && matchMedia('(max-width:980px)').matches) $('#stage').scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (document.querySelector('dialog[open]')) return;
+  const g = e.target.closest && e.target.closest('#stage [role="button"]');
+  if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); klik({ target: g }); return; }
+  if (e.key === 'Escape') { if (S.u === 'izba') naByt(S.b.id); else if (S.u === 'byt') naPodlazie(S.p, false); else if (S.u === 'pod') naBudovu(); }
+  if (S.u === 'izba' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) dalsiaIzba(e.key === 'ArrowRight' ? 1 : -1);
+  if (S.u === 'pod' && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && !e.target.closest('#panel')) { e.preventDefault(); naPodlazie(S.p + (e.key === 'ArrowUp' ? 1 : -1), false); }
+});
+$('#izbaF').addEventListener('click', () => naByt(S.b.id));
+let sx = null;
+$('#izbaF').addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+$('#izbaF').addEventListener('touchend', (e) => { if (sx === null) return; const d = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(d) > 50) { e.preventDefault(); dalsiaIzba(d < 0 ? 1 : -1); } });
+addEventListener('resize', () => {
+  if (S.u === 'bud') kamera($('#sBud'), RB(), 0, [1448, 1086]);
+  else if (S.u === 'pod') kamera($('#sPod'), RP(), 0, [1672, 941]);
+  else if (S.b) { const z = D.premium.byty[S.b.pozicia]; kamera($('#sPod'), pad(bbox([...z.p, ...z.balk]), 30), 0, [1672, 941]); }
+});
+
+async function start() {
+  try { D = await nacitaj(); } catch (e) { $('#panel').innerHTML = '<h2>Prehliadku sa nepodarilo načítať</h2><p>Skúste obnoviť stránku.</p>'; return; }
+  byty = D.byty;
+  kresliBudovu();
+  kamera($('#sBud'), RB(), 0, [1448, 1086]);
+  const m = location.hash.match(/^#(?:podlazie-(\d)|byt-(\d\.\d\d)(?:-(\d+))?)$/);
+  if (m && m[1]) { await naPodlazie(+m[1]); return; }
+  if (m && m[2]) { await naByt(m[2]); if (m[3]) naIzbu(+m[3] - 1); return; }
+  obnov();
+}
+start();
+</script>
+</body>
+</html>
