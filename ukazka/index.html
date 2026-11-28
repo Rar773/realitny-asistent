@@ -56,6 +56,20 @@ form{background:var(--card);border:1px solid var(--line);border-radius:6px;paddi
 label{display:grid;gap:5px;font-size:13.5px;font-weight:600;color:var(--mut)}
 input,select,textarea{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink)}
 footer{background:var(--gr);color:#cfd8d4;font-size:14px}footer .w{display:flex;gap:20px;flex-wrap:wrap;padding:28px 24px}footer b{color:#fff;font-family:"Playfair Display",serif}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin:-14px 0 26px}.flt button{font:600 14px Manrope,sans-serif;padding:9px 16px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}.flt button[aria-pressed="true"]{background:var(--gr);border-color:var(--gr);color:#fff}
+.prop{cursor:pointer;display:block}.prop[hidden]{display:none}
+.prop:focus-visible,.flt button:focus-visible,.cta:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+dialog.det{border:0;border-radius:8px;padding:0;max-width:760px;width:calc(100% - 32px);background:var(--card);color:var(--ink)}dialog.det::backdrop{background:rgba(15,25,22,.6)}
+.det img{width:100%;aspect-ratio:16/9;object-fit:cover}.det .db{padding:26px 28px 28px}.det h3{font-size:28px}.det .pr{margin:6px 0 16px}
+.det dl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 16px}.det dl div{background:var(--bg);border-radius:6px;padding:10px 12px}.det dt{font-size:12.5px;color:var(--mut)}.det dd{margin:0;font-weight:700}
+.det p{color:var(--mut);margin:0 0 20px}.det .row{display:flex;gap:10px;flex-wrap:wrap}.det .x{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:22px;cursor:pointer}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;counter-reset:k}.step{counter-increment:k}.step:before{content:counter(k);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--gold);color:#8a6532;font:600 20px "Playfair Display",serif;margin-bottom:16px}.step h3{font-size:21px;margin-bottom:6px}.step p{margin:0;color:var(--mut);font-size:15px}
+.stars{color:#8a6532;letter-spacing:2px;font-size:15px;margin-bottom:8px}
+.faq details{border-bottom:1px solid var(--line);padding:16px 0}.faq summary{cursor:pointer;font-weight:700;font-size:17px}.faq p{color:var(--mut);margin:10px 0 0}
+.qb{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.ok{background:#e7f1ec;color:var(--gr);border-radius:6px;padding:12px 14px;font-weight:600}
+.mbar{display:none}
+@media(max-width:860px){header .cta{display:none}.steps{grid-template-columns:1fr 1fr}.det dl{grid-template-columns:1fr 1fr}.mbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}.mbar .cta{text-align:center;padding:13px}body{padding-bottom:72px}}
 @media(max-width:860px){nav{display:none}.hero h1{font-size:38px}.stats .w{grid-template-columns:1fr 1fr}.list,.about,.refs,.ct{grid-template-columns:1fr}.sh h2,.about h2,.ct h2{font-size:32px}section{padding:64px 0}.port{max-width:340px}}
 </style>
 </head>
@@ -63,7 +77,7 @@ footer{background:var(--gr);color:#cfd8d4;font-size:14px}footer .w{display:flex;
 <aside class="demo" aria-label="Ukážka">Toto je <b>ukážka webu pre makléra</b> – maklérka, nehnuteľnosti aj ceny sú vymyslené. <a href="../weby.html">← Späť na Weby pre maklérov</a></aside>
 <header><div class="w">
   <a class="lg" href="#">Jana Kováčová <span>·</span> Reality</a>
-  <nav><a href="#ponuka">Ponuka</a><a href="#o-mne">O mne</a><a href="#referencie">Referencie</a><a href="#kontakt">Kontakt</a></nav>
+  <nav><a href="#ponuka">Ponuka</a><a href="#o-mne">O mne</a><a href="#postup">Ako predávam</a><a href="#referencie">Referencie</a><a href="#kontakt">Kontakt</a></nav>
   <a class="cta" href="#kontakt">Ocenenie zadarmo</a>
 </div></header>
 
@@ -84,14 +98,15 @@ footer{background:var(--gr);color:#cfd8d4;font-size:14px}footer .w{display:flex;
 
 <section id="ponuka"><div class="w">
   <div class="sh"><div><div class="ey">Aktuálna ponuka</div><h2>Nehnuteľnosti na predaj</h2></div><a class="cta lt" href="#kontakt">Hľadám niečo iné</a></div>
+  <div class="flt" role="group" aria-label="Typ nehnuteľnosti"><button type="button" data-f="vsetko" aria-pressed="true">Všetko</button><button type="button" data-f="dom" aria-pressed="false">Domy</button><button type="button" data-f="byt" aria-pressed="false">Byty</button></div>
   <div class="list">
-    <a class="prop" href="#kontakt"><div class="ph"><img src="garaz.jpg" alt="Rodinný dom s dvojgarážou" loading="lazy"><span class="tg">NOVINKA</span><span class="vd">▶ Video prehliadka</span></div>
+    <a class="prop" href="#kontakt" data-typ="dom" data-i="0"><div class="ph"><img src="garaz.jpg" alt="Rodinný dom s dvojgarážou" loading="lazy"><span class="tg">NOVINKA</span><span class="vd">▶ Video prehliadka</span></div>
       <div class="pb"><h3>Rodinný dom s dvojgarážou</h3><div class="loc">Nitra – Chrenová</div><div class="meta"><span><b>4</b> izby</span><span><b>128</b> m²</span><span>pozemok <b>520</b> m²</span></div><div class="pr">289 000 €</div></div></a>
-    <a class="prop" href="#kontakt"><div class="ph"><img src="terasa.jpg" alt="Bungalov s krytou terasou" loading="lazy"><span class="vd">▶ Video prehliadka</span></div>
+    <a class="prop" href="#kontakt" data-typ="dom" data-i="1"><div class="ph"><img src="terasa.jpg" alt="Bungalov s krytou terasou" loading="lazy"><span class="vd">▶ Video prehliadka</span></div>
       <div class="pb"><h3>Bungalov s krytou terasou</h3><div class="loc">Lužianky</div><div class="meta"><span><b>4</b> izby</span><span><b>112</b> m²</span><span>pozemok <b>610</b> m²</span></div><div class="pr">249 000 €</div></div></a>
-    <a class="prop" href="#kontakt"><div class="ph"><img src="obyvacka.jpg" alt="Priestranný 3-izbový byt" loading="lazy"><span class="tg">NOVOSTAVBA</span></div>
+    <a class="prop" href="#kontakt" data-typ="byt" data-i="2"><div class="ph"><img src="obyvacka.jpg" alt="Priestranný 3-izbový byt" loading="lazy"><span class="tg">NOVOSTAVBA</span></div>
       <div class="pb"><h3>Priestranný 3-izbový byt</h3><div class="loc">Nitra – Centrum</div><div class="meta"><span><b>3</b> izby</span><span><b>84</b> m²</span><span>balkón <b>8</b> m²</span></div><div class="pr">189 000 €</div></div></a>
-    <a class="prop" href="#kontakt"><div class="ph"><img src="kuchyna.jpg" alt="2-izbový byt s kuchyňou na mieru" loading="lazy"><span class="tg">REZERVOVANÉ</span></div>
+    <a class="prop" href="#kontakt" data-typ="byt" data-i="3"><div class="ph"><img src="kuchyna.jpg" alt="2-izbový byt s kuchyňou na mieru" loading="lazy"><span class="tg">REZERVOVANÉ</span></div>
       <div class="pb"><h3>2-izbový byt s kuchyňou na mieru</h3><div class="loc">Nitra – Klokočina</div><div class="meta"><span><b>2</b> izby</span><span><b>58</b> m²</span><span><b>3.</b> poschodie</span></div><div class="pr">149 000 €</div></div></a>
   </div>
 </div></section>
@@ -103,26 +118,76 @@ footer{background:var(--gr);color:#cfd8d4;font-size:14px}footer .w{display:flex;
     <ul class="chk"><li>Bezplatné ocenenie nehnuteľnosti do 48 hodín</li><li>Video prehliadka pri každej nehnuteľnosti</li><li>Inzercia na všetkých hlavných portáloch</li><li>Právny servis a pomoc s hypotékou</li></ul></div>
 </div></section>
 
+<section id="postup" style="padding-top:0"><div class="w">
+  <div class="sh"><div><div class="ey">Ako predávam</div><h2>Štyri kroky k predaju</h2></div></div>
+  <div class="steps">
+    <div class="step"><h3>Ocenenie</h3><p>Pozriem sa na nehnuteľnosť a do 48 hodín vám poviem reálnu cenu.</p></div>
+    <div class="step"><h3>Fotky a video</h3><p>Pripravím profesionálne fotky a video prehliadku, aby inzerát zaujal.</p></div>
+    <div class="step"><h3>Inzercia a obhliadky</h3><p>Inzerát dám na hlavné portály a obhliadky dohadujem za vás.</p></div>
+    <div class="step"><h3>Zmluvy a odovzdanie</h3><p>Postarám sa o zmluvy, hypotéku kupujúceho aj odovzdanie kľúčov.</p></div>
+  </div>
+</div></section>
+
 <section id="referencie" class="ref"><div class="w">
   <div class="sh"><div><div class="ey">Referencie</div><h2>Čo hovoria klienti</h2></div></div>
   <div class="refs">
-    <div class="rq"><p>„Dom sme predali za mesiac a za cenu, ktorú sme chceli.“</p><span>Peter a Lucia, Nitra</span></div>
-    <div class="rq"><p>„Video prehliadka nám ušetrila zbytočné obhliadky.“</p><span>Martin, Lužianky</span></div>
-    <div class="rq"><p>„Profesionálny prístup od prvého telefonátu až po zmluvu.“</p><span>Eva, Nitra – Zobor</span></div>
+    <div class="rq"><div class="stars" aria-label="Hodnotenie 5 z 5">★★★★★</div><p>„Dom sme predali za mesiac a za cenu, ktorú sme chceli.“</p><span>Peter a Lucia, Nitra</span></div>
+    <div class="rq"><div class="stars" aria-label="Hodnotenie 5 z 5">★★★★★</div><p>„Video prehliadka nám ušetrila zbytočné obhliadky.“</p><span>Martin, Lužianky</span></div>
+    <div class="rq"><div class="stars" aria-label="Hodnotenie 5 z 5">★★★★★</div><p>„Profesionálny prístup od prvého telefonátu až po zmluvu.“</p><span>Eva, Nitra – Zobor</span></div>
+  </div>
+</div></section>
+
+<section id="otazky" style="padding-bottom:0"><div class="w">
+  <div class="sh"><div><div class="ey">Otázky</div><h2>Čo ma klienti najčastejšie pýtajú</h2></div></div>
+  <div class="faq">
+    <details><summary>Koľko stojí ocenenie nehnuteľnosti?</summary><p>Nič. Ocenenie je zadarmo a nezaväzuje vás k ničomu.</p></details>
+    <details><summary>Ako dlho trvá predaj?</summary><p>Pri správnej cene priemerne 6 až 8 týždňov. Presný odhad vám dám pri ocenení.</p></details>
+    <details><summary>Musím byť pri obhliadkach?</summary><p>Nemusíte. Obhliadky robím sama a po každej vám dám vedieť, ako dopadla.</p></details>
   </div>
 </div></section>
 
 <section id="kontakt"><div class="w ct">
   <div><div class="ey">Kontakt</div><h2>Ozvite sa mi</h2><p>Chcete predať, kúpiť alebo len vedieť, koľko má vaša nehnuteľnosť hodnotu? Napíšte mi a ozvem sa ešte v ten deň.</p>
-    <div class="ci"><span>+421 9xx xxx xxx</span><span>jana@vasemeno.sk</span><span>Štefánikova trieda, Nitra</span></div></div>
-  <form onsubmit="alert('Toto je len ukážka – formulár nič neodosiela.');return false">
+    <div class="ci"><span>+421 9xx xxx xxx</span><span>jana@vasemeno.sk</span><span>Štefánikova trieda, Nitra</span></div>
+    <div class="qb"><button type="button" class="cta demo-b">Zavolať</button><button type="button" class="cta lt demo-b">Napísať na WhatsApp</button></div></div>
+  <form id="kf">
     <label>Meno<input required></label><label>Telefón alebo e-mail<input required></label>
     <label>Mám záujem o<select><option>Predaj nehnuteľnosti</option><option>Kúpu nehnuteľnosti</option><option>Ocenenie zadarmo</option></select></label>
-    <label>Správa<textarea rows="3"></textarea></label><button class="cta" type="submit">Odoslať</button>
+    <label>Správa<textarea rows="3" id="kfSprava"></textarea></label><button class="cta" type="submit">Odoslať</button><p class="ok" id="kfOk" role="status" hidden>Ďakujem, ozvem sa vám ešte dnes. (V ukážke sa nič neodosiela.)</p>
   </form>
 </div></section>
 
 </main>
 <footer><div class="w"><b>Jana Kováčová · Reality</b><span>Realitná maklérka, Nitra</span><span style="margin-left:auto">Web vytvoril Realitný asistent</span></div></footer>
+<dialog class="det" id="det" aria-labelledby="detH">
+  <button type="button" class="x" id="detX" aria-label="Zavrieť">×</button>
+  <img id="detImg" src="" alt="">
+  <div class="db"><h3 id="detH"></h3><div class="loc" id="detLoc"></div><div class="pr" id="detPr"></div>
+    <dl><div><dt id="detL0"></dt><dd id="detM0"></dd></div><div><dt id="detL1"></dt><dd id="detM1"></dd></div><div><dt id="detL2"></dt><dd id="detM2"></dd></div></dl>
+    <p id="detPopis"></p>
+    <div class="row"><button type="button" class="cta" id="detObh">Dohodnúť obhliadku</button><button type="button" class="cta lt demo-b">Zavolať</button></div></div>
+</dialog>
+<aside class="mbar" aria-label="Rýchly kontakt"><button type="button" class="cta demo-b">Zavolať</button><a class="cta lt" href="#kontakt">Napísať</a></aside>
+<script>
+(function(){
+  var D=[{"img": "garaz.jpg", "nazov": "Rodinný dom s dvojgarážou", "loc": "Nitra – Chrenová", "meta": ["4", "128 m²", "520 m²"], "cena": "289 000 €", "popis": "Dom po rekonštrukcii v tichej časti Chrenovej. Dvojgaráž, záhrada so zavlažovaním, tepelné čerpadlo a rekuperácia.", "lab": ["Izby", "Plocha", "Pozemok"]}, {"img": "terasa.jpg", "nazov": "Bungalov s krytou terasou", "loc": "Lužianky", "meta": ["4", "112 m²", "610 m²"], "cena": "249 000 €", "popis": "Bezbariérový bungalov s krytou terasou a výhľadom do záhrady. Podlahové kúrenie, veľké okná, garážové státie.", "lab": ["Izby", "Plocha", "Pozemok"]}, {"img": "obyvacka.jpg", "nazov": "Priestranný 3-izbový byt", "loc": "Nitra – Centrum", "meta": ["3", "84 m²", "8 m²"], "cena": "189 000 €", "popis": "Novostavba v centre s balkónom a pivnicou. Svetlá obývačka spojená s kuchyňou, parkovanie v dvore.", "lab": ["Izby", "Plocha", "Balkón"]}, {"img": "kuchyna.jpg", "nazov": "2-izbový byt s kuchyňou na mieru", "loc": "Nitra – Klokočina", "meta": ["2", "58 m²", "3."], "cena": "149 000 €", "popis": "Zrekonštruovaný byt s kuchyňou na mieru, novými rozvodmi a plastovými oknami. Blízko obchodov aj školy.", "lab": ["Izby", "Plocha", "Poschodie"]}], det=document.getElementById('det'), akt=0;
+  function $(i){return document.getElementById(i);}
+  document.querySelectorAll('.flt button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('.flt button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+    document.querySelectorAll('.prop').forEach(function(p){p.hidden=!(b.dataset.f==='vsetko'||p.dataset.typ===b.dataset.f);});
+  };});
+  document.querySelectorAll('.prop').forEach(function(p){p.onclick=function(ev){ev.preventDefault();
+    var d=D[+p.dataset.i]; akt=+p.dataset.i;
+    $('detImg').src=d.img; $('detImg').alt=d.nazov; $('detH').textContent=d.nazov; $('detLoc').textContent=d.loc; $('detPr').textContent=d.cena;
+    [0,1,2].forEach(function(k){$('detL'+k).textContent=d.lab[k];});$('detM0').textContent=d.meta[0]; $('detM1').textContent=d.meta[1]; $('detM2').textContent=d.meta[2]; $('detPopis').textContent=d.popis;
+    det.showModal();
+  };});
+  $('detX').onclick=function(){det.close();};
+  det.addEventListener('click',function(e){if(e.target===det)det.close();});
+  $('detObh').onclick=function(){det.close(); var f=$('kf'); f.querySelector('select').value='Kúpu nehnuteľnosti'; $('kfSprava').value='Mám záujem o obhliadku: '+D[akt].nazov+' ('+D[akt].cena+').'; $('kontakt').scrollIntoView({behavior:'smooth'}); setTimeout(function(){f.querySelector('input').focus();},500);};
+  $('kf').onsubmit=function(e){e.preventDefault(); $('kfOk').hidden=false;};
+  document.querySelectorAll('.demo-b').forEach(function(b){b.onclick=function(){var t=b.textContent; b.textContent='V ukážke nevoláme'; setTimeout(function(){b.textContent=t;},1800);};});
+})();
+</script>
 </body>
 </html>
