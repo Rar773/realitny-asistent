@@ -161,6 +161,8 @@
   <div class="w">
     <div class="sec-h"><div><h2 id="h-vys">Priebeh výstavby</h2></div><p id="vysAkt"></p></div>
     <ol class="cas" id="cas"></ol>
+    <h3 class="nov-h">Novinky zo stavby</h3>
+    <ul class="nov" id="nov"></ul>
   </div>
 </section>
 
@@ -189,6 +191,7 @@
       </fieldset>
       <label class="cel">Správa<textarea name="sprava" placeholder="Napríklad kedy sa vám hodí obhliadka"></textarea></label>
       <label class="chk cel"><input type="checkbox" name="strazit"> Upozornite ma e-mailom, keď sa uvoľní byt alebo sa zmení cena</label>
+      <label class="pasca" aria-hidden="true">Web<input name="web" tabindex="-1" autocomplete="off"></label>
       <div class="cel"><button class="btn" type="submit">Odoslať</button></div>
     </form>
   </div>
@@ -210,7 +213,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky } from './js/projekt.js';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt } from './js/projekt.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -438,9 +441,11 @@ async function start() {
 
   $('#gal').innerHTML = D.galeria.map(([f, alt, cap], i) => `<li class="${i === 0 ? 'velky' : ''}"><button type="button" data-g="${i}" aria-label="Zväčšiť: ${esc(cap)}"><img src="img/${f}-800.webp" width="800" height="${f === 'exterier' ? 450 : 533}" alt="${esc(alt)}" loading="lazy"><span>${esc(cap)}</span></button></li>`).join('');
   if (D.lokalita.foto) $('#lokF').innerHTML = `<img src="img/${D.lokalita.foto[0]}-800.webp" srcset="img/${D.lokalita.foto[0]}-800.webp 800w, img/${D.lokalita.foto[0]}.webp 1600w" sizes="(max-width:860px) 100vw, 40vw" width="800" height="450" alt="${esc(D.lokalita.foto[1])}" loading="lazy">`;
-  const posl = D.vystavba.filter((x) => x.hotovo).at(-1);
+  const posl = D.novinky[0];
   $('#vysAkt').textContent = posl ? `Naposledy aktualizované ${datumKr(posl.datum)}.` : '';
-  $('#cas').innerHTML = D.vystavba.map((x) => `<li class="${x.hotovo ? 'hot' : ''}">${x.foto ? `<button type="button" class="cas-f" data-v="${esc(x.foto[0])}" aria-label="Zväčšiť fotku: ${esc(x.foto[1])}"><img src="img/${x.foto[0]}-800.webp" width="800" height="600" alt="${esc(x.foto[1])}" loading="lazy"></button>` : ''}<span class="cas-d">${x.hotovo ? datumKr(x.datum) : 'plán: ' + new Date(x.datum).toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}</span><b>${esc(x.nazov)}</b><span>${esc(x.text)}</span></li>`).join('');
+  const STAV_E = { hotovo: 'hotovo', prebieha: 'prebieha', planovane: 'plánujeme' };
+  $('#cas').innerHTML = D.etapy.map((x) => `<li class="${x.stav === 'hotovo' ? 'hot' : x.stav === 'prebieha' ? 'teraz' : ''}"><span class="cas-d">${esc(x.kedy || '')}${x.kedy ? ' · ' : ''}${STAV_E[x.stav] || ''}</span><b>${esc(x.nazov)}</b></li>`).join('');
+  $('#nov').innerHTML = D.novinky.slice(0, 6).map((n, i) => `<li>${(n.fotky || []).length ? `<button type="button" class="nov-f" data-n="${i}" aria-label="Zväčšiť fotky: ${esc(n.nadpis)}"><img src="${esc(n.fotky[0])}" width="800" height="600" alt="${esc(n.nadpis)}" loading="lazy">${n.fotky.length > 1 ? `<span>${n.fotky.length} fotky</span>` : ''}</button>` : ''}<div><span class="cas-d">${datumKr(n.datum)}</span><b>${esc(n.nadpis)}</b><p>${esc(n.text || '')}</p></div></li>`).join('');
   $('#lokP').textContent = D.lokalita.popis;
   $('#lokA').textContent = `${D.ulica}, ${D.mesto}`;
   $('#lokB').innerHTML = D.lokalita.body.map(([n, d, c]) => `<li><b>${esc(n)}</b><span>${esc(d)} · ${esc(c)}</span></li>`).join('');
@@ -506,19 +511,28 @@ $('#oblBtn').addEventListener('click', () => { porovnanie(); $('#porov').showMod
 $('#porovZavri').addEventListener('click', () => $('#porov').close());
 $('#porov').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 ['#hByt', '#hVl', '#hRo', '#hUr'].forEach((s) => $(s).addEventListener('input', hypo));
-$('#fm').addEventListener('submit', (e) => {
+$('#fm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const fm = e.target;
-  fm.querySelector('.ok')?.remove();
+  const fm = e.target, btn = fm.querySelector('button[type="submit"]');
+  fm.querySelector('.ok, .chyba-f')?.remove();
   if (!fm.reportValidity()) return;
-  fm.insertAdjacentHTML('beforeend', '<p class="ok" role="status">Ďakujeme. V ukážke sa správa neodošle, na skutočnom webe príde developerovi aj do aplikácie k danému bytu.</p>');
+  const v = Object.fromEntries(new FormData(fm));
+  const doplnky = [v.ucel === 'investicia' ? 'Byt hľadá ako investíciu.' : 'Byt hľadá na bývanie.', v.strazit ? 'Chce upozornenie e-mailom, keď sa uvoľní byt alebo sa zmení cena.' : ''].filter(Boolean).join(' ');
+  btn.disabled = true; btn.textContent = 'Odosielam…';
+  try {
+    await posliDopyt(D, { meno: v.meno, email: v.email, telefon: v.telefon, jednotka: v.byt || '', sprava: [v.sprava, doplnky].filter(Boolean).join('\n\n'), web: v.web || '' });
+    fm.reset();
+    fm.insertAdjacentHTML('beforeend', '<p class="ok" role="status">Ďakujeme, správu sme dostali. Ozveme sa vám do jedného pracovného dňa.</p>');
+  } catch (err) {
+    fm.insertAdjacentHTML('beforeend', `<p class="chyba-f" role="alert">${esc(err.message)}</p>`);
+  } finally { btn.disabled = false; btn.textContent = 'Odoslať'; }
 });
 // ---------- zväčšené obrázky ----------
 $('#gal').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (b) otvorObrazky(D.galeria, +b.dataset.g); });
-$('#cas').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-v]'); if (!b) return;
-  const fotky = D.vystavba.filter((x) => x.foto).map((x) => [x.foto[0], x.foto[1], x.nazov + ' · ' + x.foto[1]]);
-  otvorObrazky(fotky, Math.max(0, fotky.findIndex((x) => x[0] === b.dataset.v)));
+$('#nov').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-n]'); if (!b) return;
+  const n = D.novinky[+b.dataset.n];
+  otvorObrazky(n.fotky.map((f) => [f, n.nadpis, `${datumKr(n.datum)} · ${n.nadpis}`]), 0);
 });
 start();
 </script>

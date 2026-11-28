@@ -23,12 +23,45 @@ export function datum(iso) {
     ' o ' + d.toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
 }
 
+// Pôdorysy, texty a fotky sú v projekt.json. Ceny, stavy bytov, etapy a novinky zo stavby
+// prídu živo zo servera Realitného asistenta – developer ich mení v aplikácii.
+// Keď server neodpovie, web ukáže poslednú uloženú kópiu z projekt.json.
+async function zivo(api) {
+  const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 5000);
+  try {
+    const r = await fetch(api + '.json', { cache: 'no-store', signal: ctrl.signal });
+    return r.ok ? await r.json() : null;
+  } catch (e) { return null; } finally { clearTimeout(t); }
+}
 export async function nacitaj() {
   const r = await fetch('projekt.json', { cache: 'no-store' });
   if (!r.ok) throw new Error('projekt.json ' + r.status);
   const d = await r.json();
+  d.zive = false;
+  const z = d.api ? await zivo(d.api) : null;
+  if (z && Array.isArray(z.jednotky)) {
+    const m = new Map(z.jednotky.map((j) => [String(j.id), j]));
+    d.byty.forEach((b) => {
+      const j = m.get(b.id); if (!j) return;
+      if (STAV[j.stav]) b.stav = j.stav;
+      if (Number.isFinite(j.cena) && j.cena > 0) b.cena = j.cena;
+    });
+    if (Array.isArray(z.etapy) && z.etapy.length) d.etapy = z.etapy;
+    if (Array.isArray(z.novinky) && z.novinky.length) d.novinky = z.novinky;
+    if (z.aktualizovane) d.aktualizovane = z.aktualizovane;
+    d.zive = true;
+  }
   d.byty.forEach((b) => { b.t = d.typy[b.typ]; b.izby = b.t.izby; });
   return d;
+}
+
+// Odoslanie dopytu developerovi: príde mu e-mailom aj do aplikácie k danému bytu
+export async function posliDopyt(d, udaje) {
+  if (!d.api) throw new Error('Formulár teraz nefunguje. Zavolajte nám, prosím.');
+  const r = await fetch(d.api + '/dopyt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(udaje) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.ok) throw new Error(j.chyba || 'Správu sa nepodarilo odoslať. Skúste to znova alebo nám zavolajte.');
+  return j;
 }
 
 export const izbyText = (n) => n + '-izbový';
@@ -207,7 +240,7 @@ let lb = null, lbZoz = [], lbI = 0;
 function lbUkaz() {
   const [f, alt, cap] = lbZoz[lbI];
   const img = lb.querySelector('img');
-  img.src = `img/${f}.webp`; img.alt = alt;
+  img.src = /[/:]/.test(f) ? f : `img/${f}.webp`; img.alt = alt;
   lb.querySelector('figcaption').textContent = cap;
   lb.querySelectorAll('.lb-p,.lb-n').forEach((b) => { b.hidden = lbZoz.length < 2; });
 }

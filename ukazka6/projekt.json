@@ -878,46 +878,6 @@
   "roky": 30,
   "vlastne": 20
  },
- "vystavba": [
-  {
-   "datum": "2026-02-10",
-   "nazov": "Stavebné povolenie",
-   "text": "Právoplatné stavebné povolenie na celý dom aj garáž.",
-   "hotovo": true
-  },
-  {
-   "datum": "2026-05-04",
-   "nazov": "Začiatok výstavby",
-   "text": "Výkopové práce a základová doska garáže.",
-   "hotovo": true,
-   "foto": [
-    "vystavba-zaklady",
-    "Základová doska garáže v máji 2026"
-   ]
-  },
-  {
-   "datum": "2026-11-20",
-   "nazov": "Hrubá stavba 4. podlažia",
-   "text": "Stoja obvodové steny do 4. podlažia, betónuje sa strop nad 4. podlažím.",
-   "hotovo": true,
-   "foto": [
-    "vystavba-hruba",
-    "Hrubá stavba po 4. podlažie v novembri 2026"
-   ]
-  },
-  {
-   "datum": "2027-02-28",
-   "nazov": "Hrubá stavba hotová",
-   "text": "Strecha a okná, dom bude uzavretý.",
-   "hotovo": false
-  },
-  {
-   "datum": "2027-06-30",
-   "nazov": "Kolaudácia a odovzdanie bytov",
-   "text": "Prevzatie kľúčov a zápis do katastra.",
-   "hotovo": false
-  }
- ],
  "lokalita": {
   "popis": "Dom stojí v tichej ulici pri lesoparku, 10 minút pešo od námestia. Na D1 sa dostanete za 5 minút autom.",
   "body": [
@@ -1057,5 +1017,47 @@
     225
    ]
   }
- }
+ },
+ "slug": "ukazka-javorova",
+ "api": "https://ra-objednavky.rarex731.workers.dev/projekt/ukazka-javorova",
+ "etapy": [
+  {
+   "nazov": "Stavebné povolenie",
+   "kedy": "február 2026",
+   "stav": "hotovo"
+  },
+  {
+   "nazov": "Začiatok výstavby",
+   "kedy": "máj 2026",
+   "stav": "hotovo"
+  },
+  {
+   "nazov": "Hrubá stavba",
+   "kedy": "február 2027",
+   "stav": "prebieha"
+  },
+  {
+   "nazov": "Kolaudácia a odovzdanie bytov",
+   "kedy": "jún 2027",
+   "stav": "planovane"
+  }
+ ],
+ "novinky": [
+  {
+   "datum": "2026-11-20",
+   "nadpis": "Hrubá stavba je na 4. podlaží",
+   "text": "Stoja obvodové steny do 4. podlažia a betónuje sa strop nad ním. Do Vianoc chceme mať hotové 5. podlažie.",
+   "fotky": [
+    "img/vystavba-hruba.webp"
+   ]
+  },
+  {
+   "datum": "2026-05-04",
+   "nadpis": "Začali sme stavať",
+   "text": "Hotová je základová doska podzemnej garáže. Pokračujeme stenami garáže a prvým stropom.",
+   "fotky": [
+    "img/vystavba-zaklady.webp"
+   ]
+  }
+ ]
 }
