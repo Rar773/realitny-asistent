@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128h">
+<link rel="stylesheet" href="styl.css?v=20261128j">
 <link rel="preload" as="image" href="img/budova.webp">
 <style>
 body.prem{background:#0F1420;color:#E8ECF2}
@@ -33,10 +33,13 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .scena.skryta{opacity:0}
 .prelet{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0F1420;opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:3}
 .prelet.on{opacity:1;pointer-events:auto}
+.stage.nacitava .tip:before{content:"";display:inline-block;width:12px;height:12px;margin-right:8px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:toc .8s linear infinite}
+@keyframes toc{to{transform:rotate(360deg)}}
 .prelet-skip{position:absolute;right:16px;bottom:16px;z-index:4;background:rgba(15,20,32,.72);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:8px 16px;font:600 14px var(--body);cursor:pointer}
 .izba-f{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;background:#0F1420}
 .izba-f.on{opacity:1;pointer-events:auto}
-.izba-f img{width:100%;height:100%;object-fit:cover}
+.izba-f img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.izba-f.on img{transform:none}
 .izba-f figcaption{position:absolute;left:20px;bottom:20px;background:rgba(15,20,32,.78);color:#fff;padding:10px 14px;border-radius:10px;font-weight:600}
 .izba-f figcaption small{display:block;font-weight:500;color:#B7C0CE;font-size:13px}
 /* podlažia na budove */
@@ -71,6 +74,8 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .fi polygon{fill:rgba(255,255,255,0);stroke:rgba(255,255,255,.55);stroke-width:2;transition:fill .2s}
 .fi:hover polygon,.fi:focus-visible polygon{fill:rgba(111,149,214,.35);stroke:#fff;stroke-width:4}
 .fi text{font:650 20px var(--body);fill:#fff;text-anchor:middle;paint-order:stroke;stroke:rgba(15,20,32,.85);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+.fi.vyb polygon{fill:rgba(111,149,214,.5);stroke:#fff;stroke-width:6;animation:vyb 1s ease-in-out infinite alternate}
+@keyframes vyb{from{fill:rgba(111,149,214,.35)}to{fill:rgba(111,149,214,.6)}}
 .fi.bez{cursor:default}
 .fi.bez text{fill:#C9D1DC;font-weight:500}
 /* ovládanie na scéne */
@@ -118,7 +123,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
   .panel{border-left:0;border-top:1px solid #232B3B;max-height:none}
   .tip{display:none}
 }
-@media (prefers-reduced-motion:reduce){.scena,.izba-f{transition:none}}
+@media (prefers-reduced-motion:reduce){.scena,.izba-f,.izba-f img{transition:none}.fi.vyb polygon{animation:none}}
 </style>
 </head>
 <body class="prem">
@@ -137,7 +142,6 @@ body.prem{background:#0F1420;color:#E8ECF2}
   <div class="stage" id="stage" aria-label="3D prehliadka budovy">
     <div class="scena" id="sBud"><img src="img/budova.webp" alt="Južná fasáda Rezidencie Javorová" width="1448" height="1086"><svg id="svgBud" viewBox="0 0 1448 1086" role="group" aria-label="Podlažia budovy"></svg></div>
     <div class="scena skryta" id="sPod"><img src="img/podlazie-3d.webp" alt="3D model podlažia s bytmi" width="1672" height="941"><svg id="svgPod" viewBox="0 0 1672 941" role="group" aria-label="Byty na podlaží"></svg></div>
-    <video class="prelet" id="prelet" muted playsinline preload="none" aria-hidden="true"></video>
     <button type="button" class="prelet-skip" id="preletSkip" hidden>Preskočiť</button>
     <figure class="izba-f" id="izbaF" aria-live="polite"><img id="izbaImg" alt=""><figcaption id="izbaCap"></figcaption></figure>
     <nav class="crumb2" id="crumb" aria-label="Kde ste"></nav>
@@ -149,7 +153,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
 <footer class="premium-pas">Chcete si radšej prezerať byty v tabuľke? <a href="./#cennik">Cenník bytov</a> · <a href="./">Štandardný web projektu</a></footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128h';
+import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128j';
 
 const $ = (s) => document.querySelector(s);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -240,25 +244,48 @@ function hash() {
 }
 
 // ---------- prelety (krátke videá medzi scénami, prvý raz v návšteve) ----------
-const VID = { 1: 'video/prelet-1.mp4', 2: 'video/prelet-2.mp4', 3: 'video/prelet-3.mp4' };
+const VID = { 1: 'video/prelet-1.mp4' };
 const videl = {}; let bezVidea = true, preskoc = null;
+// každé video má vlastný prvok, aby sa raz stiahnuté video už nesťahovalo znova
+const vids = {};
+function video(n) {
+  if (!vids[n]) {
+    const v = document.createElement('video');
+    v.className = 'prelet'; v.muted = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('aria-hidden', 'true'); v.src = VID[n];
+    v.addEventListener('click', () => preskoc && preskoc());
+    $('#stage').insertBefore(v, $('#preletSkip'));
+    vids[n] = v;
+  }
+  return vids[n];
+}
+// počká, kým je video stiahnuté tak, aby hralo bez zastavenia (najviac 6 s)
+function pripravene(v) {
+  if (v.readyState >= 4) return Promise.resolve(true);
+  return new Promise((ok) => {
+    const t = setTimeout(() => ok(v.readyState >= 3), 6000);
+    v.addEventListener('canplaythrough', () => { clearTimeout(t); ok(true); }, { once: true });
+  });
+}
 async function prelet(n) {
-  if (RM || bezVidea) return;
-  const v = $('#prelet'), sk = $('#preletSkip');
-  if (v.getAttribute('src') !== VID[n]) v.src = VID[n];
+  if (RM || bezVidea) return false;
+  const v = video(n), sk = $('#preletSkip');
+  if (v.readyState < 4) { $('#tip').textContent = 'Načítavame prelet…'; $('#stage').classList.add('nacitava'); }
+  const ok = await pripravene(v);
+  $('#stage').classList.remove('nacitava');
+  if (!ok) return false;
   v.currentTime = 0;
   v.playbackRate = videl[n] ? 2 : 1; // prvý raz celý, potom zrýchlene
+  const hra = await v.play().then(() => true, () => false);
+  if (!hra) return false;
   videl[n] = true;
-  // keď sa video nespustí do 4 s (pomalé pripojenie, nepodporovaný formát), prehliadka ide ďalej bez neho
-  const hra = await Promise.race([v.play().then(() => true, () => false), new Promise((ok) => setTimeout(() => ok(false), 4000))]);
-  if (!hra) { v.pause(); return; }
   v.classList.add('on'); sk.hidden = false;
-  await new Promise((ok) => { preskoc = ok; v.onended = ok; setTimeout(ok, ((v.duration || 6) / v.playbackRate + 1.5) * 1000); });
+  await new Promise((done) => { preskoc = done; v.onended = done; setTimeout(done, ((v.duration || 6) / v.playbackRate + 1.5) * 1000); });
   preskoc = null; v.onended = null; sk.hidden = true;
   v.classList.remove('on'); setTimeout(() => v.pause(), 400);
+  return true;
 }
 $('#preletSkip').addEventListener('click', () => preskoc && preskoc());
-$('#prelet').addEventListener('click', () => preskoc && preskoc());
 
 // ---------- prechody ----------
 let zamok = false;
@@ -281,8 +308,7 @@ async function naPodlazie(p, zBudovy = S.u === 'bud') {
   $('#izbaF').classList.remove('on');
   $('#svgPod').classList.remove('byt-on'); $('#sPod').classList.remove('byt-on');
   kresliPodlazie(p);
-  if (zBudovy && !bezVidea && !RM) {
-    await prelet(1);
+  if (zBudovy && !bezVidea && !RM && await prelet(1)) {
     kamera($('#sPod'), RP(), 0, [1672, 941]);
     $('#sPod').classList.remove('skryta'); $('#sBud').classList.add('skryta');
   } else if (zBudovy) {
@@ -305,6 +331,7 @@ async function naByt(id) {
   $('#izbaF').classList.remove('on');
   const z = D.premium.byty[b.pozicia];
   $('#sPod').classList.add('byt-on');
+  document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
   document.querySelectorAll('#svgPod .fb').forEach((g) => {
     const a = g.dataset.b === b.id; g.classList.toggle('akt', a);
     if (a) { g.removeAttribute('role'); g.removeAttribute('tabindex'); g.removeAttribute('aria-label'); } else g.setAttribute('tabindex', '-1');
@@ -315,16 +342,26 @@ async function naByt(id) {
   await cakaj(300); zamok = false;
 }
 async function naIzbu(i) {
-  const z = D.premium.byty[S.b.pozicia], [n] = z.izby[i] || [], f = n && fotoIzby(n);
+  const z = D.premium.byty[S.b.pozicia], [n, poly] = z.izby[i] || [], f = n && fotoIzby(n);
   if (!f || zamok) return;
-  // prelety z podlažia do izby (obývačka, spálňa)
-  const pv = { obyvacka: 2, spalna: 3 }[f];
-  if (pv && S.u === 'byt') { zamok = true; await prelet(pv); zamok = false; }
-  const r = D.galeria.find((g) => g[0] === f);
-  $('#izbaImg').src = `img/${f}.webp`; $('#izbaImg').alt = r ? r[1] : n;
+  const zByt = S.u === 'byt';
+  if (zByt) zamok = true;
+  const r = D.galeria.find((g) => g[0] === f), img = $('#izbaImg');
+  const nova = new Image(); nova.src = `img/${f}.webp`; // načíta sa počas priblíženia
+  if (zByt && poly && !RM) {
+    // 1) zvýrazní kliknutú izbu, 2) kamera priblíži presne túto izbu, 3) prelínanie do vizualizácie
+    document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
+    const g = document.querySelector(`#svgPod .fb.akt .fi[data-i="${i}"]`); if (g) g.classList.add('vyb');
+    await cakaj(350);
+    kamera($('#sPod'), pad(bbox(poly), 18), 900, [1672, 941]);
+    await cakaj(750);
+  }
+  try { await nova.decode(); } catch (e) {}
+  img.src = nova.src; img.alt = r ? r[1] : n;
   $('#izbaCap').innerHTML = `${esc(n)}<small>Byt ${esc(S.b.id)} · ilustračná vizualizácia</small>`;
-  $('#izbaF').classList.add('on');
+  $('#izbaF').classList.remove('on'); void $('#izbaF').offsetWidth; $('#izbaF').classList.add('on');
   S = { ...S, u: 'izba', i }; obnov();
+  if (zByt) { await cakaj(300); zamok = false; }
 }
 function dalsiaIzba(k) {
   const z = D.premium.byty[S.b.pozicia], s = z.izby.map((x, i) => [i, fotoIzby(x[0])]).filter((x) => x[1]).map((x) => x[0]);
@@ -379,7 +416,8 @@ async function start() {
   if (m && m[2]) { await naByt(m[2]); if (m[3]) await naIzbu(+m[3] - 1); bezVidea = false; return; }
   obnov(); bezVidea = false;
   // prvý prelet sa načíta vopred, aby po kliknutí hneď hral
-  if (!RM) setTimeout(() => { const v = $('#prelet'); v.preload = 'auto'; v.src = VID[1]; v.load(); }, 1500);
+  // prelety sa sťahujú hneď na začiatku, prvý ako prvý, aby po kliknutí hrali plynulo
+  if (!RM) video(1);
 }
 start();
 </script>
