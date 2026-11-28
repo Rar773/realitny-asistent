@@ -297,7 +297,9 @@ async function prelet(n) {
   $('#stage').classList.remove('nacitava');
   if (!ok) return false;
   v.currentTime = 0;
-  v.playbackRate = String(n).startsWith('izba') ? 1.5 : videl[n] ? 2 : 1; // budova: prvý raz celý, potom zrýchlene; izby 1,5×
+  // rovnaká dĺžka pri každom prehraní: poschodia ~3,2 s, izby ~3,4 s (nezávisle od dĺžky zdrojového videa)
+  const cas = String(n).startsWith('izba') ? 3.4 : String(n).startsWith('pod') ? 3.2 : 0;
+  v.playbackRate = cas && v.duration ? Math.min(2, Math.max(1, v.duration / cas)) : videl[n] ? 2 : 1;
   const hra = await v.play().then(() => true, () => false);
   if (!hra) return false;
   videl[n] = true;
