@@ -15,7 +15,7 @@
 <link rel="preload" as="image" href="img/exterier.webp" imagesrcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" imagesizes="(max-width:980px) 100vw, 55vw">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128c">
+<link rel="stylesheet" href="styl.css?v=20261128d">
 </head>
 <body>
 <aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
@@ -52,7 +52,7 @@
       <p>Kliknite na podlažie a potom na byt. Farba ukazuje, či je byt voľný. <a class="link" href="premium.html">Vyskúšajte aj 3D prehliadku bytov</a> (verzia Premium).</p>
     </div>
     <div class="vyb-g">
-      <div class="budova-box"><div id="budova"></div><div class="podl-chips" id="podlChips" role="group" aria-label="Podlažia"></div></div>
+      <div class="budova-box"><div class="rez-p" role="group" aria-label="Zobrazenie budovy"><button type="button" class="chip" data-rez="foto" aria-pressed="true">Fotka domu</button><button type="button" class="chip" data-rez="3d" aria-pressed="false">Rozložený dom</button></div><div id="budova"></div><div class="podl-chips" id="podlChips" role="group" aria-label="Podlažia"></div></div>
       <div class="podl-box">
         <div class="podl-h">
           <h3 id="podlNadpis" aria-live="polite"></h3>
@@ -160,16 +160,34 @@
 <section id="vystavba" class="mist" aria-labelledby="h-vys">
   <div class="w">
     <div class="sec-h"><div><h2 id="h-vys">Priebeh výstavby</h2></div><p id="vysAkt"></p></div>
-    <ol class="cas" id="cas"></ol>
+    <div class="rast" id="rast">
+      <div class="rast-st">
+        <div class="rast-txt">
+          <p class="rast-tip">Posúvajte stránku a dom vyrastie od výkresu až po hotovú fasádu.</p>
+          <ol class="rast-l" id="cas"></ol>
+          <p class="rast-pod" id="rastPod" aria-hidden="true"></p>
+        </div>
+        <figure class="rast-f" id="rastF" aria-label="Dom od projektu po dokončenie">
+          <img src="img/budova-vykres-800.webp" srcset="img/budova-vykres-800.webp 800w, img/budova-vykres.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="" class="r-vyk">
+          <img src="img/budova-800.webp" srcset="img/budova-800.webp 800w, img/budova.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="" class="r-siv">
+          <img src="img/budova-800.webp" srcset="img/budova-800.webp 800w, img/budova.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="Hotový bytový dom Rezidencia Javorová" class="r-far">
+          <span class="r-ciara" aria-hidden="true"></span>
+          <div class="r-prog" aria-hidden="true"><b></b><i class="r-teraz"></i></div>
+        </figure>
+      </div>
+    </div>
     <h3 class="nov-h">Novinky zo stavby</h3>
     <ul class="nov" id="nov"></ul>
   </div>
 </section>
 
 <section id="lokalita" aria-labelledby="h-lok">
-  <div class="w lok-g">
-    <div><h2 id="h-lok">Lokalita</h2><p id="lokP"></p><p class="adr" id="lokA"></p><figure class="lok-f" id="lokF"></figure></div>
-    <ul class="body" id="lokB"></ul>
+  <div class="w">
+    <div class="sec-h"><div><h2 id="h-lok">Lokalita</h2><p class="adr" id="lokA"></p></div><p id="lokP"></p></div>
+    <div class="lok-g">
+      <div class="lok-m" id="lokM"></div>
+      <div><p class="lok-tip">Vyberte miesto a ukážeme vám cestu z domu.</p><ul class="body" id="lokB"></ul><figure class="lok-f" id="lokF"></figure></div>
+    </div>
   </div>
 </section>
 
@@ -213,7 +231,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt } from './js/projekt.js?v=20261128c';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128d';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -347,9 +365,20 @@ function budova() {
   }
   return s + '</svg></div>';
 }
+let rezim = 'foto';
+function rozlozena() {
+  let s = '<div class="r3 zlo" role="group" aria-label="Rozložená budova, výber podlažia"><div class="r3-in">';
+  for (let p = 1; p <= D.podlazia; p++) {
+    const nap = byty.filter((b) => b.podlazie === p), v = vol(nap).length;
+    s += `<button type="button" class="bud-p r3-p${p === aktPodl ? ' akt' : ''}" data-p="${p}" style="--i:${p - 1}" aria-pressed="${p === aktPodl}" aria-label="${p}. podlažie ${v ? volneText(v) : 'vypredané'} z ${nap.length} bytov">${doska(byty, p)}</button>`;
+  }
+  return s + '</div></div>';
+}
 function zobrazPodlazie(p, fokus) {
   aktPodl = Math.max(1, Math.min(D.podlazia, p));
-  $('#budova').innerHTML = budova();
+  const bolo3d = !!$('#budova .r3');
+  $('#budova').innerHTML = rezim === '3d' ? rozlozena() : budova();
+  if (rezim === '3d' && !bolo3d && !matchMedia('(prefers-reduced-motion: reduce)').matches) { const r = $('#budova .r3'); r.classList.remove('zlo'); requestAnimationFrame(() => requestAnimationFrame(() => r.classList.add('zlo'))); }
   const nap = byty.filter((b) => b.podlazie === aktPodl);
   $('#podlNadpis').textContent = `${aktPodl}. podlažie · ${volneText(vol(nap).length)} z ${nap.length}`;
   $('#podlPlan').innerHTML = podlazie(byty, aktPodl);
@@ -402,6 +431,47 @@ function hypo() {
   $('#hDet').textContent = `Úver ${eur(uver)}, vlastné zdroje ${eur(b.cena - uver)}, spolu zaplatíte ${eur(Math.round(s * ro * 12))}.` + (vl < 20 ? ' Pri menej ako 20 % vlastných zdrojov banky požičiavajú len výnimočne.' : '');
 }
 
+// ---------- dom rastie pri posúvaní ----------
+function rast() {
+  const box = $('#rast'), F = D.fasada; if (!box || !F) return;
+  const H = F.rozmer[1];
+  const pod = Object.entries(F.podlazia).sort((a, b) => b[1][1] - a[1][1]); // od 1. podlažia hore
+  const hranice = [H, ...pod.map(([, [hore]]) => hore), 0];
+  const et = [...$('#cas').children], n = et.length;
+  const tIdx = D.etapy.findIndex((x) => x.stav === 'prebieha');
+  const fig = $('#rastF'), prog = fig.querySelector('.r-prog b'), tz = fig.querySelector('.r-teraz');
+  if (tIdx >= 0) tz.style.left = ((tIdx + 0.5) / n * 100) + '%'; else tz.hidden = true;
+  const ez = (t) => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+  const vyska = (t) => { // stupňovito po podlažiach
+    t = Math.min(1, Math.max(0, t)); const k = t * (hranice.length - 1), i = Math.min(hranice.length - 2, Math.floor(k));
+    return hranice[i] + (hranice[i + 1] - hranice[i]) * ez(k - i);
+  };
+  const ktore = (y) => { const z = pod.find(([, [h, d]]) => y >= h - 1 && y <= d + 1); return z ? z[0] : null; };
+  const kresli = (p) => {
+    const vy = Math.min(1, p / .16), gs = (p - .16) / .44, cs = (p - .58) / .36;
+    fig.style.setProperty('--v', (100 - vy * 100).toFixed(2) + '%');
+    const yg = gs <= 0 ? H : vyska(gs), yc = cs <= 0 ? H : vyska(cs);
+    fig.style.setProperty('--g', (yg / H * 100).toFixed(2) + '%');
+    fig.style.setProperty('--c', (yc / H * 100).toFixed(2) + '%');
+    const yl = cs > 0 && cs < 1 ? yc : gs > 0 && gs < 1 ? yg : null;
+    fig.classList.toggle('r-l', yl != null);
+    if (yl != null) fig.style.setProperty('--l', (yl / H * 100).toFixed(2) + '%');
+    const pp = yl != null ? ktore(yl + 3) : null;
+    $('#rastPod').textContent = p < .16 ? 'Projekt a výkresy' : gs < 1 ? (pp ? `Hrubá stavba · ${pp}. podlažie` : 'Základy') : cs < 1 ? (pp ? `Fasáda a okná · ${pp}. podlažie` : 'Fasáda a okná') : 'Hotový dom';
+    prog.style.width = (p * 100).toFixed(1) + '%';
+    // etapa podľa toho, čo práve vidno: výkres → základy → hrubá stavba → dokončovanie
+    const prahy = n === 4 ? [0, .16, .26, .6] : et.map((_, i) => i / n);
+    let a = 0; prahy.forEach((t, i) => { if (p >= t) a = i; });
+    et.forEach((li, i) => li.classList.toggle('zv', i === a));
+  };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { box.classList.add('stat'); kresli(1); return; }
+  let cak = false;
+  const krok = () => { cak = false; const r = box.getBoundingClientRect(); kresli(Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight + 80)))); };
+  addEventListener('scroll', () => { if (!cak) { cak = true; requestAnimationFrame(krok); } }, { passive: true });
+  addEventListener('resize', krok);
+  krok();
+}
+
 // ---------- štart ----------
 async function start() {
   try { D = await nacitaj(); } catch (e) {
@@ -444,11 +514,13 @@ async function start() {
   const posl = D.novinky[0];
   $('#vysAkt').textContent = posl ? `Naposledy aktualizované ${datumKr(posl.datum)}.` : '';
   const STAV_E = { hotovo: 'hotovo', prebieha: 'prebieha', planovane: 'plánujeme' };
-  $('#cas').innerHTML = D.etapy.map((x) => `<li class="${x.stav === 'hotovo' ? 'hot' : x.stav === 'prebieha' ? 'teraz' : ''}"><span class="cas-d">${esc(x.kedy || '')}${x.kedy ? ' · ' : ''}${STAV_E[x.stav] || ''}</span><b>${esc(x.nazov)}</b></li>`).join('');
+  $('#cas').innerHTML = D.etapy.map((x) => `<li class="${x.stav === 'hotovo' ? 'hot' : x.stav === 'prebieha' ? 'teraz' : ''}"><span class="cas-d">${esc(x.kedy || '')}${x.kedy ? ' · ' : ''}${STAV_E[x.stav] || ''}</span><b>${esc(x.nazov)}</b>${x.stav === 'prebieha' ? '<span class="r-tu">Tu sme teraz</span>' : ''}</li>`).join('');
+  rast();
   $('#nov').innerHTML = D.novinky.slice(0, 6).map((n, i) => `<li>${(n.fotky || []).length ? `<button type="button" class="nov-f" data-n="${i}" aria-label="Zväčšiť fotky: ${esc(n.nadpis)}"><img src="${esc(n.fotky[0])}" width="800" height="600" alt="${esc(n.nadpis)}" loading="lazy">${n.fotky.length > 1 ? `<span>${n.fotky.length} fotky</span>` : ''}</button>` : ''}<div><span class="cas-d">${datumKr(n.datum)}</span><b>${esc(n.nadpis)}</b><p>${esc(n.text || '')}</p></div></li>`).join('');
   $('#lokP').textContent = D.lokalita.popis;
   $('#lokA').textContent = `${D.ulica}, ${D.mesto}`;
-  $('#lokB').innerHTML = D.lokalita.body.map(([n, d, c]) => `<li><b>${esc(n)}</b><span>${esc(d)} · ${esc(c)}</span></li>`).join('');
+  $('#lokB').innerHTML = D.lokalita.body.map(([n, d, c], i) => `<li><button type="button" data-i="${i}" aria-pressed="false"><b>${esc(n)}</b><span>${esc(d)} · ${esc(c)}</span></button></li>`).join('');
+  if (D.lokalita.mapa) { $('#lokM').innerHTML = mapa(D.lokalita); zapniMapu($('#lokM'), $('#lokB')); }
 
   const k = D.kontakt;
   $('#osoba').innerHTML = `<b>${esc(k.meno)}</b><span>predaj bytov</span><a href="tel:${esc(k.telefon.replace(/\s/g, ''))}">${esc(k.telefon)}</a><a href="mailto:${esc(k.email)}">${esc(k.email)}</a>`;
@@ -505,6 +577,7 @@ $('#budova').addEventListener('keydown', (e) => {
   if (e.key === 'ArrowDown') { e.preventDefault(); zobrazPodlazie(aktPodl - 1, true); }
 });
 $('#podlChips').addEventListener('click', (e) => { const c = e.target.closest('[data-p]'); if (c) { zobrazPodlazie(+c.dataset.p); $(`#podlChips [data-p="${aktPodl}"]`).focus(); } });
+$('.rez-p').addEventListener('click', (e) => { const b = e.target.closest('[data-rez]'); if (!b || b.dataset.rez === rezim) return; rezim = b.dataset.rez; $$('.rez-p [data-rez]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); zobrazPodlazie(aktPodl); });
 $('#podlHore').addEventListener('click', () => zobrazPodlazie(aktPodl + 1));
 $('#podlDole').addEventListener('click', () => zobrazPodlazie(aktPodl - 1));
 $('#oblBtn').addEventListener('click', () => { porovnanie(); $('#porov').showModal(); });

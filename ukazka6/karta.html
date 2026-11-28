@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="../ikona.png">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128c">
+<link rel="stylesheet" href="styl.css?v=20261128d">
 <style>
 @page{size:A4;margin:12mm}
 body{background:var(--mist)}
@@ -53,7 +53,7 @@ body{background:var(--mist)}
 <header class="ovl"><p>Karta bytu je pripravená na tlač. V okne tlače zvoľte „Uložiť ako PDF“.</p><button class="btn" type="button" id="tlac">Uložiť ako PDF</button><a class="btn sec" id="spat" href="./#cennik">Späť na byt</a></header>
 <main class="lis" id="lis"><p>Načítavam kartu bytu…</p></main>
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka } from './js/projekt.js?v=20261128c';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka } from './js/projekt.js?v=20261128d';
 const $ = (s) => document.querySelector(s);
 $('#tlac').addEventListener('click', () => window.print());
 async function start() {

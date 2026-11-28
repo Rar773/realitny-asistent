@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Rezidencia Javorová – video</title>
+<link rel="stylesheet" href="../fonts/familjen-grotesk.css">
+<link rel="stylesheet" href="../fonts/figtree.css">
+<link rel="stylesheet" href="styl.css?v=20261128d">
+<style>
+/* Video 1080 × 1920 pre reels. Všetky pohyby sú CSS animácie s pevným časom, takže sa dajú nahrať po snímkach. */
+@property --v{syntax:'<percentage>';inherits:true;initial-value:100%}
+@property --g{syntax:'<percentage>';inherits:true;initial-value:100%}
+@property --c{syntax:'<percentage>';inherits:true;initial-value:100%}
+html,body{margin:0;background:#0F1D33;overflow:hidden}
+body{width:1080px;height:1920px;position:relative;font-family:var(--body);color:#fff}
+.sc{position:absolute;inset:0;opacity:0;overflow:hidden;animation:vin .28s ease-out var(--a) both,vout .28s ease-in var(--b) forwards}
+@keyframes vin{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes vout{from{opacity:1}to{opacity:0}}
+.cap{position:absolute;left:80px;right:80px}
+.cap h2{font:650 92px/1.02 var(--head);letter-spacing:-.03em;margin:0;color:#fff}
+.cap p{font:500 40px/1.3 var(--body);margin:22px 0 0;color:#C9D6EC}
+.up{animation:up .5s cubic-bezier(.2,.8,.2,1) var(--t) both}
+@keyframes up{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+.pill{display:inline-block;background:#F2C14E;color:#18221C;font:700 34px var(--body);padding:10px 26px;border-radius:99px}
+/* 1: úvod */
+.s1 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:52% 50%;animation:kb 2.6s linear 0s both}
+@keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
+.s1:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,29,51,0) 45%,rgba(15,29,51,.92) 82%)}
+.s1 .cap{bottom:170px;z-index:1}
+.s1 .cap h2{font-size:120px}
+/* 2: dom rastie */
+.s2 .cap{top:150px}
+.rf{position:absolute;left:30px;right:30px;top:600px;aspect-ratio:1448/1086;border-radius:28px;overflow:hidden;background:#1F3A66}
+.rf img{position:absolute;inset:0;width:100%;height:100%}
+.rf .r-vyk{clip-path:inset(0 var(--v) 0 0);animation:vyk .7s cubic-bezier(.6,0,.3,1) 2.45s both}
+.rf .r-siv{filter:grayscale(1) contrast(.85) brightness(1.08) sepia(.15);clip-path:inset(var(--g) 0 0 0)}
+.rf .r-far{clip-path:inset(var(--c) 0 0 0)}
+@keyframes vyk{from{--v:100%}to{--v:0%}}
+.stl{position:absolute;left:80px;right:40px;top:1430px;font:650 46px var(--head);color:#F2C14E}
+.stl span{position:absolute;inset:0;opacity:0}
+/* 3: rozložený dom */
+.s3 .cap{top:150px}
+.s3 .r3{position:absolute;left:0;right:0;top:470px;height:1250px;background:none;perspective:2600px;border-radius:0;overflow:visible}
+.s3 .r3-in{left:18%;right:18%;bottom:140px}
+.s3 .r3-p{transform-style:preserve-3d;transform:translateZ(calc(var(--i) * 16px));animation:expl .9s cubic-bezier(.3,.8,.2,1) calc(6.05s + var(--i) * .07s) both}
+@keyframes expl{from{transform:translateZ(calc(var(--i) * 16px))}to{transform:translateZ(calc(var(--i) * 118px))}}
+.s3 .r3-s{filter:drop-shadow(0 16px 12px rgba(0,0,0,.35))}
+.s3 .r3-p.akt .r3-s{animation:lift .5s cubic-bezier(.3,.8,.2,1) 7.4s both}
+@keyframes lift{from{transform:none}to{transform:translateZ(60px) translateX(-30px)}}
+.s3 .r3-p.akt .r3-dom{stroke:#F2C14E;stroke-width:5}
+.s3 .r3-n{font-size:18px}
+/* 4: pôdorys */
+.s4{background:#fff;color:var(--ink)}
+.s4 .cap{top:150px}
+.s4 .cap h2{color:var(--ink)}
+.s4 .cap p{color:var(--ink2)}
+.s4 .pl{position:absolute;left:50px;right:50px;top:640px}
+.s4 .plan-d.hraj .obrys{animation-delay:9.1s}
+.s4 .plan-d.hraj .room{animation-delay:calc(var(--d) * .55 + 8.9s),calc(var(--d) * .55 + 9.3s)}
+.s4 .plan-d.hraj .balk,.s4 .plan-d.hraj .okno{animation-delay:10s}
+.s4 .plan-d.hraj text,.s4 .plan-d.hraj line,.s4 .plan-d.hraj .k,.s4 .plan-d.hraj path{animation-delay:10.3s}
+.s4 .cena{position:absolute;left:80px;top:1580px;font:650 64px var(--head);color:var(--brand)}
+/* 5: vizualizácia izby */
+.s5 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:odkry .7s cubic-bezier(.6,0,.2,1) 11.55s both,kb2 2.6s linear 11.55s both}
+@keyframes odkry{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes kb2{from{transform:scale(1.12) translateX(30px)}to{transform:scale(1.02)}}
+.s5:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,29,51,.85) 0%,rgba(15,29,51,0) 30%)}
+.s5 .cap{top:150px;z-index:1}
+/* 6: mapa */
+.s6{background:#EEF1EC;color:var(--ink)}
+.s6 .cap{top:150px}
+.s6 .cap h2{color:var(--ink)}
+.s6 .cap p{color:var(--ink2)}
+.s6 .mp{position:absolute;left:-130px;top:600px}
+.s6 .mapa{width:1340px}
+.s6 .hraj .m-tr{animation-delay:calc(var(--d) * .7 + 14.1s)}
+.s6 .hraj .m-b{animation-delay:calc(var(--d) * .7 + 14.4s)}
+/* 7: záver */
+.s7{background:var(--brand)}
+.s7 .cap{top:620px}
+.s7 .cap h2{font-size:104px}
+.s7 .zn{position:absolute;left:80px;bottom:200px;font:650 52px var(--head)}
+.s7 .zn small{display:block;font:500 36px var(--body);color:#C9D6EC;margin-top:10px}
+</style>
+</head>
+<body>
+<section class="sc s1" style="--a:0s;--b:2.25s"><img src="img/exterier.webp" alt=""><div class="cap"><h2 class="up" style="--t:.25s">Rezidencia Javorová</h2><p class="up" style="--t:.55s" id="r1p"></p></div></section>
+<section class="sc s2" style="--a:2.25s;--b:5.7s"><div class="cap"><h2 class="up" style="--t:2.4s">Od výkresu<br>po hotový dom</h2></div>
+  <div class="rf" id="rf"><img src="img/budova-vykres.webp" class="r-vyk" alt=""><img src="img/budova.webp" class="r-siv" alt=""><img src="img/budova.webp" class="r-far" alt=""></div>
+  <div class="stl" id="stl"></div></section>
+<section class="sc s3" style="--a:5.7s;--b:8.7s"><div class="cap"><h2 class="up" style="--t:5.85s">Vyberte si podlažie</h2><p class="up" style="--t:6.15s" id="r3p"></p></div><div id="r3"></div></section>
+<section class="sc s4" style="--a:8.7s;--b:11.5s"><div class="cap"><h2 class="up" style="--t:8.85s" id="r4h"></h2><p class="up" style="--t:9.1s" id="r4p"></p></div><div class="pl" id="pl"></div><div class="cena up" style="--t:10.4s" id="r4c"></div></section>
+<section class="sc s5" style="--a:11.5s;--b:13.8s"><img src="img/obyvacka.webp" alt=""><div class="cap"><h2 class="up" style="--t:11.9s">Každá izba<br>ešte pred stavbou</h2></div></section>
+<section class="sc s6" style="--a:13.8s;--b:16.8s"><div class="cap"><h2 class="up" style="--t:13.95s">Škola za 8 minút pešo</h2><p class="up" style="--t:14.2s">Park hneď za domom, námestie do 11 minút.</p></div><div class="mp" id="mp"></div></section>
+<section class="sc s7" style="--a:16.8s;--b:99s"><div class="cap"><h2 class="up" style="--t:16.95s">Takýto web postavíme aj vášmu projektu</h2><p class="up" style="--t:17.3s">Ceny a stavy bytov meníte v aplikácii. Web sa aktualizuje sám.</p></div><div class="zn up" style="--t:17.6s">Realitný asistent<small>realitnyasistent.eu</small></div></section>
+<script type="module">
+import { nacitaj, eur, m2, podorys, doska, mapa } from './js/projekt.js?v=20261128d';
+const $ = (s) => document.querySelector(s);
+const D = await nacitaj();
+const v = D.byty.filter((b) => b.stav !== 'predany');
+$('#r1p').textContent = `Hlohovec · byty od ${eur(Math.min(...v.map((b) => b.cena)))}`;
+// 2: rast po podlažiach (kľúčové snímky z výšok podlaží na fotke)
+const F = D.fasada, H = F.rozmer[1];
+const pod = Object.entries(F.podlazia).sort((a, b) => b[1][1] - a[1][1]);
+const hr = [H, ...pod.map(([, [h]]) => h), 0].map((y) => (y / H * 100).toFixed(2) + '%');
+const kf = (n) => `@keyframes ${n}{` + hr.map((y, i) => `${(i / (hr.length - 1) * 100).toFixed(1)}%{--${n === 'sv' ? 'g' : 'c'}:${y}}`).join('') + '}';
+const st = document.createElement('style');
+st.textContent = kf('sv') + kf('fa') + `.rf .r-siv{animation:sv 1.25s linear 3.0s both}.rf .r-far{animation:fa 1.25s linear 4.3s both}`;
+document.head.append(st);
+const st2 = [['Projekt', 2.3], ['Hrubá stavba', 3.0], ['Fasáda a okná', 4.3], ['Hotovo · leto 2027', 5.5]];
+$('#stl').innerHTML = st2.map(([t, a], i) => `<span style="animation:vin .2s ${a}s both${i < st2.length - 1 ? `,vout .15s ${st2[i + 1][1]}s forwards` : ''}">${t}</span>`).join('');
+// 3: rozložený dom
+const akt = 4, volne = v.filter((b) => b.podlazie === akt).length;
+$('#r3p').textContent = `${akt}. podlažie · ${volne} voľné byty. Farba hneď ukáže, čo je voľné.`;
+let r = '<div class="r3"><div class="r3-in">';
+for (let p = 1; p <= D.podlazia; p++) r += `<div class="r3-p${p === akt ? ' akt' : ''}" style="--i:${p - 1}">${doska(D.byty, p)}</div>`;
+$('#r3').innerHTML = r + '</div></div>';
+// 4: pôdorys bytu
+const b = v.find((x) => x.podlazie === akt && x.izby === 3) || v[0];
+const t = D.typy[b.typ];
+$('#r4h').textContent = `Byt ${b.id}`;
+$('#r4p').textContent = `${b.izby} izby · ${m2(b.plocha)} · ${b.vonkajsia_druh === 'terasa' ? 'terasa' : 'balkón'} ${m2(b.vonkajsia)}`;
+$('#pl').innerHTML = podorys(t, { detail: true, druh: b.vonkajsia_druh, id: b.id });
+$('#pl svg').classList.add('anim', 'hraj');
+$('#r4c').textContent = eur(b.cena);
+// 6: mapa
+$('#mp').innerHTML = mapa(D.lokalita);
+$('#mp svg').classList.add('hraj');
+// nahrávanie po snímkach
+window.seek = (s) => { document.getAnimations().forEach((a) => { a.pause(); a.currentTime = s * 1000; }); };
+window.pripravene = true;
+</script>
+</body>
+</html>

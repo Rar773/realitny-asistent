@@ -85,12 +85,12 @@ export function podorys(typ, { detail = false, druh = 'balkón', id = '' } = {})
   // balkón / terasa
   s += `<rect x="${X(bx)}" y="${Y(by)}" width="${bw * S}" height="${bh * S}" fill="url(#${hid})" class="balk"/>`;
   // miestnosti
-  for (const [n, x, y, w, h] of typ.miestnosti) {
+  typ.miestnosti.forEach(([n, x, y, w, h], i) => {
     const mokra = /Kúpe|WC/.test(n);
-    s += `<rect x="${X(x)}" y="${Y(y)}" width="${w * S}" height="${h * S}" class="room${mokra ? ' wet' : ''}"/>`;
-  }
+    s += `<rect x="${X(x)}" y="${Y(y)}" width="${w * S}" height="${h * S}" class="room${mokra ? ' wet' : ''}"${detail ? ` pathLength="100" style="--d:${(0.5 + i * 0.12).toFixed(2)}s"` : ''}/>`;
+  });
   // vonkajší obrys
-  s += `<rect x="${X(0)}" y="${Y(0)}" width="${W * S}" height="${H * S}" class="obrys"/>`;
+  s += `<rect x="${X(0)}" y="${Y(0)}" width="${W * S}" height="${H * S}" class="obrys"${detail ? ' pathLength="100"' : ''}/>`;
   // okná na fasáde (obytné miestnosti pri vonkajšej stene)
   const ok = typ.okna || [];
   for (const [n, x, y, w, h] of typ.miestnosti) {
@@ -269,4 +269,99 @@ export function fotkyBytu(b, galeria) {
   const k = { A: ['obyvacka', 'kupelna'], B: ['obyvacka', 'spalna', 'kupelna'], C: ['obyvacka', 'spalna', 'kupelna'], D: ['obyvacka', 'spalna', 'detska', 'kupelna'], E: ['obyvacka', 'spalna', 'detska', 'kupelna'] }[b.typ] || [];
   if (b.podlazie === 6) k.push('terasa');
   return k.map((x) => g[x]).filter(Boolean);
+}
+
+// ---------- mapa okolia: dom, body záujmu a pešie trasy ----------
+// Súradnice v metroch od domu (0,0), x na východ, y na juh. Trasy sa kreslia animovane.
+const IKONY = {
+  deti: '<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3"/>',
+  skola: '<path d="M3 9 12 4l9 5-9 5z"/><path d="M7 11.5V16c1.5 1.4 3.2 2 5 2s3.5-.6 5-2v-4.5"/>',
+  nakup: '<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  strom: '<path d="M12 3 6 12h3l-4 6h14l-4-6h3z"/><path d="M12 18v3"/>',
+  namestie: '<path d="M3 21h18M5 10h14M12 3 4 8h16z"/><path d="M7 10v8M12 10v8M17 10v8"/>',
+  auto: '<path d="M5 16h14v-4l-2-5H7l-2 5z"/><circle cx="8" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/>',
+  vlak: '<rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 11h12M9 21l1.5-4M15 21l-1.5-4"/>',
+  mesto: '<path d="M3 21V9l5-3v15M8 21V4l8 3v14M16 21v-9l5 2v7"/>',
+};
+const dlzkaTrasy = (t) => t.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - t[i][0], p[1] - t[i][1]), 0);
+const cesta = (c) => 'M' + c.map((p) => p.join(' ')).join('L');
+
+export function mapa(lok, { trieda = '' } = {}) {
+  const M = lok.mapa;
+  const [vx, vy, vw, vh] = M.pohlad;
+  let s = `<svg class="mapa ${trieda}" viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="Mapa okolia domu s peším časom k škole, obchodu, parku a námestiu">`;
+  s += `<rect x="${vx}" y="${vy}" width="${vw}" height="${vh}" class="m-zem"/>`;
+  s += `<path d="${cesta(M.park)}Z" class="m-park"/>`;
+  s += `<path d="${cesta(M.cyklo)}" class="m-cyklo"/>`;
+  for (const [x, y, w, h] of M.budovy) s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="m-bud"/>`;
+  for (const u of M.ulice) s += `<path d="${cesta(u.c)}" class="m-ul${u.hlavna ? ' hl' : ''}"/>`;
+  M.body.forEach((b, i) => {
+    const [n, d, c] = lok.body[i];
+    if (b.trasa) {
+      const L = Math.round(dlzkaTrasy(b.trasa));
+      s += `<path d="${cesta(b.trasa)}" class="m-tr" data-i="${i}" pathLength="${L}" style="--l:${L};--d:${(i * 0.35).toFixed(2)}s"/>`;
+    }
+  });
+  M.body.forEach((b, i) => {
+    const [n, d, c] = lok.body[i];
+    const kratko = c.replace(' pešo', '').replace(' autom', '');
+    if (b.trasa) {
+      const [x, y] = b.bod;
+      const [lx, ly, la] = b.l || [40, 0, 'start'];
+      s += `<g class="m-b" data-i="${i}" transform="translate(${x} ${y})" style="--d:${(i * 0.35 + 0.6).toFixed(2)}s"><circle r="30" class="m-bk"/><svg x="-17" y="-17" width="34" height="34" viewBox="0 0 24 24" class="m-ik">${IKONY[b.ikona] || ''}</svg>` +
+        `<g class="m-lb" transform="translate(${lx} ${ly})"><text x="0" y="-6" class="m-n" text-anchor="${la}">${esc(n)}</text><text x="0" y="26" class="m-c" text-anchor="${la}">${esc(kratko)} pešo · ${esc(d)}</text></g></g>`;
+    } else {
+      const [x, y] = b.smer;
+      const vpravo = x > 0;
+      const tx = x + (vpravo ? -24 : 24), ty = y + (y > 0 ? -12 : -66);
+      s += `<g class="m-b m-sm" data-i="${i}" style="--d:${(i * 0.2 + 1.6).toFixed(2)}s"><g transform="translate(${tx} ${ty})"><text x="0" y="0" class="m-n" text-anchor="${vpravo ? 'end' : 'start'}">${vpravo ? '' : '← '}${esc(n.replace('Diaľnica ', ''))}${vpravo ? ' →' : ''}</text><text x="0" y="30" class="m-c" text-anchor="${vpravo ? 'end' : 'start'}">${esc(c)}</text></g></g>`;
+    }
+  });
+  // dom
+  s += `<g class="m-dom"><circle r="54" class="m-pulz"/><circle r="36" class="m-dk"/><svg x="-19" y="-19" width="38" height="38" viewBox="0 0 24 24" class="m-ik dom"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg><text y="-50" class="m-n dom" text-anchor="middle">Rezidencia</text></g>`;
+  s += '</svg>';
+  return s;
+}
+
+// Prepojí mapu so zoznamom: klik na bod v zozname zvýrazní trasu, mapa sa animuje pri zobrazení.
+export function zapniMapu(obal, zoznam) {
+  const svg = obal.querySelector('svg.mapa');
+  const vyber = (i) => {
+    svg.classList.toggle('m-vyb', i != null);
+    svg.querySelectorAll('[data-i]').forEach((e) => e.classList.toggle('on', +e.dataset.i === i));
+    zoznam.querySelectorAll('button[data-i]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.i === i)));
+  };
+  zoznam.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-i]');
+    if (!b) return;
+    const i = +b.dataset.i;
+    vyber(b.getAttribute('aria-pressed') === 'true' ? null : i);
+  });
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((z) => { if (z.some((x) => x.isIntersecting)) { svg.classList.add('hraj'); io.disconnect(); } }, { threshold: 0.35 });
+    io.observe(svg);
+  } else svg.classList.add('hraj');
+  return vyber;
+}
+
+// Pôdorys na detaile sa nakreslí ako výkres: obrys, steny, potom výplň izieb a popisy.
+export function kresliPodorys(svg) {
+  if (!svg || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  svg.classList.add('anim');
+  const io = new IntersectionObserver((z) => { if (z.some((x) => x.isIntersecting)) { svg.classList.add('hraj'); io.disconnect(); } }, { threshold: 0.3 });
+  io.observe(svg);
+}
+
+// Jedno podlažie ako doska pre rozloženú budovu (bez textov, byty farbou podľa stavu).
+export function doska(byty, p) {
+  const S = 10, W = 28.2, H = 17.4;
+  let s = `<svg viewBox="-8 -8 ${W * S + 16} ${H * S + 16}" aria-hidden="true" class="r3-s">`;
+  s += `<rect x="-6" y="-6" width="${W * S + 12}" height="${H * S + 12}" rx="6" class="r3-dom"/>`;
+  s += `<rect x="${16.8 * S}" y="0" width="${3 * S}" height="${7.6 * S}" class="r3-j"/><rect x="${14 * S}" y="${9.4 * S}" width="${7 * S}" height="${8 * S}" class="r3-j"/>`;
+  for (const [poz, [x, y, w, h]] of Object.entries(POLOHA)) {
+    const b = byty.find((q) => q.podlazie === p && q.pozicia === +poz);
+    if (b) s += `<rect x="${x * S + 2}" y="${y * S + 2}" width="${w * S - 4}" height="${h * S - 4}" rx="3" class="r3-b ${STAV[b.stav].c}"/>`;
+  }
+  s += `<text x="${8.6 * S}" y="${8.9 * S}" class="r3-n">${p}. podlažie</text>`;
+  return s + '</svg>';
 }

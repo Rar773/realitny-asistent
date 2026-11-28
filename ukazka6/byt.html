@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" href="../ikona.png">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128c">
+<link rel="stylesheet" href="styl.css?v=20261128d">
 </head>
 <body>
 <aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
@@ -31,7 +31,7 @@
 </footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka, oblubene, prepniOblubene, splatka, otvorObrazky, fotkyBytu } from './js/projekt.js?v=20261128c';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka, oblubene, prepniOblubene, splatka, otvorObrazky, fotkyBytu, kresliPodorys } from './js/projekt.js?v=20261128d';
 
 const $ = (s) => document.querySelector(s);
 const ikona = {
@@ -138,6 +138,7 @@ async function start() {
   </div>
   <p class="akt" style="padding-bottom:40px"><i aria-hidden="true"></i>Cena a stav aktualizované ${datum(D.aktualizovane)}</p>`;
 
+  kresliPodorys(document.querySelector('.plbox .plan-d'));
   document.querySelector('.gal-b')?.addEventListener('click', (e) => { const x = e.target.closest('[data-f]'); if (x) otvorObrazky(fotky, +x.dataset.f); });
   const ob = document.getElementById('oblD');
   const kresliObl = () => { const on = oblubene().includes(b.id); ob.setAttribute('aria-pressed', String(on)); ob.querySelector('span').textContent = on ? 'V obľúbených' : 'Uložiť do obľúbených'; };
