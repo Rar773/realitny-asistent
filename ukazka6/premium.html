@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128g">
+<link rel="stylesheet" href="styl.css?v=20261128h">
 <link rel="preload" as="image" href="img/budova.webp">
 <style>
 body.prem{background:#0F1420;color:#E8ECF2}
@@ -149,7 +149,7 @@ body.prem{background:#0F1420;color:#E8ECF2}
 <footer class="premium-pas">Chcete si radšej prezerať byty v tabuľke? <a href="./#cennik">Cenník bytov</a> · <a href="./">Štandardný web projektu</a></footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128g';
+import { nacitaj, STAV, eur, m2, esc, izbyText, otvorObrazky, oblubene, prepniOblubene } from './js/projekt.js?v=20261128h';
 
 const $ = (s) => document.querySelector(s);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -240,7 +240,7 @@ function hash() {
 }
 
 // ---------- prelety (krátke videá medzi scénami, prvý raz v návšteve) ----------
-const VID = { 1: 'video/prelet-1.mp4', 2: 'video/prelet-2.mp4' };
+const VID = { 1: 'video/prelet-1.mp4', 2: 'video/prelet-2.mp4', 3: 'video/prelet-3.mp4' };
 const videl = {}; let bezVidea = true, preskoc = null;
 async function prelet(n) {
   if (RM || bezVidea) return;
@@ -317,7 +317,9 @@ async function naByt(id) {
 async function naIzbu(i) {
   const z = D.premium.byty[S.b.pozicia], [n] = z.izby[i] || [], f = n && fotoIzby(n);
   if (!f || zamok) return;
-  if (f === 'obyvacka' && S.u === 'byt') { zamok = true; await prelet(2); zamok = false; }
+  // prelety z podlažia do izby (obývačka, spálňa)
+  const pv = { obyvacka: 2, spalna: 3 }[f];
+  if (pv && S.u === 'byt') { zamok = true; await prelet(pv); zamok = false; }
   const r = D.galeria.find((g) => g[0] === f);
   $('#izbaImg').src = `img/${f}.webp`; $('#izbaImg').alt = r ? r[1] : n;
   $('#izbaCap').innerHTML = `${esc(n)}<small>Byt ${esc(S.b.id)} · ilustračná vizualizácia</small>`;

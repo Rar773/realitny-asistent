@@ -486,6 +486,8 @@ section.mist{background:var(--mist)}
 .uvod-g{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);align-items:center;gap:48px}
 .uvod-f{margin:0;position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;background:var(--mist)}
 .uvod-f img{width:100%;height:100%;object-fit:cover}
+.uvod-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;pointer-events:none}
+.uvod-v.on{opacity:1}
 .uvod-f figcaption,.lok-f figcaption{position:absolute;left:12px;bottom:12px;font-size:12.5px;font-weight:600;color:#fff;background:rgba(24,34,28,.55);padding:3px 9px;border-radius:6px}
 .uvod .cisla{display:flex;flex-wrap:wrap;gap:16px 48px;padding:28px 0 0;margin-top:36px;border:0;border-top:1px solid var(--line);border-radius:0}
 @media (max-width:980px){.uvod-g{grid-template-columns:1fr;gap:28px}.uvod-f{order:-1}}

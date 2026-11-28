@@ -15,7 +15,7 @@
 <link rel="preload" as="image" href="img/exterier.webp" imagesrcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" imagesizes="(max-width:980px) 100vw, 55vw">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128g">
+<link rel="stylesheet" href="styl.css?v=20261128h">
 </head>
 <body>
 <aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
@@ -39,7 +39,7 @@
       <p class="lead">Bytový dom so 6 podlažiami v tichej ulici pri lesoparku v Hlohovci. Byty od 1 do 4 izieb, garáž v suteréne a nasťahovanie v lete 2027.</p>
       <div class="uvod-cta"><a class="btn" href="#vyber">Vybrať byt na budove</a><a class="btn sec" href="#cennik">Cenník bytov</a><a class="btn sec" href="premium.html">3D prehliadka</a></div>
     </div>
-    <figure class="uvod-f"><img src="img/exterier.webp" srcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" sizes="(max-width:980px) 100vw, 55vw" width="1600" height="900" alt="Rezidencia Javorová z ulice pri západe slnka: biela fasáda, drevené lamely a balkóny so skleneným zábradlím" fetchpriority="high"><figcaption>Vizualizácia</figcaption></figure>
+    <figure class="uvod-f"><img src="img/exterier.webp" srcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" sizes="(max-width:980px) 100vw, 55vw" width="1600" height="900" alt="Rezidencia Javorová z ulice pri západe slnka: biela fasáda, drevené lamely a balkóny so skleneným zábradlím" fetchpriority="high"><figcaption>Vizualizácia</figcaption><video class="uvod-v" id="uvodV" muted playsinline preload="none" aria-hidden="true"></video></figure>
   </div>
   <div class="w"><ul class="cisla" id="cisla"></ul></div>
   <div class="w"><ul class="dovera" id="dovera"></ul></div>
@@ -231,7 +231,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128g';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128h';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -476,6 +476,19 @@ function rast() {
   addEventListener('resize', krok);
   krok();
 }
+
+// ---------- úvod: prelet dronom, ktorý skončí presne na úvodnej fotke ----------
+(function () {
+  const v = document.getElementById('uvodV');
+  if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 861px)').matches || (navigator.connection && navigator.connection.saveData)) return;
+  const hraj = () => setTimeout(() => {
+    v.src = 'video/uvod.mp4';
+    v.addEventListener('playing', () => v.classList.add('on'), { once: true });
+    v.addEventListener('ended', () => v.classList.remove('on'), { once: true });
+    v.play().catch(() => {});
+  }, 400);
+  if (document.readyState === 'complete') hraj(); else addEventListener('load', hraj, { once: true });
+})();
 
 // ---------- štart ----------
 async function start() {
