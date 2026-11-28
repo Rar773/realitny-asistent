@@ -480,7 +480,7 @@ function rast() {
 // ---------- úvod: prelet dronom, ktorý skončí presne na úvodnej fotke ----------
 (function () {
   const v = document.getElementById('uvodV');
-  if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(min-width: 861px)').matches || (navigator.connection && navigator.connection.saveData)) return;
+  if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const hraj = () => setTimeout(() => {
     v.src = 'video/uvod.mp4';
     v.addEventListener('playing', () => v.classList.add('on'), { once: true });
