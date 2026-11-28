@@ -15,3 +15,9 @@ Ceny a stavy: server /projekt/ukazka-javorova.json (účet rarex731@gmail.com), 
 - Vstup do izby v Premium: žiadne generické video (prelety do izieb leteli do iného bytu/cez výťah). Teraz: zvýraznenie kliknutej izby → kamera priblíži presne jej obrys na 3D podlaží → prelínanie do vizualizácie s jemným priblížením. Esc ide späť s oddialením. Videá prelet-2/3 zmazané z webu (originály na PC).
 - Videá sa sťahujú hneď po načítaní (vlastný <video> pre každé), prehrajú sa až po canplaythrough (inak „Načítavame prelet…“, max 6 s, potom bez videa).
 - Byt v Premium ako v Pri parku: okolie bytu stmavené (.tma s dierou pre byt a balkón), izby s vizualizáciou majú špendlík s názvom (stála veľkosť cez --inv = 1/priblíženie), hover na mape aj v zozname zvýrazní izbu. Pozor na špecifickosť: .byt-on .fb.akt>polygon (nie polygon), inak prebije zvýraznenie izieb.
+
+## Kódovanie videí (od 28.11.)
+- Prelety a vlety: plné 1920 px + jemné doostrenie, bez zvuku. Marian chce ostrý obraz, dáta návštevníkov neriešime.
+  `ffmpeg -i ORIG.mp4 -an -vf "scale=1920:-2:flags=lanczos,unsharp=5:5:0.5:5:5:0" -c:v libx264 -crf 22 -preset slow -tune film -pix_fmt yuv420p -movflags +faststart OUT.mp4`
+  (izby crf 22, budova prelet-1 crf 24). Staré 1024 px / crf 27 bolo rozmazané.
+- Vlety do izieb: MAGI-2 na webe Higgsfield (účet 2, plán Lite), Frames start = výrez z vlety_vyrez, koniec = fotka izby, 4–5 s, zvuk Off, 16:9, 1080p. Hotové: 3-0.
