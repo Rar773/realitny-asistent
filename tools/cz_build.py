@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Česká verzia webu: zo slovenských stránok a slovníkov tools/cz/*.json vyrobí priečinok cz/.
+"""POZOR – ZASTARANÉ (28. 11. 2026): slovníky nie sú aktuálne, české stránky sa upravujú ručne. Nespúšťať – prepíše cz/ a odkazy na SK stránkach.
+Česká verzia webu: zo slovenských stránok a slovníkov tools/cz/*.json vyrobí priečinok cz/.
 Spustenie z koreňa repa:  python tools/cz_build.py   (pred tools/kontrola.py)
 - texty a popisy (alt, title, aria-label, placeholder, meta) sa prekladajú podľa slovníka stránky + spoločného slovníka,
 - ceny v eurách sa menia na Kč podľa tabuľky CENY,
 - odkazy na obrázky, štýly a skripty dostanú ../, odkazy medzi preloženými stránkami ostávajú v cz/,
 - chýbajúci preklad = chyba (stránka sa nevyrobí s polovicou slovenčiny)."""
 import json
+import sys as _s
+if "--naozaj" not in _s.argv:
+    raise SystemExit("cz_build.py je zastaraný – české stránky sa upravujú ručne (spusti s --naozaj len ak si aktualizoval slovníky).")
 import re
 import sys
 from html.parser import HTMLParser
