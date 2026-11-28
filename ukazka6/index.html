@@ -15,7 +15,7 @@
 <link rel="preload" as="image" href="img/exterier.webp" imagesrcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" imagesizes="(max-width:980px) 100vw, 55vw">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
-<link rel="stylesheet" href="styl.css?v=20261128e">
+<link rel="stylesheet" href="styl.css?v=20261128f">
 </head>
 <body>
 <aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
@@ -169,7 +169,7 @@
         </div>
         <figure class="rast-f" id="rastF" aria-label="Dom od projektu po dokončenie">
           <img src="img/budova-vykres-800.webp" srcset="img/budova-vykres-800.webp 800w, img/budova-vykres.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="" class="r-vyk">
-          <img src="img/budova-800.webp" srcset="img/budova-800.webp 800w, img/budova.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="" class="r-siv">
+          <img src="img/budova-siva-800.webp" srcset="img/budova-siva-800.webp 800w, img/budova-siva.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="" class="r-siv" decoding="async">
           <img src="img/budova-800.webp" srcset="img/budova-800.webp 800w, img/budova.webp 1448w" sizes="(max-width:860px) 100vw, 60vw" width="1448" height="1086" alt="Hotový bytový dom Rezidencia Javorová" class="r-far">
           <span class="r-ciara" aria-hidden="true"></span>
           <div class="r-prog" aria-hidden="true"><b></b><i class="r-teraz"></i></div>
@@ -231,7 +231,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128e';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, doska, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky, posliDopyt, mapa, zapniMapu } from './js/projekt.js?v=20261128f';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -442,9 +442,9 @@ function rast() {
   const fig = $('#rastF'), prog = fig.querySelector('.r-prog b'), tz = fig.querySelector('.r-teraz');
   if (tIdx >= 0) tz.style.left = ((tIdx + 0.5) / n * 100) + '%'; else tz.hidden = true;
   const ez = (t) => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
-  const vyska = (t) => { // stupňovito po podlažiach
+  const vyska = (t) => { // plynulo, každé podlažie dostane rovnaký kus posúvania
     t = Math.min(1, Math.max(0, t)); const k = t * (hranice.length - 1), i = Math.min(hranice.length - 2, Math.floor(k));
-    return hranice[i] + (hranice[i + 1] - hranice[i]) * ez(k - i);
+    return hranice[i] + (hranice[i + 1] - hranice[i]) * (k - i);
   };
   const ktore = (y) => { const z = pod.find(([, [h, d]]) => y >= h - 1 && y <= d + 1); return z ? z[0] : null; };
   const kresli = (p) => {
@@ -455,7 +455,7 @@ function rast() {
     fig.style.setProperty('--c', (yc / H * 100).toFixed(2) + '%');
     const yl = cs > 0 && cs < 1 ? yc : gs > 0 && gs < 1 ? yg : null;
     fig.classList.toggle('r-l', yl != null);
-    if (yl != null) fig.style.setProperty('--l', (yl / H * 100).toFixed(2) + '%');
+    if (yl != null) fig.style.setProperty('--ly', (yl / H * fig.clientHeight).toFixed(1) + 'px');
     const pp = yl != null ? ktore(yl + 3) : null;
     $('#rastPod').textContent = p < .16 ? 'Projekt a výkresy' : gs < 1 ? (pp ? `Hrubá stavba · ${pp}. podlažie` : 'Základy') : cs < 1 ? (pp ? `Fasáda a okná · ${pp}. podlažie` : 'Fasáda a okná') : 'Hotový dom';
     prog.style.width = (p * 100).toFixed(1) + '%';
@@ -465,8 +465,13 @@ function rast() {
     et.forEach((li, i) => li.classList.toggle('zv', i === a));
   };
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { box.classList.add('stat'); kresli(1); return; }
-  let cak = false;
-  const krok = () => { cak = false; const r = box.getBoundingClientRect(); kresli(Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight + 80)))); };
+  let cak = false, posl = -1;
+  const krok = () => {
+    cak = false; const r = box.getBoundingClientRect();
+    if (r.bottom < -50 || r.top > innerHeight + 50) return;
+    const p = Math.round(Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight + 80))) * 1000) / 1000;
+    if (p !== posl) { posl = p; kresli(p); }
+  };
   addEventListener('scroll', () => { if (!cak) { cak = true; requestAnimationFrame(krok); } }, { passive: true });
   addEventListener('resize', krok);
   krok();
