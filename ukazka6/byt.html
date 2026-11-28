@@ -31,7 +31,7 @@
 </footer>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka, oblubene, prepniOblubene, splatka } from './js/projekt.js';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka, oblubene, prepniOblubene, splatka, otvorObrazky, fotkyBytu } from './js/projekt.js';
 
 const $ = (s) => document.querySelector(s);
 const ikona = {
@@ -62,6 +62,7 @@ async function start() {
   const mail = 'mailto:?subject=' + encodeURIComponent(`Byt ${b.id} – Rezidencia Javorová`) + '&body=' + encodeURIComponent(mailText);
   const podobne = D.byty.filter((q) => q.typ === b.typ && q.id !== b.id && q.stav !== 'predany').slice(0, 4);
   const spolu = t.miestnosti.reduce((s, m) => s + m[3] * m[4], 0);
+  const fotky = D.galeria ? fotkyBytu(b, D.galeria) : [];
 
   $('#obsah').innerHTML = `
   <nav class="crumb" aria-label="Omrvinky"><a href="./">Rezidencia Javorová</a> › <a href="./#cennik">Byty a ceny</a> › Byt ${esc(b.id)}</nav>
@@ -109,6 +110,9 @@ async function start() {
     <section class="karta" aria-labelledby="k-fin"><h3 id="k-fin">Financovanie</h3>${pred ? '' : `<p class="spl">Splátka od <b>${eur(Math.round(splatka(b.cena * (1 - D.hypoteka.vlastne / 100), D.hypoteka.urok, D.hypoteka.roky)))}</b> mesačne<small>pri ${D.hypoteka.vlastne} % vlastných zdrojov a ${D.hypoteka.roky} rokoch, orientačne · <a class="link" href="./#financovanie">spočítať inak</a></small></p>`}<ul>${D.financovanie.map((s) => `<li>${esc(s)}</li>`).join('')}</ul></section>
   </div>
 
+  ${fotky.length ? `<section class="dsec" aria-labelledby="h-viz"><div class="sec-h" style="margin-bottom:16px"><div><h2 id="h-viz" style="font-size:28px">Vizualizácie</h2></div><p>Ilustračné vizualizácie bytov tohto typu. Kliknutím obrázok zväčšíte.</p></div>
+    <ul class="gal gal-b">${fotky.map(([f, alt, cap], i) => `<li><button type="button" data-f="${i}" aria-label="Zväčšiť: ${esc(cap)}"><img src="img/${f}-800.webp" width="800" height="533" alt="${esc(alt)}" loading="lazy"><span>${esc(cap)}</span></button></li>`).join('')}</ul></section>` : ''}
+
   <div class="dsec d2">
     <section aria-labelledby="h-mi">
       <h2 id="h-mi">Miestnosti</h2>
@@ -134,6 +138,7 @@ async function start() {
   </div>
   <p class="akt" style="padding-bottom:40px"><i aria-hidden="true"></i>Cena a stav aktualizované ${datum(D.aktualizovane)}</p>`;
 
+  document.querySelector('.gal-b')?.addEventListener('click', (e) => { const x = e.target.closest('[data-f]'); if (x) otvorObrazky(fotky, +x.dataset.f); });
   const ob = document.getElementById('oblD');
   const kresliObl = () => { const on = oblubene().includes(b.id); ob.setAttribute('aria-pressed', String(on)); ob.querySelector('span').textContent = on ? 'V obľúbených' : 'Uložiť do obľúbených'; };
   ob.addEventListener('click', () => { prepniOblubene(b.id); kresliObl(); });

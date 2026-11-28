@@ -10,6 +10,9 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Rezidencia Javorová – 30 bytov v Hlohovci">
 <meta property="og:description" content="Vyberte si byt na budove, porovnajte obľúbené a spočítajte si splátku.">
+<meta property="og:image" content="https://realitnyasistent.eu/ukazka6/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" href="img/exterier.webp" imagesrcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" imagesizes="(max-width:980px) 100vw, 55vw">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
 <link rel="stylesheet" href="styl.css">
@@ -30,14 +33,15 @@
 <main>
 <section class="uvod" aria-labelledby="h1">
   <div class="w uvod-g">
-    <div>
+    <div class="uvod-t">
       <ul class="odznaky" id="odznaky" aria-label="To najdôležitejšie"></ul>
       <h1 id="h1">Rezidencia Javorová</h1>
       <p class="lead">Bytový dom so 6 podlažiami v tichej ulici pri lesoparku v Hlohovci. Byty od 1 do 4 izieb, garáž v suteréne a nasťahovanie v lete 2027.</p>
       <div class="uvod-cta"><a class="btn" href="#vyber">Vybrať byt na budove</a><a class="btn sec" href="#cennik">Cenník bytov</a></div>
     </div>
-    <ul class="cisla" id="cisla"></ul>
+    <figure class="uvod-f"><img src="img/exterier.webp" srcset="img/exterier-800.webp 800w, img/exterier.webp 1600w" sizes="(max-width:980px) 100vw, 55vw" width="1600" height="900" alt="Rezidencia Javorová z ulice pri západe slnka: biela fasáda, drevené lamely a balkóny so skleneným zábradlím" fetchpriority="high"><figcaption>Vizualizácia</figcaption></figure>
   </div>
+  <div class="w"><ul class="cisla" id="cisla"></ul></div>
   <div class="w"><ul class="dovera" id="dovera"></ul></div>
 </section>
 
@@ -58,6 +62,13 @@
         <ul class="legenda" aria-label="Legenda"><li><i class="volny"></i>voľný</li><li><i class="rez"></i>rezervovaný</li><li><i class="pred"></i>predaný</li></ul>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="galeria" aria-labelledby="h-gal">
+  <div class="w">
+    <div class="sec-h"><div><h2 id="h-gal">Vizualizácie</h2></div><p>Takto bude dom a byty vyzerať po dokončení. Kliknutím obrázok zväčšíte.</p></div>
+    <ul class="gal" id="gal"></ul>
   </div>
 </section>
 
@@ -155,7 +166,7 @@
 
 <section id="lokalita" aria-labelledby="h-lok">
   <div class="w lok-g">
-    <div><h2 id="h-lok">Lokalita</h2><p id="lokP"></p><p class="adr" id="lokA"></p></div>
+    <div><h2 id="h-lok">Lokalita</h2><p id="lokP"></p><p class="adr" id="lokA"></p><figure class="lok-f" id="lokF"></figure></div>
     <ul class="body" id="lokB"></ul>
   </div>
 </section>
@@ -199,7 +210,7 @@
 </dialog>
 
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText } from './js/projekt.js';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText, otvorObrazky } from './js/projekt.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
@@ -317,31 +328,21 @@ function nacitajUrl() {
 
 // ---------- výber na budove ----------
 function budova() {
-  const P = D.podlazia, W = 520, fh = 52, top = 46, x0 = 40;
-  const h = top + P * fh + 70;
-  let s = `<svg class="bud" viewBox="0 0 ${W + 150} ${h}" role="group" aria-label="Budova, výber podlažia">`;
-  s += `<path d="M${x0 - 14} ${top} h${W + 28}" class="bud-str"/>`;
-  s += `<rect x="${x0}" y="${top}" width="${W}" height="${P * fh + 40}" class="bud-f"/>`;
-  const gy = top + P * fh;
-  s += `<rect x="${x0}" y="${gy}" width="${W}" height="40" class="bud-pr"/>`;
-  s += `<text x="${x0 + W / 2}" y="${gy + 25}" class="bud-t">vstup a garáž</text>`;
-  s += `<path d="M0 ${gy + 40} H${W + 150}" class="bud-zem"/>`;
-  for (let p = P; p >= 1; p--) {
-    const y = top + (P - p) * fh;
+  const F = D.fasada, [W, H] = F.rozmer, [x0, x1] = F.x;
+  let s = `<div class="bud-foto"><img src="img/budova.webp" srcset="img/budova-800.webp 800w, img/budova.webp 1448w" sizes="(max-width:980px) 100vw, 48vw" width="${W}" height="${H}" alt="Čelný pohľad na južnú fasádu domu" loading="lazy">`;
+  s += `<svg class="bud" viewBox="0 0 ${W} ${H}" role="group" aria-label="Budova, výber podlažia">`;
+  for (let p = D.podlazia; p >= 1; p--) {
+    const [y0, y1] = F.podlazia[p];
     const nap = byty.filter((b) => b.podlazie === p);
     const v = vol(nap).length;
     const lbl = `${p}. podlažie ${v ? volneText(v) : 'vypredané'} z ${nap.length} bytov`;
+    const ly = (y0 + y1) / 2;
     s += `<g class="bud-p${p === aktPodl ? ' akt' : ''}" data-p="${p}" role="button" tabindex="0" aria-label="${lbl}" aria-pressed="${p === aktPodl}">`;
-    s += `<rect x="${x0}" y="${y}" width="${W}" height="${fh}" class="bud-h"/>`;
-    for (let i = 0; i < 8; i++) {
-      const wx = x0 + 22 + i * 62;
-      s += `<rect x="${wx}" y="${y + 10}" width="${p === P ? 44 : 34}" height="${fh - 18}" rx="2" class="bud-o"/>`;
-    }
-    if (p !== P) s += `<rect x="${x0 + 14}" y="${y + fh - 8}" width="${W - 28}" height="5" class="bud-bal"/>`;
-    s += `<text x="${x0 + W + 16}" y="${y + fh / 2 - 2}"><tspan class="bud-pn">${p}. podlažie</tspan> <tspan x="${x0 + W + 16}" dy="18" class="bud-v${v ? '' : ' nic'}">${v ? volneText(v) : 'vypredané'}</tspan></text>`;
+    s += `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" class="bud-h"/>`;
+    s += `<g class="bud-st" aria-hidden="true"><rect x="${x1 - 420}" y="${ly - 52}" width="400" height="104" rx="22"/><text x="${x1 - 220}" y="${ly - 8}"><tspan class="bud-pn">${p}. podlažie</tspan> <tspan x="${x1 - 220}" dy="42" class="bud-v${v ? '' : ' nic'}">${v ? volneText(v) : 'vypredané'}</tspan></text></g>`;
     s += '</g>';
   }
-  return s + '</svg>';
+  return s + '</svg></div>';
 }
 function zobrazPodlazie(p, fokus) {
   aktPodl = Math.max(1, Math.min(D.podlazia, p));
@@ -435,9 +436,11 @@ async function start() {
   $('#hVl').value = D.hypoteka.vlastne; $('#hRo').value = D.hypoteka.roky; $('#hUr').value = D.hypoteka.urok;
   hypo();
 
+  $('#gal').innerHTML = D.galeria.map(([f, alt, cap], i) => `<li class="${i === 0 ? 'velky' : ''}"><button type="button" data-g="${i}" aria-label="Zväčšiť: ${esc(cap)}"><img src="img/${f}-800.webp" width="800" height="${f === 'exterier' ? 450 : 533}" alt="${esc(alt)}" loading="lazy"><span>${esc(cap)}</span></button></li>`).join('');
+  if (D.lokalita.foto) $('#lokF').innerHTML = `<img src="img/${D.lokalita.foto[0]}-800.webp" srcset="img/${D.lokalita.foto[0]}-800.webp 800w, img/${D.lokalita.foto[0]}.webp 1600w" sizes="(max-width:860px) 100vw, 40vw" width="800" height="450" alt="${esc(D.lokalita.foto[1])}" loading="lazy">`;
   const posl = D.vystavba.filter((x) => x.hotovo).at(-1);
   $('#vysAkt').textContent = posl ? `Naposledy aktualizované ${datumKr(posl.datum)}.` : '';
-  $('#cas').innerHTML = D.vystavba.map((x) => `<li class="${x.hotovo ? 'hot' : ''}"><span class="cas-d">${x.hotovo ? datumKr(x.datum) : 'plán: ' + new Date(x.datum).toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}</span><b>${esc(x.nazov)}</b><span>${esc(x.text)}</span></li>`).join('');
+  $('#cas').innerHTML = D.vystavba.map((x) => `<li class="${x.hotovo ? 'hot' : ''}">${x.foto ? `<button type="button" class="cas-f" data-v="${esc(x.foto[0])}" aria-label="Zväčšiť fotku: ${esc(x.foto[1])}"><img src="img/${x.foto[0]}-800.webp" width="800" height="600" alt="${esc(x.foto[1])}" loading="lazy"></button>` : ''}<span class="cas-d">${x.hotovo ? datumKr(x.datum) : 'plán: ' + new Date(x.datum).toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}</span><b>${esc(x.nazov)}</b><span>${esc(x.text)}</span></li>`).join('');
   $('#lokP').textContent = D.lokalita.popis;
   $('#lokA').textContent = `${D.ulica}, ${D.mesto}`;
   $('#lokB').innerHTML = D.lokalita.body.map(([n, d, c]) => `<li><b>${esc(n)}</b><span>${esc(d)} · ${esc(c)}</span></li>`).join('');
@@ -509,6 +512,13 @@ $('#fm').addEventListener('submit', (e) => {
   fm.querySelector('.ok')?.remove();
   if (!fm.reportValidity()) return;
   fm.insertAdjacentHTML('beforeend', '<p class="ok" role="status">Ďakujeme. V ukážke sa správa neodošle, na skutočnom webe príde developerovi aj do aplikácie k danému bytu.</p>');
+});
+// ---------- zväčšené obrázky ----------
+$('#gal').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (b) otvorObrazky(D.galeria, +b.dataset.g); });
+$('#cas').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-v]'); if (!b) return;
+  const fotky = D.vystavba.filter((x) => x.foto).map((x) => [x.foto[0], x.foto[1], x.nazov + ' · ' + x.foto[1]]);
+  otvorObrazky(fotky, Math.max(0, fotky.findIndex((x) => x[0] === b.dataset.v)));
 });
 start();
 </script>

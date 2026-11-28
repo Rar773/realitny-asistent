@@ -889,13 +889,21 @@
    "datum": "2026-05-04",
    "nazov": "Začiatok výstavby",
    "text": "Výkopové práce a základová doska garáže.",
-   "hotovo": true
+   "hotovo": true,
+   "foto": [
+    "vystavba-zaklady",
+    "Základová doska garáže v máji 2026"
+   ]
   },
   {
    "datum": "2026-11-20",
    "nazov": "Hrubá stavba 4. podlažia",
    "text": "Stoja obvodové steny do 4. podlažia, betónuje sa strop nad 4. podlažím.",
-   "hotovo": true
+   "hotovo": true,
+   "foto": [
+    "vystavba-hruba",
+    "Hrubá stavba po 4. podlažie v novembri 2026"
+   ]
   },
   {
    "datum": "2027-02-28",
@@ -953,6 +961,10 @@
     "25 km",
     "20 min autom"
    ]
+  ],
+  "foto": [
+   "lokalita",
+   "Ulica pri lesoparku s cyklotrasou"
   ]
  },
  "dovera": [
@@ -972,5 +984,78 @@
    "Pevná cena",
    "cena bytu sa do odovzdania nezmení"
   ]
- ]
+ ],
+ "galeria": [
+  [
+   "exterier",
+   "Rezidencia Javorová z ulice pri západe slnka",
+   "Dom z ulice"
+  ],
+  [
+   "letecky",
+   "Letecký pohľad na dom, záhradu s ihriskom, parkovanie a park za domom",
+   "Letecký pohľad"
+  ],
+  [
+   "obyvacka",
+   "Obývačka s kuchynským ostrovčekom a balkónom s výhľadom do parku",
+   "Obývačka s kuchyňou"
+  ],
+  [
+   "spalna",
+   "Spálňa s veľkým oknom a vstavanou skriňou",
+   "Spálňa"
+  ],
+  [
+   "detska",
+   "Detská izba s písacím stolom pri okne",
+   "Detská izba"
+  ],
+  [
+   "kupelna",
+   "Kúpeľňa so sprchou bez vaničky a závesným WC",
+   "Kúpeľňa"
+  ],
+  [
+   "terasa",
+   "Strešná terasa bytu na 6. podlaží pri západe slnka",
+   "Terasa na 6. podlaží"
+  ]
+ ],
+ "fasada": {
+  "rozmer": [
+   1448,
+   1086
+  ],
+  "x": [
+   118,
+   1345
+  ],
+  "podlazia": {
+   "1": [
+    729,
+    858
+   ],
+   "2": [
+    610,
+    729
+   ],
+   "3": [
+    487,
+    610
+   ],
+   "4": [
+    365,
+    487
+   ],
+   "5": [
+    225,
+    365
+   ],
+   "6": [
+    97,
+    225
+   ]
+  }
+ }
 }

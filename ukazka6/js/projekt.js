@@ -201,3 +201,39 @@ export function splatka(istina, urokPct, roky) {
   if (r === 0) return istina / n;
   return istina * r / (1 - Math.pow(1 + r, -n));
 }
+
+// ---------- Zväčšené obrázky (spoločné pre všetky stránky) ----------
+let lb = null, lbZoz = [], lbI = 0;
+function lbUkaz() {
+  const [f, alt, cap] = lbZoz[lbI];
+  const img = lb.querySelector('img');
+  img.src = `img/${f}.webp`; img.alt = alt;
+  lb.querySelector('figcaption').textContent = cap;
+  lb.querySelectorAll('.lb-p,.lb-n').forEach((b) => { b.hidden = lbZoz.length < 2; });
+}
+const lbPosun = (k) => { if (lbZoz.length > 1) { lbI = (lbI + k + lbZoz.length) % lbZoz.length; lbUkaz(); } };
+export function otvorObrazky(zoz, i = 0) {
+  if (!lb) {
+    document.body.insertAdjacentHTML('beforeend', `<dialog class="lb" aria-label="Zväčšený obrázok">
+      <figure><img alt=""><figcaption></figcaption></figure>
+      <button type="button" class="lb-b lb-z" aria-label="Zavrieť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="lb-b lb-p" aria-label="Predchádzajúci obrázok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="lb-b lb-n" aria-label="Ďalší obrázok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </dialog>`);
+    lb = document.body.lastElementChild;
+    lb.querySelector('.lb-z').addEventListener('click', () => lb.close());
+    lb.querySelector('.lb-p').addEventListener('click', () => lbPosun(-1));
+    lb.querySelector('.lb-n').addEventListener('click', () => lbPosun(1));
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+    lb.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') lbPosun(1); if (e.key === 'ArrowLeft') lbPosun(-1); });
+  }
+  lbZoz = zoz; lbI = i; lbUkaz(); lb.showModal();
+}
+
+// Ktoré vizualizácie patria k bytu podľa typu a podlažia
+export function fotkyBytu(b, galeria) {
+  const g = Object.fromEntries(galeria.map((x) => [x[0], x]));
+  const k = { A: ['obyvacka', 'kupelna'], B: ['obyvacka', 'spalna', 'kupelna'], C: ['obyvacka', 'spalna', 'kupelna'], D: ['obyvacka', 'spalna', 'detska', 'kupelna'], E: ['obyvacka', 'spalna', 'detska', 'kupelna'] }[b.typ] || [];
+  if (b.podlazie === 6) k.push('terasa');
+  return k.map((x) => g[x]).filter(Boolean);
+}
