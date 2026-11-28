@@ -232,7 +232,7 @@
     const kod = form.querySelector('[name=kod]'); if (kod) { kod.value = ''; const l = kod.closest('label'); if (l) l.hidden = true; }
     if (ODM.sluzba === 'zariadenie' && form.pocet) { form.pocet.value = ODM.max; form.pocet.max = ODM.max; }
     const b = document.createElement('p'); b.className = 'odm-ban';
-    b.innerHTML = ODM.tok ? '<b>Odměna za doporučení</b> – tuto objednávku máte zdarma.' : 'Pro použití odměny se nejprve přihlaste v <a class="link" href="ucet.html#odmeny">Můj účet</a>.';
+    b.innerHTML = ODM.tok ? '<b>Odměna za doporučení</b> – tuto objednávku máte zdarma.' : 'Pro použití odměny se nejprve přihlaste v <a class="link" href="ucet#odmeny">Můj účet</a>.';
     form.prepend(b);
   }
   prepocitaj();

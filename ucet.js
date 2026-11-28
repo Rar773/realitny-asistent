@@ -152,7 +152,7 @@
   async function pokracuj(sprava) {
     let a = '';
     try { a = sessionStorage.getItem('ra_app') || ''; sessionStorage.removeItem('ra_app'); } catch { /* nič */ }
-    if (a && !preApp) { location.replace('ucet.html' + a); return; }
+    if (a && !preApp) { location.replace('ucet' + a); return; }
     history.replaceState(null, '', location.pathname + location.search);
     await nacitaj();
     if (!U) return;
@@ -166,14 +166,14 @@
     const box = $('dOdm'); if (!box) return;
     const r = await post('/ucet/odmeny', {}, true);
     const z = (r && r.ok && r.odmeny) || [];
-    if (!z.length) { box.innerHTML = '<p class="mut" style="margin:0">Zatiaľ žiadne odmeny. Pošlite kolegovi svoj kód z aplikácie (časť Odporučte kolegu). <a class="link" href="odporucanie.html">Ako to funguje</a></p>'; return; }
+    if (!z.length) { box.innerHTML = '<p class="mut" style="margin:0">Zatiaľ žiadne odmeny. Pošlite kolegovi svoj kód z aplikácie (časť Odporučte kolegu). <a class="link" href="odporucanie">Ako to funguje</a></p>'; return; }
     box.innerHTML = '<table><thead><tr><th>Odmena</th><th>Stav</th><th><span class="vh">Akcia</span></th></tr></thead><tbody>' + z.map((o) => {
       let st = '', bt = '';
       if (o.stav === 'caka') st = 'pripíšeme {d}'.replace('{d}', datum(o.dostupna_od));
       else if (o.stav === 'dostupna') {
         st = 'aktivujte do {d}'.replace('{d}', datum(o.platna_do));
         bt = o.druh === 'mesiace' ? `<button class="btn sm" type="button" data-odm="${esc(o.id)}">Aktivovať</button>`
-          : `<a class="btn sm" href="objednavka.html?odmena=${encodeURIComponent(o.id)}&sluzba=${o.druh === 'fotky' ? 'zariadenie&pocet=' + o.mnozstvo : 'standard'}">Použiť</a>`;
+          : `<a class="btn sm" href="objednavka?odmena=${encodeURIComponent(o.id)}&sluzba=${o.druh === 'fotky' ? 'zariadenie&pocet=' + o.mnozstvo : 'standard'}">Použiť</a>`;
       } else if (o.stav === 'aktivovana') st = o.objednavka && o.objednavka !== 'odmena' ? 'použitá v objednávke {c}'.replace('{c}', esc(o.objednavka)) : 'aktivovaná {d}'.replace('{d}', datum(o.aktivovana));
       else if (o.stav === 'prepadnuta') st = 'prepadla';
       return `<tr><td>${esc(odmPopis(o))}</td><td>${st}</td><td>${bt}</td></tr>`;

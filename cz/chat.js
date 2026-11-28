@@ -6,8 +6,8 @@
   var C = Object.assign({
     api: 'https://ra-objednavky.rarex731.workers.dev',
     zdroj: 'web',
-    objednat: 'objednavka.html',
-    sukromie: 'sukromie.html#pomocnik',
+    objednat: 'objednavka',
+    sukromie: 'sukromie#pomocnik',
     otvorene: false
   }, window.RA_CHAT || {});
   var KLUC = 'ra_chat_cz_v1';
@@ -75,7 +75,7 @@
     u = String(u || '').trim();
     if (/^mailto:info@realitnyasistent\.eu/i.test(u)) return u;
     if (/^https:\/\/(www\.)?realitnyasistent\.eu(\/|$)/i.test(u)) return u;
-    if (/^(\.?\/)?[\w-]+\.html(#[\w-]*)?$/i.test(u) || /^#[\w-]+$/.test(u) || /^(\.\.\/|\.?\/)?ukazka\d?\/?$/.test(u)) {
+    if (/^(\.?\/)?[\w-]+(\.html)?(#[\w-]*)?$/i.test(u) || /^#[\w-]+$/.test(u) || /^(\.\.\/|\.?\/)?ukazka\d?\/?$/.test(u)) {
       return C.zdroj === 'aplikacia' ? 'https://realitnyasistent.eu/' + u.replace(/^\.?\//, '') : u;
     }
     return '';

@@ -141,7 +141,7 @@ function pOdoslat(ev) {
 /* ---------- Asistent: výber verzie v úvode ---------- */
 (function () {
   const f = document.getElementById('pick'), go = document.getElementById('pickGo'); if (!f || !go) return;
-  const set = () => { const r = f.querySelector('input:checked'); go.href = 'ucet.html#registracia'; go.dataset.plan = r.dataset.s; };
+  const set = () => { const r = f.querySelector('input:checked'); go.href = 'ucet#registracia'; go.dataset.plan = r.dataset.s; };
   f.addEventListener('change', set); set();
 })();
 
@@ -241,10 +241,10 @@ document.querySelectorAll('.ba').forEach(ba => {
   const CZ = (document.documentElement.lang || '').startsWith('cs');
   const T = CZ ? {
     text: 'Používáme jen nezbytné cookies a údaje v prohlížeči – pro přihlášení, objednávky a chat. S vaším souhlasem si na 60 dní zapamatujeme i kód ambasadora, přes kterého jste přišli.',
-    viac: 'Více o soukromí', ano: 'Souhlasím', nie: 'Jen nezbytné', nast: 'Nastavení cookies', url: '/cz/sukromie.html#cookies', aria: 'Souhlas s cookies'
+    viac: 'Více o soukromí', ano: 'Souhlasím', nie: 'Jen nezbytné', nast: 'Nastavení cookies', url: '/cz/sukromie#cookies', aria: 'Souhlas s cookies'
   } : {
     text: 'Používame len nevyhnutné cookies a údaje v prehliadači – na prihlásenie, objednávky a chat. S vaším súhlasom si na 60 dní zapamätáme aj kód ambasádora, cez ktorého ste prišli.',
-    viac: 'Viac o súkromí', ano: 'Súhlasím', nie: 'Len nevyhnutné', nast: 'Nastavenia cookies', url: '/sukromie.html#cookies', aria: 'Súhlas s cookies'
+    viac: 'Viac o súkromí', ano: 'Súhlasím', nie: 'Len nevyhnutné', nast: 'Nastavenia cookies', url: '/sukromie#cookies', aria: 'Súhlas s cookies'
   };
   const ls = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }, del: (k) => { try { localStorage.removeItem(k); } catch (e) {} } };
   const stav = () => { const v = ls.get('ra_cookies'); return v === 'vsetko' || v === 'nutne' ? v : ''; };
@@ -270,7 +270,7 @@ document.querySelectorAll('.ba').forEach(ba => {
   function vyska() { if (lista) document.body.style.setProperty('--ck-h', lista.offsetHeight + 'px'); }
   function zavri() { if (lista) { lista.remove(); lista = null; } removeEventListener('resize', vyska); document.body.classList.remove('ma-ck'); }
   if (!stav()) ukaz();
-  const suk = document.querySelector('footer a[href$="sukromie.html"]');
+  const suk = document.querySelector('footer a[href$="sukromie"]');
   if (suk && !document.querySelector('footer .ck-nast')) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'ck-nast'; b.textContent = T.nast;

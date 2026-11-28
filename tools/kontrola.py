@@ -39,8 +39,12 @@ for f, s in pages.items():
         if path:
             path = os.path.normpath(os.path.join(zlozka, path)).replace(os.sep, '/')
             p = ROOT / path
-            if path.endswith('/'):
+            if path.endswith('/') or path in ('.', '..') or (ROOT / path).is_dir():
                 p = p / 'index.html'
+                path = (path.rstrip('/') + '/index.html').lstrip('./') if path not in ('.',) else 'index.html'
+            elif not p.exists() and (ROOT / (path + '.html')).exists():
+                path += '.html'  # odkaz bez .html (Cloudflare Pages)
+                p = ROOT / path
             if not p.exists():
                 chyby.append(f'{f}: chýba súbor {h}')
                 continue
