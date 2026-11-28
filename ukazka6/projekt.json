@@ -359,7 +359,8 @@
     "západ"
    ],
    "cena": 240400,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": []
   },
   {
    "id": "1.02",
@@ -373,7 +374,8 @@
     "sever"
    ],
    "cena": 124100,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": []
   },
   {
    "id": "1.03",
@@ -388,7 +390,8 @@
     "východ"
    ],
    "cena": 179700,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "1.04",
@@ -403,7 +406,10 @@
     "východ"
    ],
    "cena": 178800,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": [
+    "Na juh"
+   ]
   },
   {
    "id": "1.05",
@@ -418,7 +424,11 @@
     "západ"
    ],
    "cena": 323900,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "2 kúpeľne",
+    "Na juh"
+   ]
   },
   {
    "id": "2.01",
@@ -433,7 +443,8 @@
     "západ"
    ],
    "cena": 243900,
-   "stav": "rezervovany"
+   "stav": "rezervovany",
+   "vyhody": []
   },
   {
    "id": "2.02",
@@ -447,7 +458,8 @@
     "sever"
    ],
    "cena": 125900,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "2.03",
@@ -462,7 +474,8 @@
     "východ"
    ],
    "cena": 182400,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": []
   },
   {
    "id": "2.04",
@@ -477,7 +490,10 @@
     "východ"
    ],
    "cena": 181400,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "Na juh"
+   ]
   },
   {
    "id": "2.05",
@@ -492,7 +508,11 @@
     "západ"
    ],
    "cena": 328600,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": [
+    "2 kúpeľne",
+    "Na juh"
+   ]
   },
   {
    "id": "3.01",
@@ -507,7 +527,8 @@
     "západ"
    ],
    "cena": 247400,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "3.02",
@@ -521,7 +542,8 @@
     "sever"
    ],
    "cena": 127700,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": []
   },
   {
    "id": "3.03",
@@ -536,7 +558,8 @@
     "východ"
    ],
    "cena": 185000,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "3.04",
@@ -551,7 +574,10 @@
     "východ"
    ],
    "cena": 184000,
-   "stav": "rezervovany"
+   "stav": "rezervovany",
+   "vyhody": [
+    "Na juh"
+   ]
   },
   {
    "id": "3.05",
@@ -566,7 +592,11 @@
     "západ"
    ],
    "cena": 333400,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "2 kúpeľne",
+    "Na juh"
+   ]
   },
   {
    "id": "4.01",
@@ -581,7 +611,8 @@
     "západ"
    ],
    "cena": 250900,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "4.02",
@@ -595,7 +626,8 @@
     "sever"
    ],
    "cena": 129500,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "4.03",
@@ -610,7 +642,8 @@
     "východ"
    ],
    "cena": 187600,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "4.04",
@@ -625,7 +658,10 @@
     "východ"
    ],
    "cena": 186600,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": [
+    "Na juh"
+   ]
   },
   {
    "id": "4.05",
@@ -640,7 +676,11 @@
     "západ"
    ],
    "cena": 338100,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "2 kúpeľne",
+    "Na juh"
+   ]
   },
   {
    "id": "5.01",
@@ -655,7 +695,8 @@
     "západ"
    ],
    "cena": 254400,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "5.02",
@@ -669,7 +710,8 @@
     "sever"
    ],
    "cena": 131300,
-   "stav": "rezervovany"
+   "stav": "rezervovany",
+   "vyhody": []
   },
   {
    "id": "5.03",
@@ -684,7 +726,8 @@
     "východ"
    ],
    "cena": 190200,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": []
   },
   {
    "id": "5.04",
@@ -699,7 +742,10 @@
     "východ"
    ],
    "cena": 189200,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "Na juh"
+   ]
   },
   {
    "id": "5.05",
@@ -714,7 +760,11 @@
     "západ"
    ],
    "cena": 342800,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "2 kúpeľne",
+    "Na juh"
+   ]
   },
   {
    "id": "6.01",
@@ -729,7 +779,10 @@
     "západ"
    ],
    "cena": 279400,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": [
+    "Terasa"
+   ]
   },
   {
    "id": "6.02",
@@ -743,7 +796,10 @@
     "sever"
    ],
    "cena": 143400,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "Terasa"
+   ]
   },
   {
    "id": "6.03",
@@ -758,7 +814,10 @@
     "východ"
    ],
    "cena": 207700,
-   "stav": "volny"
+   "stav": "volny",
+   "vyhody": [
+    "Terasa"
+   ]
   },
   {
    "id": "6.04",
@@ -773,7 +832,11 @@
     "východ"
    ],
    "cena": 206900,
-   "stav": "predany"
+   "stav": "predany",
+   "vyhody": [
+    "Terasa",
+    "Na juh"
+   ]
   },
   {
    "id": "6.05",
@@ -788,7 +851,12 @@
     "západ"
    ],
    "cena": 374300,
-   "stav": "rezervovany"
+   "stav": "rezervovany",
+   "vyhody": [
+    "Terasa",
+    "2 kúpeľne",
+    "Na juh"
+   ]
   }
  ],
  "standard": [
@@ -802,5 +870,107 @@
   "Rezervácia 3 000 €, vrátime ju, ak vám banka neschváli hypotéku",
   "10 % pri zmluve o budúcej kúpnej zmluve",
   "90 % pri kolaudácii, aj z hypotéky"
+ ],
+ "akcia": "Pri rezervácii do 31. 1. 2027 máte pivnicu k bytu zadarmo",
+ "energeticka_trieda": "A0",
+ "hypoteka": {
+  "urok": 3.6,
+  "roky": 30,
+  "vlastne": 20
+ },
+ "vystavba": [
+  {
+   "datum": "2026-02-10",
+   "nazov": "Stavebné povolenie",
+   "text": "Právoplatné stavebné povolenie na celý dom aj garáž.",
+   "hotovo": true
+  },
+  {
+   "datum": "2026-05-04",
+   "nazov": "Začiatok výstavby",
+   "text": "Výkopové práce a základová doska garáže.",
+   "hotovo": true
+  },
+  {
+   "datum": "2026-11-20",
+   "nazov": "Hrubá stavba 4. podlažia",
+   "text": "Stoja obvodové steny do 4. podlažia, betónuje sa strop nad 4. podlažím.",
+   "hotovo": true
+  },
+  {
+   "datum": "2027-02-28",
+   "nazov": "Hrubá stavba hotová",
+   "text": "Strecha a okná, dom bude uzavretý.",
+   "hotovo": false
+  },
+  {
+   "datum": "2027-06-30",
+   "nazov": "Kolaudácia a odovzdanie bytov",
+   "text": "Prevzatie kľúčov a zápis do katastra.",
+   "hotovo": false
+  }
+ ],
+ "lokalita": {
+  "popis": "Dom stojí v tichej ulici pri lesoparku, 10 minút pešo od námestia. Na D1 sa dostanete za 5 minút autom.",
+  "body": [
+   [
+    "Materská škola",
+    "350 m",
+    "4 min pešo"
+   ],
+   [
+    "Základná škola",
+    "650 m",
+    "8 min pešo"
+   ],
+   [
+    "Potraviny",
+    "300 m",
+    "4 min pešo"
+   ],
+   [
+    "Lesopark a cyklotrasa",
+    "150 m",
+    "2 min pešo"
+   ],
+   [
+    "Námestie a úrady",
+    "900 m",
+    "11 min pešo"
+   ],
+   [
+    "Diaľnica D1",
+    "3,5 km",
+    "5 min autom"
+   ],
+   [
+    "Vlaková stanica",
+    "1,8 km",
+    "6 min autom"
+   ],
+   [
+    "Trnava",
+    "25 km",
+    "20 min autom"
+   ]
+  ]
+ },
+ "dovera": [
+  [
+   "Energetická trieda A0",
+   "nízke náklady na kúrenie"
+  ],
+  [
+   "Vratná rezervácia",
+   "3 000 € vrátime, ak banka neschváli hypotéku"
+  ],
+  [
+   "Financovanie bankou",
+   "projekt financuje banka, peniaze sú v úschove"
+  ],
+  [
+   "Pevná cena",
+   "cena bytu sa do odovzdania nezmení"
+  ]
  ]
 }

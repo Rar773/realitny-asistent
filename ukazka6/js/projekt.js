@@ -151,3 +151,53 @@ export function zostav(htmlSel, html) {
   if (el) el.innerHTML = html;
   return el;
 }
+
+// ---------- Pôdorys podlažia s bytmi vo farbách stavu ----------
+export function podlazie(byty, p) {
+  const S = 22, pd = 14, W = 28.2, H = 17.4;
+  const X = (m) => pd + m * S, Y = (m) => pd + 26 + m * S;
+  const vw = W * S + pd * 2 + 40, vh = H * S + pd * 2 + 30;
+  let s = `<svg class="podl" viewBox="0 0 ${vw} ${vh}" role="group" aria-label="Pôdorys ${p}. podlažia">`;
+  s += `<rect x="${X(0)}" y="${Y(0)}" width="${W * S}" height="${H * S}" class="pd-dom"/>`;
+  s += `<rect x="${X(16.8)}" y="${Y(0)}" width="${3 * S}" height="${7.6 * S}" class="pd-jadro"/>`;
+  s += `<rect x="${X(14)}" y="${Y(9.4)}" width="${7 * S}" height="${8 * S}" class="pd-jadro"/>`;
+  s += `<text x="${X(17.5)}" y="${Y(13.7)}" class="pd-tj">schodisko a výťah</text>`;
+  s += `<text x="${X(W / 2)}" y="${Y(8.5) + 4}" class="pd-tj">chodba</text>`;
+  for (const [poz, [x, y, w, h]] of Object.entries(POLOHA)) {
+    const b = byty.find((q) => q.podlazie === p && q.pozicia === +poz);
+    if (!b) continue;
+    const st = STAV[b.stav];
+    const lbl = `${b.id} ${b.izby}-izb. · ${nf1.format(b.plocha)} m² ${b.stav === 'predany' ? 'predaný' : eur(b.cena) + ', ' + st.t.toLowerCase()}`;
+    s += `<a href="byt.html?id=${encodeURIComponent(b.id)}" class="pd-b ${st.c}" aria-label="${esc(lbl)}">`;
+    s += `<rect x="${X(x) + 3}" y="${Y(y) + 3}" width="${w * S - 6}" height="${h * S - 6}" rx="6"/>`;
+    const cx = X(x + w / 2), cy = Y(y + h / 2);
+    s += `<text x="${cx}" y="${cy - 14}"><tspan class="pd-id">${esc(b.id)}</tspan> <tspan x="${cx}" dy="20" class="pd-in">${b.izby}-izb. · ${nf1.format(b.plocha)} m²</tspan> <tspan x="${cx}" dy="20" class="pd-in pd-c">${b.stav === 'predany' ? 'predaný' : esc(eur(b.cena))}</tspan></text>`;
+    s += '</a>';
+  }
+  const sx = X(W) + 24, sy = Y(0) + 4;
+  s += `<g class="pd-s" aria-hidden="true"><path d="M${sx} ${sy - 12} l7 18 -7 -5 -7 5z"/><text x="${sx}" y="${sy + 24}" class="pd-tj">S</text></g>`;
+  return s + '</svg>';
+}
+
+// ---------- Obľúbené byty (uložené v prehliadači) ----------
+const OBL = 'jav-oblubene';
+export function oblubene() {
+  try { return JSON.parse(localStorage.getItem(OBL) || '[]'); } catch (e) { return []; }
+}
+export function prepniOblubene(id) {
+  const a = oblubene();
+  const i = a.indexOf(id);
+  i < 0 ? a.push(id) : a.splice(i, 1);
+  try { localStorage.setItem(OBL, JSON.stringify(a)); } catch (e) {}
+  document.dispatchEvent(new CustomEvent('oblubene', { detail: a }));
+  return i < 0;
+}
+export const srdce = (id, on) => `<button type="button" class="srdce" data-obl="${esc(id)}" aria-pressed="${on}" aria-label="Obľúbený byt ${esc(id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg></button>`;
+
+// ---------- Hypotéka: mesačná splátka (anuita) ----------
+export function splatka(istina, urokPct, roky) {
+  const r = urokPct / 100 / 12, n = roky * 12;
+  if (istina <= 0) return 0;
+  if (r === 0) return istina / n;
+  return istina * r / (1 - Math.pow(1 + r, -n));
+}

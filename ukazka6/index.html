@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rezidencia Javorová – 30 bytov v Hlohovci (ukážka webu projektu)</title>
-<meta name="description" content="Ukážka webu bytového domu od Realitného asistenta: cenník bytov s filtrami, pôdorysy, detail bytu s rozpisom ceny a karta bytu v PDF.">
+<meta name="description" content="Ukážka webu bytového domu od Realitného asistenta: výber bytu na budove a podlaží, cenník s filtrami, porovnanie obľúbených bytov, hypokalkulačka a detail bytu s pôdorysom.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="../ikona.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Rezidencia Javorová – 30 bytov v Hlohovci">
-<meta property="og:description" content="Cenník bytov s filtrami, pôdorysy a detail každého bytu.">
+<meta property="og:description" content="Vyberte si byt na budove, porovnajte obľúbené a spočítajte si splátku.">
 <link rel="stylesheet" href="../fonts/familjen-grotesk.css">
 <link rel="stylesheet" href="../fonts/figtree.css">
 <link rel="stylesheet" href="styl.css">
@@ -19,27 +19,52 @@
 <header class="hl">
   <div class="w nav">
     <a class="logo" href="./">Javorová <small>Hlohovec</small></a>
-    <nav aria-label="Hlavné menu"><a href="#cennik">Byty a ceny</a><a href="#kontakt">Kontakt</a></nav>
+    <nav aria-label="Hlavné menu"><a href="#vyber">Výber bytu</a><a href="#cennik">Cenník</a><a href="#standard">Štandard</a><a href="#financovanie">Financovanie</a><a href="#vystavba">Výstavba</a><a href="#lokalita">Lokalita</a></nav>
+    <button type="button" class="obl-btn" id="oblBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg><span>Obľúbené</span><b id="oblPoc">0</b></button>
     <a class="tel" href="tel:+421900123456">+421 900 123 456</a>
     <a class="btn" href="#kontakt">Mám záujem</a>
   </div>
 </header>
+<aside class="pruh" id="pruh" aria-label="Akciová ponuka" hidden><div class="pruh-in" id="pruhIn"></div></aside>
 
 <main>
 <section class="uvod" aria-labelledby="h1">
+  <div class="w uvod-g">
+    <div>
+      <ul class="odznaky" id="odznaky" aria-label="To najdôležitejšie"></ul>
+      <h1 id="h1">Rezidencia Javorová</h1>
+      <p class="lead">Bytový dom so 6 podlažiami v tichej ulici pri lesoparku v Hlohovci. Byty od 1 do 4 izieb, garáž v suteréne a nasťahovanie v lete 2027.</p>
+      <div class="uvod-cta"><a class="btn" href="#vyber">Vybrať byt na budove</a><a class="btn sec" href="#cennik">Cenník bytov</a></div>
+    </div>
+    <ul class="cisla" id="cisla"></ul>
+  </div>
+  <div class="w"><ul class="dovera" id="dovera"></ul></div>
+</section>
+
+<section id="vyber" aria-labelledby="h-vyb" class="vyber">
   <div class="w">
-    <h1 id="h1">Rezidencia Javorová</h1>
-    <p class="lead">Bytový dom so 6 podlažiami v tichej časti Hlohovca. Byty od 1 do 4 izieb, garáž v suteréne a nasťahovanie v lete 2027.</p>
-    <ul class="cisla" id="cisla" aria-live="polite"></ul>
+    <div class="sec-h">
+      <div><h2 id="h-vyb">Vyberte si byt na budove</h2></div>
+      <p>Kliknite na podlažie a potom na byt. Farba ukazuje, či je byt voľný.</p>
+    </div>
+    <div class="vyb-g">
+      <div class="budova-box"><div id="budova"></div><div class="podl-chips" id="podlChips" role="group" aria-label="Podlažia"></div></div>
+      <div class="podl-box">
+        <div class="podl-h">
+          <h3 id="podlNadpis" aria-live="polite"></h3>
+          <div class="podl-nav"><button type="button" class="btn sec mal" id="podlDole" aria-label="O podlažie nižšie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><button type="button" class="btn sec mal" id="podlHore" aria-label="O podlažie vyššie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+        </div>
+        <div id="podlPlan" class="podl-scroll"></div>
+        <ul class="legenda" aria-label="Legenda"><li><i class="volny"></i>voľný</li><li><i class="rez"></i>rezervovaný</li><li><i class="pred"></i>predaný</li></ul>
+      </div>
+    </div>
   </div>
 </section>
 
 <section id="cennik" aria-labelledby="h-cen">
   <div class="w">
     <div class="sec-h">
-      <div>
-        <h2 id="h-cen">Byty a ceny</h2>
-      </div>
+      <div><h2 id="h-cen">Cenník bytov</h2></div>
       <p class="akt" id="akt"><i aria-hidden="true"></i><span>Ceny a stavy sa načítavajú…</span></p>
     </div>
 
@@ -58,27 +83,29 @@
         <select id="fPo"><option value="">Všetky</option></select>
       </div>
       <div class="fg">
-        <span class="fl" id="l-ce">Cena</span>
+        <span class="fl">Cena</span>
         <div class="rozsah" id="rCe"><span class="draha"><b></b></span>
           <input type="range" aria-label="Najnižšia cena" data-k="min">
           <input type="range" aria-label="Najvyššia cena" data-k="max">
         </div>
-        <span class="hodn" id="hCe" aria-live="polite"></span>
+        <span class="hodn"></span>
       </div>
       <div class="fg">
-        <span class="fl" id="l-pl">Plocha bytu</span>
+        <span class="fl">Plocha bytu</span>
         <div class="rozsah" id="rPl"><span class="draha"><b></b></span>
           <input type="range" aria-label="Najmenšia plocha" data-k="min">
           <input type="range" aria-label="Najväčšia plocha" data-k="max">
         </div>
-        <span class="hodn" id="hPl" aria-live="polite"></span>
+        <span class="hodn"></span>
       </div>
     </div>
 
     <div class="lista">
       <span class="poc" id="poc" role="status"></span>
       <label class="chk"><input type="checkbox" id="fPred"> Zobraziť aj predané</label>
+      <label class="chk"><input type="checkbox" id="fObl"> Len obľúbené</label>
       <div class="vpravo">
+        <button type="button" class="reset" id="zdielaj">Kopírovať odkaz na výber</button>
         <button type="button" class="reset" id="reset">Zrušiť filtre</button>
         <div class="prep" role="group" aria-label="Zobrazenie">
           <button type="button" data-v="tab" aria-pressed="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 3.5h12M2 8h12M2 12.5h12"/></svg>Tabuľka</button>
@@ -88,6 +115,48 @@
     </div>
 
     <div id="vysledky"></div>
+  </div>
+</section>
+
+<section id="standard" class="tmave" aria-labelledby="h-std">
+  <div class="w std-g">
+    <div><h2 id="h-std">Štandard v cene bytu</h2><p>Žiadne príplatky za lepšie materiály. Toto dostanete v každom byte.</p></div>
+    <ul class="std-l" id="stdL"></ul>
+  </div>
+</section>
+
+<section id="financovanie" aria-labelledby="h-fin">
+  <div class="w fin-g">
+    <div>
+      <h2 id="h-fin">Financovanie</h2>
+      <p>Platíte postupne a rezerváciu vám vrátime, ak vám banka neschváli hypotéku.</p>
+      <ol class="kroky" id="finL"></ol>
+    </div>
+    <form class="hypo" id="hypo" aria-labelledby="h-hyp" onsubmit="return false">
+      <h3 id="h-hyp">Koľko budete splácať</h3>
+      <label>Byt<select id="hByt"></select></label>
+      <div class="hypo-r">
+        <label>Vlastné zdroje<span class="sufix"><input id="hVl" type="number" inputmode="numeric" min="0" max="90" step="5"><i>%</i></span></label>
+        <label>Doba splácania<span class="sufix"><input id="hRo" type="number" inputmode="numeric" min="5" max="40" step="1"><i>rokov</i></span></label>
+        <label>Úrok<span class="sufix"><input id="hUr" type="number" inputmode="decimal" min="0" max="15" step="0.1"><i>%</i></span></label>
+      </div>
+      <div class="hypo-v" aria-live="polite"><span>Mesačná splátka</span><b id="hSpl">–</b><small id="hDet"></small></div>
+      <p class="pozn">Výpočet je orientačný. Úrok sme nastavili podľa priemeru hypoték na Slovensku, presnú ponuku vám dá banka.</p>
+    </form>
+  </div>
+</section>
+
+<section id="vystavba" class="mist" aria-labelledby="h-vys">
+  <div class="w">
+    <div class="sec-h"><div><h2 id="h-vys">Priebeh výstavby</h2></div><p id="vysAkt"></p></div>
+    <ol class="cas" id="cas"></ol>
+  </div>
+</section>
+
+<section id="lokalita" aria-labelledby="h-lok">
+  <div class="w lok-g">
+    <div><h2 id="h-lok">Lokalita</h2><p id="lokP"></p><p class="adr" id="lokA"></p></div>
+    <ul class="body" id="lokB"></ul>
   </div>
 </section>
 
@@ -108,6 +177,7 @@
         <label><input type="radio" name="ucel" value="investicia"> ako investíciu</label>
       </fieldset>
       <label class="cel">Správa<textarea name="sprava" placeholder="Napríklad kedy sa vám hodí obhliadka"></textarea></label>
+      <label class="chk cel"><input type="checkbox" name="strazit"> Upozornite ma e-mailom, keď sa uvoľní byt alebo sa zmení cena</label>
       <div class="cel"><button class="btn" type="submit">Odoslať</button></div>
     </form>
   </div>
@@ -118,21 +188,37 @@
   <div class="w"><span>© 2026 Rezidencia Javorová (ukážka)</span><span>Web vytvoril <a href="../projekty.html">Realitný asistent</a></span></div>
 </footer>
 
+<nav class="plav" aria-label="Rýchly kontakt">
+  <a href="tel:+421900123456" class="plav-b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Zavolať</span></a>
+  <a href="#kontakt" class="plav-b hl2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>Napísať</span></a>
+</nav>
+
+<dialog class="porov" id="porov" aria-labelledby="h-por">
+  <div class="porov-h"><h2 id="h-por">Obľúbené byty</h2><button type="button" class="zavri" id="porovZavri" aria-label="Zavrieť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div id="porovObs"></div>
+</dialog>
+
 <script type="module">
-import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, vonkText } from './js/projekt.js';
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, podlazie, oblubene, prepniOblubene, srdce, splatka, vonkText } from './js/projekt.js';
 
 const $ = (s) => document.querySelector(s);
-let D, byty = [];
-const f = { izby: new Set(), pod: '', ce: [0, 0], pl: [0, 0], pred: false, sort: ['id', 1], view: 'tab' };
-const lim = {};
-
+const $$ = (s) => document.querySelectorAll(s);
+let D, byty = [], obl = oblubene(), aktPodl = 1;
+const f = { izby: new Set(), pod: '', ce: [0, 0], pl: [0, 0], pred: false, obl: false, sort: ['id', 1], view: 'tab' };
+const lim = {}, rozsahy = {};
 try { f.view = localStorage.getItem('jav-view') || 'tab'; } catch (e) {}
 
+const datumKr = (iso) => new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' });
+const odkaz = (b) => 'byt.html?id=' + encodeURIComponent(b.id);
+const cenaText = (b) => b.stav === 'predany' ? '—' : eur(b.cena);
+const vol = (arr) => arr.filter((b) => b.stav === 'volny');
+const volneText = (n) => n === 1 ? '1 voľný' : n >= 2 && n <= 4 ? n + ' voľné' : n + ' voľných';
+
+// ---------- posuvníky ----------
 function rozsah(id, kluc, krok, fmt) {
   const box = $(id), [a, b] = box.querySelectorAll('input'), bar = box.querySelector('.draha b');
   const [lo, hi] = lim[kluc];
   for (const i of [a, b]) { i.min = lo; i.max = hi; i.step = krok; }
-  a.value = lo; b.value = hi; f[kluc] = [lo, hi];
   const kresli = () => {
     const x = +a.value, y = +b.value;
     bar.style.left = ((x - lo) / (hi - lo) * 100) + '%';
@@ -146,24 +232,24 @@ function rozsah(id, kluc, krok, fmt) {
     f[kluc] = [x, y]; kresli(); vykresli();
   };
   a.addEventListener('input', zmena); b.addEventListener('input', zmena);
-  box.reset = () => { a.value = lo; b.value = hi; f[kluc] = [lo, hi]; kresli(); };
-  kresli();
+  rozsahy[kluc] = { nastav: ([x, y]) => { a.value = x; b.value = y; f[kluc] = [+a.value, +b.value]; kresli(); } };
+  rozsahy[kluc].nastav(f[kluc][1] ? f[kluc] : [lo, hi]);
 }
 
+// ---------- cenník ----------
 function filtruj() {
   return byty.filter((b) =>
     (f.pred || b.stav !== 'predany') &&
+    (!f.obl || obl.includes(b.id)) &&
     (!f.izby.size || f.izby.has(b.izby)) &&
     (!f.pod || b.podlazie === +f.pod) &&
     (b.stav === 'predany' || (b.cena >= f.ce[0] && b.cena <= f.ce[1])) &&
     b.plocha >= f.pl[0] && b.plocha <= f.pl[1]);
 }
-
 const STLPCE = [
-  ['id', 'Byt'], ['izby', 'Izby'], ['podlazie', 'Podlažie', 'm'], ['plocha', 'Plocha', 'num'],
+  ['id', 'Byt'], ['izby', 'Izby', 'm2'], ['podlazie', 'Podlažie', 'm'], ['plocha', 'Plocha', 'num'],
   ['vonkajsia', 'Balkón / terasa', 'num m'], ['orientacia', 'Orientácia', 'm'], ['cena', 'Cena', 'num'], ['stav', 'Stav'],
 ];
-
 function zorad(arr) {
   const [k, smer] = f.sort;
   const v = (b) => k === 'stav' ? ['volny', 'rezervovany', 'predany'].indexOf(b.stav) : k === 'orientacia' ? b.orientacia.join() : b[k];
@@ -172,42 +258,147 @@ function zorad(arr) {
     return (v(a) > v(b) ? 1 : v(a) < v(b) ? -1 : a.id.localeCompare(b.id) * smer) * smer;
   });
 }
-
-const cenaText = (b) => b.stav === 'predany' ? '—' : eur(b.cena);
-const odkaz = (b) => 'byt.html?id=' + encodeURIComponent(b.id);
+const tagy = (b) => b.vyhody.length ? `<span class="tagy">${b.vyhody.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</span>` : '';
 
 function vykresli() {
+  ulozUrl();
   const vys = zorad(filtruj());
-  const volne = vys.filter((b) => b.stav === 'volny').length;
-  $('#poc').textContent = `Zobrazených ${vys.length} z ${byty.length} bytov` + (vys.length ? `, z toho ${volne} voľných` : '');
+  $('#poc').textContent = `Zobrazených ${vys.length} z ${byty.length} bytov` + (vys.length ? `, z toho ${vol(vys).length} voľných` : '');
   const el = $('#vysledky');
   if (!vys.length) {
-    el.innerHTML = '<div class="prazdne"><p>Takému výberu teraz nezodpovedá žiadny byt.</p><button type="button" class="reset" data-reset>Zrušiť filtre</button></div>';
+    el.innerHTML = `<div class="prazdne"><p>${f.obl && !obl.length ? 'Zatiaľ nemáte žiadne obľúbené byty. Pridáte ich srdiečkom pri byte.' : 'Takému výberu teraz nezodpovedá žiadny byt.'}</p><button type="button" class="reset" data-reset>Zrušiť filtre</button></div>`;
     return;
   }
   if (f.view === 'dl') {
-    el.innerHTML = '<ul class="dlazdice">' + vys.map((b) => `<li><a class="dl ${STAV[b.stav].c}" href="${odkaz(b)}">
+    el.innerHTML = '<ul class="dlazdice">' + vys.map((b) => `<li class="dl-li"><a class="dl ${STAV[b.stav].c}" href="${odkaz(b)}">
       <span class="nh">${podorys(b.t, { id: b.id })}</span>
       <span class="tx"><b>Byt ${esc(b.id)}</b><span class="cn">${cenaText(b)}</span>
-      <span class="inf">${izbyText(b.izby)} · ${m2(b.plocha)} · ${b.podlazie}. podlažie</span><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></span></a></li>`).join('') + '</ul>';
+      <span class="inf">${izbyText(b.izby)} · ${m2(b.plocha)} · ${b.podlazie}. podlažie</span>${tagy(b)}<span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></span></a>${srdce(b.id, obl.includes(b.id))}</li>`).join('') + '</ul>';
     return;
   }
-  el.innerHTML = `<table class="tab"><caption class="vh">Zoznam bytov s cenou a stavom</caption><thead><tr>${STLPCE.map(([k, t, c = '']) =>
-    `<th scope="col" class="${c}" ${f.sort[0] === k ? `aria-sort="${f.sort[1] > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-sort="${k}">${t}</button></th>`).join('')}<th scope="col"><span class="vh">Detail</span></th></tr></thead><tbody>` +
-    vys.map((b) => `<tr class="${STAV[b.stav].c}" data-href="${odkaz(b)}"><td><a href="${odkaz(b)}">${esc(b.id)}</a></td><td>${b.izby}</td><td class="m">${b.podlazie}.</td>
+  el.innerHTML = `<div class="tab-wrap"><table class="tab"><caption class="vh">Zoznam bytov s cenou a stavom</caption><thead><tr><th scope="col"><span class="vh">Obľúbené</span></th>${STLPCE.map(([k, t, c = '']) =>
+    `<th scope="col" class="${c}" ${f.sort[0] === k ? `aria-sort="${f.sort[1] > 0 ? 'ascending' : 'descending'}"` : ''}><button type="button" data-sort="${k}">${t}</button></th>`).join('')}<th scope="col" class="m"><span class="vh">Detail</span></th></tr></thead><tbody>` +
+    vys.map((b) => `<tr class="${STAV[b.stav].c}" data-href="${odkaz(b)}"><td class="s">${srdce(b.id, obl.includes(b.id))}</td><td><a href="${odkaz(b)}">${esc(b.id)}</a>${tagy(b)}<span class="mi">${b.izby}-izb.</span></td><td class="m2">${b.izby}</td><td class="m">${b.podlazie}.</td>
       <td class="num">${m2(b.plocha)}</td><td class="num m">${m2(b.vonkajsia)}</td><td class="m">${esc(b.orientacia.join(', '))}</td>
-      <td class="num"><b>${cenaText(b)}</b></td><td><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></td><td class="go" aria-hidden="true">Detail</td></tr>`).join('') +
-    '</tbody></table>';
+      <td class="num"><b>${cenaText(b)}</b></td><td><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></td><td class="go m" aria-hidden="true">Detail</td></tr>`).join('') +
+    '</tbody></table></div>';
 }
 
 function zrusFiltre() {
-  f.izby.clear(); document.querySelectorAll('#fIz .chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+  f.izby.clear(); $$('#fIz .chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
   f.pod = ''; $('#fPo').value = '';
   f.pred = false; $('#fPred').checked = false;
-  $('#rCe').reset(); $('#rPl').reset();
+  f.obl = false; $('#fObl').checked = false;
+  rozsahy.ce.nastav(lim.ce); rozsahy.pl.nastav(lim.pl);
   vykresli();
 }
 
+// filtre v odkaze, aby sa dali poslať ďalej
+function ulozUrl() {
+  const q = new URLSearchParams();
+  if (f.izby.size) q.set('izby', [...f.izby].sort().join(','));
+  if (f.pod) q.set('podlazie', f.pod);
+  if (lim.ce && (f.ce[0] !== lim.ce[0] || f.ce[1] !== lim.ce[1])) q.set('cena', f.ce.join('-'));
+  if (lim.pl && (f.pl[0] !== lim.pl[0] || f.pl[1] !== lim.pl[1])) q.set('plocha', f.pl.join('-'));
+  if (f.pred) q.set('predane', '1');
+  const byt = new URLSearchParams(location.search).get('byt');
+  if (byt) q.set('byt', byt);
+  const s = q.toString();
+  history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+}
+function nacitajUrl() {
+  const q = new URLSearchParams(location.search);
+  (q.get('izby') || '').split(',').filter((x) => /^[1-4]$/.test(x)).forEach((x) => { f.izby.add(+x); $(`#fIz .chip[data-v="${x}"]`).setAttribute('aria-pressed', 'true'); });
+  if (/^[1-9]$/.test(q.get('podlazie') || '')) { f.pod = q.get('podlazie'); $('#fPo').value = f.pod; }
+  const rz = (k) => { const m = (q.get(k) || '').match(/^(\d+)-(\d+)$/); return m ? [+m[1], +m[2]] : null; };
+  f.ce = rz('cena') || [0, 0]; f.pl = rz('plocha') || [0, 0];
+  if (q.get('predane') === '1') { f.pred = true; $('#fPred').checked = true; }
+}
+
+// ---------- výber na budove ----------
+function budova() {
+  const P = D.podlazia, W = 520, fh = 52, top = 46, x0 = 40;
+  const h = top + P * fh + 70;
+  let s = `<svg class="bud" viewBox="0 0 ${W + 150} ${h}" role="group" aria-label="Budova, výber podlažia">`;
+  s += `<path d="M${x0 - 14} ${top} h${W + 28}" class="bud-str"/>`;
+  s += `<rect x="${x0}" y="${top}" width="${W}" height="${P * fh + 40}" class="bud-f"/>`;
+  const gy = top + P * fh;
+  s += `<rect x="${x0}" y="${gy}" width="${W}" height="40" class="bud-pr"/>`;
+  s += `<text x="${x0 + W / 2}" y="${gy + 25}" class="bud-t">vstup a garáž</text>`;
+  s += `<path d="M0 ${gy + 40} H${W + 150}" class="bud-zem"/>`;
+  for (let p = P; p >= 1; p--) {
+    const y = top + (P - p) * fh;
+    const nap = byty.filter((b) => b.podlazie === p);
+    const v = vol(nap).length;
+    const lbl = `${p}. podlažie ${v ? volneText(v) : 'vypredané'} z ${nap.length} bytov`;
+    s += `<g class="bud-p${p === aktPodl ? ' akt' : ''}" data-p="${p}" role="button" tabindex="0" aria-label="${lbl}" aria-pressed="${p === aktPodl}">`;
+    s += `<rect x="${x0}" y="${y}" width="${W}" height="${fh}" class="bud-h"/>`;
+    for (let i = 0; i < 8; i++) {
+      const wx = x0 + 22 + i * 62;
+      s += `<rect x="${wx}" y="${y + 10}" width="${p === P ? 44 : 34}" height="${fh - 18}" rx="2" class="bud-o"/>`;
+    }
+    if (p !== P) s += `<rect x="${x0 + 14}" y="${y + fh - 8}" width="${W - 28}" height="5" class="bud-bal"/>`;
+    s += `<text x="${x0 + W + 16}" y="${y + fh / 2 - 2}"><tspan class="bud-pn">${p}. podlažie</tspan> <tspan x="${x0 + W + 16}" dy="18" class="bud-v${v ? '' : ' nic'}">${v ? volneText(v) : 'vypredané'}</tspan></text>`;
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+function zobrazPodlazie(p, fokus) {
+  aktPodl = Math.max(1, Math.min(D.podlazia, p));
+  $('#budova').innerHTML = budova();
+  const nap = byty.filter((b) => b.podlazie === aktPodl);
+  $('#podlNadpis').textContent = `${aktPodl}. podlažie · ${volneText(vol(nap).length)} z ${nap.length}`;
+  $('#podlPlan').innerHTML = podlazie(byty, aktPodl);
+  $('#podlChips').innerHTML = Array.from({ length: D.podlazia }, (_, i) => D.podlazia - i).map((p) => {
+    const v = vol(byty.filter((b) => b.podlazie === p)).length;
+    return `<button type="button" class="chip" data-p="${p}" aria-pressed="${p === aktPodl}">${p}. <small>${v ? volneText(v) : 'plné'}</small></button>`;
+  }).join('');
+  $('#podlDole').disabled = aktPodl === 1;
+  $('#podlHore').disabled = aktPodl === D.podlazia;
+  if (fokus) $(`.bud-p[data-p="${aktPodl}"]`)?.focus();
+}
+
+// ---------- obľúbené a porovnanie ----------
+function obnovObl() {
+  obl = oblubene();
+  $('#oblPoc').textContent = obl.length;
+  $('#oblBtn').classList.toggle('ma', obl.length > 0);
+  $$('[data-obl]').forEach((b) => b.setAttribute('aria-pressed', String(obl.includes(b.dataset.obl))));
+  if (f.obl) vykresli();
+  if ($('#porov').open) porovnanie();
+}
+function porovnanie() {
+  const vyb = obl.map((id) => byty.find((b) => b.id === id)).filter(Boolean);
+  if (!vyb.length) { $('#porovObs').innerHTML = '<p class="prazdne">Obľúbené byty si označíte srdiečkom v cenníku alebo v detaile bytu. Potom ich tu porovnáte vedľa seba.</p>'; return; }
+  const riadky = [
+    ['Pôdorys', (b) => `<a href="${odkaz(b)}" class="por-nh" aria-label="Detail bytu ${esc(b.id)}">${podorys(b.t, { id: 'p' + b.id })}</a>`],
+    ['Cena', (b) => `<b>${cenaText(b)}</b>`],
+    ['Cena za m²', (b) => b.stav === 'predany' ? '—' : eur(Math.round(b.cena / b.plocha))],
+    ['Stav', (b) => `<span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span>`],
+    ['Dispozícia', (b) => izbyText(b.izby)],
+    ['Plocha bytu', (b) => m2(b.plocha)],
+    ['Balkón / terasa', (b) => m2(b.vonkajsia)],
+    ['Podlažie', (b) => b.podlazie + '. z ' + D.podlazia],
+    ['Orientácia', (b) => esc(b.orientacia.join(', '))],
+    ['Splátka od', (b) => b.stav === 'predany' ? '—' : eur(Math.round(splatka(b.cena * (1 - D.hypoteka.vlastne / 100), D.hypoteka.urok, D.hypoteka.roky))) + ' / mes.'],
+  ];
+  $('#porovObs').innerHTML = `<div class="por-wrap"><table class="por"><caption class="vh">Porovnanie obľúbených bytov</caption><thead><tr><td></td>${vyb.map((b) => `<th scope="col"><a href="${odkaz(b)}">Byt ${esc(b.id)}</a> ${srdce(b.id, true)}</th>`).join('')}</tr></thead><tbody>` +
+    riadky.map(([n, fn]) => `<tr><th scope="row">${n}</th>${vyb.map((b) => `<td>${fn(b)}</td>`).join('')}</tr>`).join('') +
+    `</tbody></table></div><p class="pozn">Obľúbené sú uložené len v tomto prehliadači. Splátka je orientačná pri ${D.hypoteka.vlastne} % vlastných zdrojov, úroku ${String(D.hypoteka.urok).replace('.', ',')} % a ${D.hypoteka.roky} rokoch.</p>`;
+}
+
+// ---------- hypokalkulačka ----------
+function hypo() {
+  const b = byty.find((q) => q.id === $('#hByt').value);
+  const vl = Math.min(90, Math.max(0, +$('#hVl').value || 0)), ro = Math.min(40, Math.max(5, +$('#hRo').value || 30)), ur = Math.max(0, +String($('#hUr').value).replace(',', '.') || 0);
+  if (!b) return;
+  const uver = Math.round(b.cena * (1 - vl / 100));
+  const s = splatka(uver, ur, ro);
+  $('#hSpl').textContent = eur(Math.round(s)) + ' mesačne';
+  $('#hDet').textContent = `Úver ${eur(uver)}, vlastné zdroje ${eur(b.cena - uver)}, spolu zaplatíte ${eur(Math.round(s * ro * 12))}.` + (vl < 20 ? ' Pri menej ako 20 % vlastných zdrojov banky požičiavajú len výnimočne.' : '');
+}
+
+// ---------- štart ----------
 async function start() {
   try { D = await nacitaj(); } catch (e) {
     $('#vysledky').innerHTML = '<div class="prazdne"><p>Cenník sa nepodarilo načítať. Skúste obnoviť stránku alebo nám zavolajte.</p></div>';
@@ -215,33 +406,59 @@ async function start() {
     return;
   }
   byty = D.byty;
-  const vol = byty.filter((b) => b.stav === 'volny');
-  $('#cisla').innerHTML = `<li><b>${vol.length} z ${byty.length}</b><span>voľných bytov</span></li>
-    <li><b>od ${eur(Math.min(...vol.map((b) => b.cena)))}</b><span>cena bytu</span></li>
-    <li><b>1 – 4 izby</b><span>${m2(Math.min(...byty.map((b) => b.plocha)))} až ${m2(Math.max(...byty.map((b) => b.plocha)))}</span></li>
-    <li><b>${esc(D.dokoncenie)}</b><span>nasťahovanie</span></li>`;
+  const v = vol(byty);
+  const terasy = v.filter((b) => b.vyhody.includes('Terasa')).length;
+  $('#odznaky').innerHTML = `<li>Zostáva ${volneText(v.length)} bytov</li>${terasy ? `<li>${terasy === 1 ? 'Posledný byt' : 'Posledné ' + terasy + ' byty'} s terasou</li>` : ''}<li>Nasťahovanie ${esc(D.dokoncenie)}</li>`;
+  $('#cisla').innerHTML = `<li><b>${v.length} z ${byty.length}</b><span>voľných bytov</span></li>
+    <li><b>od ${eur(Math.min(...v.map((b) => b.cena)))}</b><span>cena bytu so štandardom</span></li>
+    <li><b>${Math.floor(Math.min(...byty.map((b) => b.plocha)))} – ${Math.ceil(Math.max(...byty.map((b) => b.plocha)))}&nbsp;m²</b><span>byty s 1 až 4 izbami</span></li>
+    <li><b>${esc(D.energeticka_trieda)}</b><span>energetická trieda</span></li>`;
+  $('#dovera').innerHTML = D.dovera.map(([a, b]) => `<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join('');
+  if (D.akcia) { const t = esc(D.akcia); $('#pruhIn').innerHTML = `<span>${t}</span>` + `<span aria-hidden="true">${t}</span>`.repeat(7); $('#pruh').hidden = false; }
   $('#akt span').textContent = 'Aktualizované ' + datum(D.aktualizovane);
   for (let p = 1; p <= D.podlazia; p++) $('#fPo').insertAdjacentHTML('beforeend', `<option value="${p}">${p}. podlažie</option>`);
   const ceny = byty.map((b) => b.cena), pl = byty.map((b) => b.plocha);
   lim.ce = [Math.floor(Math.min(...ceny) / 5000) * 5000, Math.ceil(Math.max(...ceny) / 5000) * 5000];
   lim.pl = [Math.floor(Math.min(...pl)), Math.ceil(Math.max(...pl))];
+  nacitajUrl();
   rozsah('#rCe', 'ce', 5000, eur);
   rozsah('#rPl', 'pl', 1, (n) => n + ' m²');
+
+  // výberovník: začne na podlaží s najviac voľnými bytmi
+  let naj = 1;
+  for (let p = 1; p <= D.podlazia; p++) if (vol(byty.filter((b) => b.podlazie === p)).length > vol(byty.filter((b) => b.podlazie === naj)).length) naj = p;
+  zobrazPodlazie(naj);
+
+  $('#stdL').innerHTML = D.standard.map((s) => `<li>${esc(s)}</li>`).join('');
+  $('#finL').innerHTML = D.financovanie.map((s) => `<li>${esc(s)}</li>`).join('');
+  $('#hByt').innerHTML = v.map((b) => `<option value="${esc(b.id)}">Byt ${esc(b.id)} · ${izbyText(b.izby)} · ${eur(b.cena)}</option>`).join('');
+  $('#hVl').value = D.hypoteka.vlastne; $('#hRo').value = D.hypoteka.roky; $('#hUr').value = D.hypoteka.urok;
+  hypo();
+
+  const posl = D.vystavba.filter((x) => x.hotovo).at(-1);
+  $('#vysAkt').textContent = posl ? `Naposledy aktualizované ${datumKr(posl.datum)}.` : '';
+  $('#cas').innerHTML = D.vystavba.map((x) => `<li class="${x.hotovo ? 'hot' : ''}"><span class="cas-d">${x.hotovo ? datumKr(x.datum) : 'plán: ' + new Date(x.datum).toLocaleDateString('sk-SK', { month: 'long', year: 'numeric' })}</span><b>${esc(x.nazov)}</b><span>${esc(x.text)}</span></li>`).join('');
+  $('#lokP').textContent = D.lokalita.popis;
+  $('#lokA').textContent = `${D.ulica}, ${D.mesto}`;
+  $('#lokB').innerHTML = D.lokalita.body.map(([n, d, c]) => `<li><b>${esc(n)}</b><span>${esc(d)} · ${esc(c)}</span></li>`).join('');
+
   const k = D.kontakt;
   $('#osoba').innerHTML = `<b>${esc(k.meno)}</b><span>predaj bytov</span><a href="tel:${esc(k.telefon.replace(/\s/g, ''))}">${esc(k.telefon)}</a><a href="mailto:${esc(k.email)}">${esc(k.email)}</a>`;
   $('#fmByt').insertAdjacentHTML('beforeend', byty.filter((b) => b.stav !== 'predany').map((b) => `<option value="${esc(b.id)}">Byt ${esc(b.id)} · ${izbyText(b.izby)}, ${m2(b.plocha)}</option>`).join(''));
   const chce = new URLSearchParams(location.search).get('byt');
   if (chce && byty.some((b) => b.id === chce && b.stav !== 'predany')) $('#fmByt').value = chce;
+  obnovObl();
   nastavView(f.view);
 }
 
 function nastavView(v) {
   f.view = v;
-  document.querySelectorAll('.prep button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+  $$('.prep button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
   try { localStorage.setItem('jav-view', v); } catch (e) {}
   vykresli();
 }
 
+// ---------- udalosti ----------
 $('#fIz').addEventListener('click', (e) => {
   const c = e.target.closest('.chip'); if (!c) return;
   const v = +c.dataset.v, on = !f.izby.has(v);
@@ -250,15 +467,42 @@ $('#fIz').addEventListener('click', (e) => {
 });
 $('#fPo').addEventListener('change', (e) => { f.pod = e.target.value; vykresli(); });
 $('#fPred').addEventListener('change', (e) => { f.pred = e.target.checked; vykresli(); });
+$('#fObl').addEventListener('change', (e) => { f.obl = e.target.checked; vykresli(); });
 $('#reset').addEventListener('click', zrusFiltre);
-document.querySelector('.prep').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) nastavView(b.dataset.v); });
+$('#zdielaj').addEventListener('click', async (e) => {
+  const t = e.currentTarget;
+  try { await navigator.clipboard.writeText(location.href.split('#')[0] + '#cennik'); t.textContent = 'Odkaz je skopírovaný'; }
+  catch (err) { t.textContent = 'Skopírujte adresu z prehliadača'; }
+  setTimeout(() => { t.textContent = 'Kopírovať odkaz na výber'; }, 2500);
+});
+$('.prep').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) nastavView(b.dataset.v); });
+document.addEventListener('click', (e) => {
+  const s = e.target.closest('[data-obl]');
+  if (s) { e.preventDefault(); e.stopPropagation(); prepniOblubene(s.dataset.obl); }
+}, true);
+document.addEventListener('oblubene', obnovObl);
+window.addEventListener('storage', (e) => { if (e.key === 'jav-oblubene') obnovObl(); });
 $('#vysledky').addEventListener('click', (e) => {
   if (e.target.closest('[data-reset]')) return zrusFiltre();
   const s = e.target.closest('[data-sort]');
   if (s) { const k = s.dataset.sort; f.sort = [k, f.sort[0] === k ? -f.sort[1] : 1]; vykresli(); $(`[data-sort="${k}"]`).focus(); return; }
   const tr = e.target.closest('tr[data-href]');
-  if (tr && !e.target.closest('a')) location.href = tr.dataset.href;
+  if (tr && !e.target.closest('a,button')) location.href = tr.dataset.href;
 });
+$('#budova').addEventListener('click', (e) => { const g = e.target.closest('.bud-p'); if (g) zobrazPodlazie(+g.dataset.p, true); });
+$('#budova').addEventListener('keydown', (e) => {
+  const g = e.target.closest('.bud-p'); if (!g) return;
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zobrazPodlazie(+g.dataset.p, true); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); zobrazPodlazie(aktPodl + 1, true); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); zobrazPodlazie(aktPodl - 1, true); }
+});
+$('#podlChips').addEventListener('click', (e) => { const c = e.target.closest('[data-p]'); if (c) { zobrazPodlazie(+c.dataset.p); $(`#podlChips [data-p="${aktPodl}"]`).focus(); } });
+$('#podlHore').addEventListener('click', () => zobrazPodlazie(aktPodl + 1));
+$('#podlDole').addEventListener('click', () => zobrazPodlazie(aktPodl - 1));
+$('#oblBtn').addEventListener('click', () => { porovnanie(); $('#porov').showModal(); });
+$('#porovZavri').addEventListener('click', () => $('#porov').close());
+$('#porov').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+['#hByt', '#hVl', '#hRo', '#hUr'].forEach((s) => $(s).addEventListener('input', hypo));
 $('#fm').addEventListener('submit', (e) => {
   e.preventDefault();
   const fm = e.target;
