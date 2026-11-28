@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Byt – Rezidencia Javorová (ukážka webu projektu)</title>
+<meta name="description" content="Detail bytu v Rezidencii Javorová: pôdorys s rozmermi, miestnosti, rozpis ceny a karta bytu v PDF.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<link rel="stylesheet" href="../fonts/familjen-grotesk.css">
+<link rel="stylesheet" href="../fonts/figtree.css">
+<link rel="stylesheet" href="styl.css">
+</head>
+<body>
+<aside class="demo" aria-label="Ukážka">Toto je ukážka webu projektu. Projekt aj ceny sú vymyslené. <a href="../projekty.html">Web pre váš projekt</a></aside>
+<header class="hl">
+  <div class="w nav">
+    <a class="logo" href="./">Javorová <small>Hlohovec</small></a>
+    <nav aria-label="Hlavné menu"><a href="./#cennik" aria-current="page">Byty a ceny</a><a href="./#kontakt">Kontakt</a></nav>
+    <a class="tel" href="tel:+421900123456">+421 900 123 456</a>
+    <a class="btn" id="hZaujem" href="./#kontakt">Mám záujem</a>
+  </div>
+</header>
+
+<main id="obsah" class="w">
+  <p class="crumb">Načítavam byt…</p>
+</main>
+
+<footer class="pata">
+  <div class="w"><span>© 2026 Rezidencia Javorová (ukážka)</span><span>Web vytvoril <a href="../projekty.html">Realitný asistent</a></span></div>
+</footer>
+
+<script type="module">
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka } from './js/projekt.js';
+
+const $ = (s) => document.querySelector(s);
+const ikona = {
+  pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  sip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  spat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+};
+
+function chyba(t) {
+  $('#obsah').innerHTML = `<div class="chyba"><h1>${esc(t)}</h1><p>Pozrite si <a class="link" href="./#cennik">všetky byty a ceny</a>.</p></div>`;
+}
+
+async function start() {
+  let D;
+  try { D = await nacitaj(); } catch (e) { return chyba('Byt sa nepodarilo načítať'); }
+  const id = new URLSearchParams(location.search).get('id');
+  const i = D.byty.findIndex((b) => b.id === id);
+  if (i < 0) return chyba('Taký byt sme nenašli');
+  const b = D.byty[i], t = b.t, st = STAV[b.stav], pred = b.stav === 'predany';
+  const prev = D.byty[(i - 1 + D.byty.length) % D.byty.length], next = D.byty[(i + 1) % D.byty.length];
+  document.title = `Byt ${b.id}, ${izbyText(b.izby)}, ${m2(b.plocha)} – Rezidencia Javorová`;
+  const url = location.origin + location.pathname + '?id=' + encodeURIComponent(b.id);
+  const zaujem = './?byt=' + encodeURIComponent(b.id) + '#kontakt';
+  if (!pred) $('#hZaujem').href = zaujem;
+  const dop = D.doplnky;
+  const mailText = `Dobrý deň,\n\nposielam ponuku bytu ${b.id} v Rezidencii Javorová (Hlohovec):\n${izbyText(b.izby)}, ${m2(b.plocha)} + ${vonkText(b).toLowerCase()} ${m2(b.vonkajsia)}, ${b.podlazie}. podlažie\nCena: ${pred ? 'predaný' : eur(b.cena)}\n\nPôdorys a detail: ${url}\n`;
+  const mail = 'mailto:?subject=' + encodeURIComponent(`Byt ${b.id} – Rezidencia Javorová`) + '&body=' + encodeURIComponent(mailText);
+  const podobne = D.byty.filter((q) => q.typ === b.typ && q.id !== b.id && q.stav !== 'predany').slice(0, 4);
+  const spolu = t.miestnosti.reduce((s, m) => s + m[3] * m[4], 0);
+
+  $('#obsah').innerHTML = `
+  <nav class="crumb" aria-label="Omrvinky"><a href="./">Rezidencia Javorová</a> › <a href="./#cennik">Byty a ceny</a> › Byt ${esc(b.id)}</nav>
+  <div class="dhl">
+    <div>
+      <h1>Byt ${esc(b.id)}</h1>
+      <div class="pod"><span class="stav ${st.c}">${st.t}</span><span>${izbyText(b.izby)} · ${m2(b.plocha)} · ${b.podlazie}. podlažie · ${esc(b.orientacia.join(', '))}</span></div>
+    </div>
+    <div class="cena">${pred ? '<b>Predaný</b>' : `<b>${eur(b.cena)}</b><span>${eur(Math.round(b.cena / b.plocha))} za m²</span>`}</div>
+  </div>
+
+  <div class="dmain">
+    <figure class="plbox" style="margin:0" tabindex="0" aria-label="Pôdorys bytu">
+      ${podorys(t, { detail: true, druh: b.vonkajsia_druh, id: b.id })}
+      <figcaption><span>Orientačný pôdorys, rozmery v metroch<span class="mtip"> · posuňte do strán</span></span><span>Typ ${esc(b.typ)} · ${esc(t.nazov)}</span></figcaption>
+    </figure>
+    <aside class="box" aria-labelledby="h-cena">
+      <h2 id="h-cena">${pred ? 'Tento byt je predaný' : 'Cena bytu'}</h2>
+      ${pred ? `<p class="predany-info">Pozrite si podobné voľné byty nižšie alebo nám napíšte, ozveme sa, ak sa podobný byt uvoľní.</p>` : `
+      <table class="rozpis">
+        <tbody>
+          <tr><td>Byt ${esc(b.id)} so štandardom<small>${vonkText(b)} ${m2(b.vonkajsia)} v cene</small></td><td>${eur(b.cena)}</td></tr>
+          <tr><td><label><input type="checkbox" data-c="${dop.parkovanie_garaz}"><span>Parkovacie miesto v garáži<small>voliteľné</small></span></label></td><td>${eur(dop.parkovanie_garaz)}</td></tr>
+          <tr><td><label><input type="checkbox" data-c="${dop.pivnica}"><span>Pivnica v suteréne<small>voliteľné</small></span></label></td><td>${eur(dop.pivnica)}</td></tr>
+        </tbody>
+        <tfoot><tr><td>Spolu</td><td id="spolu" aria-live="polite">${eur(b.cena)}</td></tr></tfoot>
+      </table>
+      <p class="pozn">Konečné ceny vrátane DPH. Rezerváciu ${eur(D.rezervacny_poplatok)} vrátime, ak vám banka neschváli hypotéku.</p>`}
+      <div class="akc">
+        <a class="btn" href="${pred ? './#kontakt' : zaujem}">${pred ? 'Napíšte nám' : 'Mám záujem o tento byt'}</a>
+        <a class="btn sec" href="karta.html?id=${encodeURIComponent(b.id)}&tlac=1" target="_blank" rel="noopener">${ikona.pdf}Karta bytu (PDF)</a>
+        <a class="btn sec" href="${mail}">${ikona.mail}Poslať ponuku e-mailom</a>
+      </div>
+    </aside>
+  </div>
+
+  <div class="karty">
+    <section class="karta" aria-labelledby="k-roz"><h3 id="k-roz">Rozloha</h3><dl>
+      <dt>Plocha bytu</dt><dd>${m2(b.plocha)}</dd>
+      <dt>${vonkText(b)}</dt><dd>${m2(b.vonkajsia)}</dd>
+      <dt>Spolu</dt><dd>${m2(b.plocha + b.vonkajsia)}</dd>
+      <dt>Svetlá výška</dt><dd>2,70&nbsp;m</dd></dl></section>
+    <section class="karta" aria-labelledby="k-std"><h3 id="k-std">Štandard v cene</h3><ul>${D.standard.map((s) => `<li>${esc(s)}</li>`).join('')}</ul></section>
+    <section class="karta" aria-labelledby="k-fin"><h3 id="k-fin">Financovanie</h3><ul>${D.financovanie.map((s) => `<li>${esc(s)}</li>`).join('')}</ul></section>
+  </div>
+
+  <div class="dsec d2">
+    <section aria-labelledby="h-mi">
+      <h2 id="h-mi">Miestnosti</h2>
+      <p>${esc(t.popis)}</p>
+      <table class="mtab"><thead><tr><th scope="col">Miestnosť</th><th scope="col" class="num">Rozmery</th><th scope="col" class="num">Plocha</th></tr></thead><tbody>
+        ${t.miestnosti.map(([n, , , w, h]) => `<tr><td>${esc(n)}</td><td class="num">${dlzka(w)} × ${dlzka(h)}&nbsp;m</td><td class="num">${m2(w * h)}</td></tr>`).join('')}
+        <tr><td>${vonkText(b)}</td><td class="num"></td><td class="num">${m2(b.vonkajsia)}</td></tr>
+      </tbody><tfoot><tr><td>Plocha bytu</td><td></td><td class="num">${m2(spolu)}</td></tr></tfoot></table>
+    </section>
+    <section class="polbox" aria-labelledby="h-po">
+      <h2 id="h-po">Kde je byt v dome</h2>
+      ${poloha(b, D.byty)}
+      <p>${b.podlazie}. podlažie z ${D.podlazia}, okná na ${esc(b.orientacia.join(' a '))}. Výťah ide do všetkých podlaží aj do garáže.</p>
+    </section>
+  </div>
+
+  ${podobne.length ? `<section class="dsec" aria-labelledby="h-pod"><h2 id="h-pod" style="font-size:28px;margin-bottom:16px">Podobné voľné byty</h2>
+    <div class="dalsie">${podobne.map((q) => `<a href="byt.html?id=${encodeURIComponent(q.id)}"><b>Byt ${esc(q.id)}</b><span>${q.podlazie}. podlažie · ${m2(q.plocha)}</span><span>${eur(q.cena)} · ${STAV[q.stav].t.toLowerCase()}</span></a>`).join('')}</div></section>` : ''}
+
+  <div class="dsec" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center">
+    <a class="link" href="./#cennik">Späť na všetky byty</a>
+    <nav class="listuj" aria-label="Listovanie bytov"><a href="byt.html?id=${encodeURIComponent(prev.id)}">${ikona.spat}Byt ${esc(prev.id)}</a><a href="byt.html?id=${encodeURIComponent(next.id)}">Byt ${esc(next.id)}${ikona.sip}</a></nav>
+  </div>
+  <p class="akt" style="padding-bottom:40px"><i aria-hidden="true"></i>Cena a stav aktualizované ${datum(D.aktualizovane)}</p>`;
+
+  const boxy = document.querySelectorAll('.rozpis input');
+  boxy.forEach((c) => c.addEventListener('change', () => {
+    let s = b.cena; boxy.forEach((x) => { if (x.checked) s += +x.dataset.c; });
+    $('#spolu').textContent = eur(s);
+  }));
+}
+start();
+</script>
+</body>
+</html>

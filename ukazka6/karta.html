@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karta bytu – Rezidencia Javorová</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="../ikona.png">
+<link rel="stylesheet" href="../fonts/familjen-grotesk.css">
+<link rel="stylesheet" href="../fonts/figtree.css">
+<link rel="stylesheet" href="styl.css">
+<style>
+@page{size:A4;margin:12mm}
+body{background:var(--mist)}
+.lis{max-width:210mm;margin:24px auto;background:#fff;padding:14mm 14mm 12mm;box-shadow:0 2px 12px rgba(24,34,28,.12);font-size:13px;line-height:1.4}
+.ovl{max-width:210mm;margin:24px auto 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:0 4px}
+.ovl p{margin:0;color:var(--ink2);font-size:15px;flex:1 1 260px}
+.kh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.kh .logo{font-size:24px}
+.kh .pr{text-align:right;color:var(--ink2);font-size:12.5px}
+.kt{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:16px 0 10px}
+.kt h1{font-size:36px}
+.kt .c{text-align:right}
+.kt .c b{display:block;font:650 26px var(--head)}
+.par{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:8px;margin-bottom:12px}
+.par div{padding:8px 10px;border-left:1px solid var(--line)}
+.par div:first-child{border-left:0}
+.par span{display:block;color:var(--ink3);font-size:11.5px}
+.par b{font-size:14px}
+.kp{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-bottom:12px}
+.kp svg{height:78mm;width:100%}
+.k2{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.k2 section{padding:0}
+.k2 h2{font-size:15px;margin:0 0 6px}
+.k2 table{width:100%;border-collapse:collapse;font-size:12.5px}
+.k2 td{padding:4px 0;border-bottom:1px solid var(--line)}
+.k2 td:last-child{text-align:right;white-space:nowrap}
+.k2 tfoot td{font-weight:700;border:0}
+.k2 ul{margin:0;padding-left:16px;font-size:12.5px}
+.kf{display:flex;justify-content:space-between;gap:16px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--ink2)}
+.kf b{color:var(--ink)}
+.poloha{max-width:58mm}
+@media print{
+  body{background:#fff}
+  .demo,.ovl{display:none}
+  .lis{margin:0;padding:0;box-shadow:none;max-width:none}
+}
+@media (max-width:640px){.lis{padding:18px}.par{grid-template-columns:repeat(2,1fr)}.par div{border-left:0;border-top:1px solid var(--line)}.k2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside class="demo" aria-label="Ukážka">Ukážka karty bytu. Projekt aj ceny sú vymyslené.</aside>
+<header class="ovl"><p>Karta bytu je pripravená na tlač. V okne tlače zvoľte „Uložiť ako PDF“.</p><button class="btn" type="button" id="tlac">Uložiť ako PDF</button><a class="btn sec" id="spat" href="./#cennik">Späť na byt</a></header>
+<main class="lis" id="lis"><p>Načítavam kartu bytu…</p></main>
+<script type="module">
+import { nacitaj, STAV, eur, m2, esc, datum, izbyText, podorys, poloha, vonkText, dlzka } from './js/projekt.js';
+const $ = (s) => document.querySelector(s);
+$('#tlac').addEventListener('click', () => window.print());
+async function start() {
+  let D;
+  try { D = await nacitaj(); } catch (e) { $('#lis').innerHTML = '<p>Kartu bytu sa nepodarilo načítať.</p>'; return; }
+  const p = new URLSearchParams(location.search);
+  const b = D.byty.find((q) => q.id === p.get('id'));
+  if (!b) { $('#lis').innerHTML = '<h1>Taký byt sme nenašli</h1>'; return; }
+  const t = b.t, pred = b.stav === 'predany', k = D.kontakt;
+  document.title = `Karta bytu ${b.id} – Rezidencia Javorová`;
+  $('#spat').href = 'byt.html?id=' + encodeURIComponent(b.id);
+  $('#lis').innerHTML = `
+  <div class="kh"><div class="logo">Javorová <small>Hlohovec</small></div><div class="pr">Rezidencia Javorová<br>${esc(D.ulica)}, ${esc(D.mesto)}</div></div>
+  <div class="kt"><div><h1>Byt ${esc(b.id)}</h1><span class="stav ${STAV[b.stav].c}">${STAV[b.stav].t}</span></div>
+    <div class="c">${pred ? '<b>Predaný</b>' : `<b>${eur(b.cena)}</b>${eur(Math.round(b.cena / b.plocha))} za m²`}</div></div>
+  <div class="par">
+    <div><span>Dispozícia</span><b>${izbyText(b.izby)}</b></div>
+    <div><span>Plocha bytu</span><b>${m2(b.plocha)}</b></div>
+    <div><span>${vonkText(b)}</span><b>${m2(b.vonkajsia)}</b></div>
+    <div><span>Podlažie</span><b>${b.podlazie}. z ${D.podlazia}</b></div>
+    <div><span>Orientácia</span><b>${esc(b.orientacia.join(', '))}</b></div>
+  </div>
+  <div class="kp">${podorys(t, { detail: true, druh: b.vonkajsia_druh, id: 'k' + b.id })}</div>
+  <div class="k2">
+    <section><h2>Miestnosti</h2><table><tbody>
+      ${t.miestnosti.map(([n, , , w, h]) => `<tr><td>${esc(n)}</td><td>${dlzka(w)} × ${dlzka(h)} m</td><td>${m2(w * h)}</td></tr>`).join('')}
+      </tbody><tfoot><tr><td>Plocha bytu</td><td></td><td>${m2(b.plocha)}</td></tr></tfoot></table></section>
+    <section><h2>Poloha v dome</h2>${poloha(b, D.byty)}
+      <h2 style="margin-top:10px">Štandard v cene</h2><ul>${D.standard.slice(0, 3).map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+      ${pred ? '' : `<h2 style="margin-top:10px">Doplnky</h2><table><tbody><tr><td>Parkovacie miesto v garáži</td><td>${eur(D.doplnky.parkovanie_garaz)}</td></tr><tr><td>Pivnica</td><td>${eur(D.doplnky.pivnica)}</td></tr></tbody></table>`}
+    </section>
+  </div>
+  <div class="kf"><span>Predaj: <b>${esc(k.meno)}</b> · ${esc(k.telefon)} · ${esc(k.email)}</span><span>Stav a cena k ${datum(D.aktualizovane)}. Pôdorys je orientačný.</span></div>`;
+  if (p.get('tlac') === '1') {
+    await document.fonts.ready;
+    setTimeout(() => window.print(), 300);
+  }
+}
+start();
+</script>
+</body>
+</html>

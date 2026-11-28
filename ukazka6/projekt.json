@@ -1,0 +1,806 @@
+{
+ "projekt": "Rezidencia Javorová",
+ "mesto": "Hlohovec",
+ "ulica": "Javorová ulica",
+ "zdroj": "Realitný asistent",
+ "aktualizovane": "2026-11-28T09:40:00+01:00",
+ "podlazia": 6,
+ "dokoncenie": "leto 2027",
+ "doplnky": {
+  "parkovanie_garaz": 14900,
+  "parkovanie_vonku": 6500,
+  "pivnica": 3200
+ },
+ "rezervacny_poplatok": 3000,
+ "kontakt": {
+  "meno": "Petra Hudecová",
+  "telefon": "+421 900 123 456",
+  "email": "predaj@rezidencia-javorova.sk"
+ },
+ "typy": {
+  "A": {
+   "nazov": "1-izbový",
+   "izby": 1,
+   "rozmer": [
+    6.2,
+    6.2
+   ],
+   "miestnosti": [
+    [
+     "Predsieň",
+     0,
+     0,
+     2.2,
+     2.6
+    ],
+    [
+     "Kúpeľňa s WC",
+     0,
+     2.6,
+     2.2,
+     2.2
+    ],
+    [
+     "Šatník",
+     0,
+     4.8,
+     2.2,
+     1.4
+    ],
+    [
+     "Izba s kuchyňou",
+     2.2,
+     0,
+     4.0,
+     6.2
+    ]
+   ],
+   "balkon": [
+    2.2,
+    6.2,
+    4.0,
+    1.3
+   ],
+   "plocha": 38.4,
+   "popis": "Kompaktný byt s kuchyňou v izbe a šatníkom. Vhodný pre jedného alebo na prenájom.",
+   "okna": [
+    "dole"
+   ]
+  },
+  "B": {
+   "nazov": "2-izbový",
+   "izby": 2,
+   "rozmer": [
+    8.4,
+    7.0
+   ],
+   "miestnosti": [
+    [
+     "Predsieň",
+     0,
+     0,
+     3.4,
+     2.4
+    ],
+    [
+     "Kúpeľňa s WC",
+     3.4,
+     0,
+     2.4,
+     2.4
+    ],
+    [
+     "Šatník",
+     5.8,
+     0,
+     2.6,
+     2.4
+    ],
+    [
+     "Obývačka s kuchyňou",
+     0,
+     2.4,
+     5.0,
+     4.6
+    ],
+    [
+     "Spálňa",
+     5.0,
+     2.4,
+     3.4,
+     4.6
+    ]
+   ],
+   "balkon": [
+    0,
+    7.0,
+    5.0,
+    1.5
+   ],
+   "plocha": 58.8,
+   "popis": "Oddelená spálňa, veľký šatník a obývačka s kuchyňou na balkón.",
+   "okna": [
+    "dole",
+    "vpravo"
+   ]
+  },
+  "C": {
+   "nazov": "2-izbový rohový",
+   "izby": 2,
+   "rozmer": [
+    7.2,
+    8.0
+   ],
+   "miestnosti": [
+    [
+     "Predsieň",
+     0,
+     0,
+     2.2,
+     3.2
+    ],
+    [
+     "Kúpeľňa",
+     0,
+     3.2,
+     2.2,
+     2.4
+    ],
+    [
+     "WC",
+     0,
+     5.6,
+     2.2,
+     1.2
+    ],
+    [
+     "Komora",
+     0,
+     6.8,
+     2.2,
+     1.2
+    ],
+    [
+     "Spálňa",
+     2.2,
+     0,
+     5.0,
+     3.4
+    ],
+    [
+     "Obývačka s kuchyňou",
+     2.2,
+     3.4,
+     5.0,
+     4.6
+    ]
+   ],
+   "balkon": [
+    2.2,
+    8.0,
+    5.0,
+    1.6
+   ],
+   "plocha": 57.6,
+   "popis": "Rohový byt s oknami na dve strany, samostatné WC a komora.",
+   "okna": [
+    "dole",
+    "vpravo"
+   ]
+  },
+  "D": {
+   "nazov": "3-izbový",
+   "izby": 3,
+   "rozmer": [
+    10.6,
+    7.6
+   ],
+   "miestnosti": [
+    [
+     "Predsieň",
+     0,
+     0,
+     3.4,
+     2.6
+    ],
+    [
+     "Kúpeľňa",
+     3.4,
+     0,
+     2.6,
+     2.6
+    ],
+    [
+     "WC",
+     6.0,
+     0,
+     1.4,
+     2.6
+    ],
+    [
+     "Šatník",
+     7.4,
+     0,
+     3.2,
+     2.6
+    ],
+    [
+     "Obývačka s kuchyňou",
+     0,
+     2.6,
+     5.0,
+     5.0
+    ],
+    [
+     "Detská izba",
+     5.0,
+     2.6,
+     2.8,
+     5.0
+    ],
+    [
+     "Spálňa",
+     7.8,
+     2.6,
+     2.8,
+     5.0
+    ]
+   ],
+   "balkon": [
+    0,
+    7.6,
+    7.8,
+    1.6
+   ],
+   "plocha": 80.6,
+   "popis": "Rodinný byt s dvoma spálňami, šatníkom a samostatným WC.",
+   "okna": [
+    "dole",
+    "vlavo"
+   ]
+  },
+  "E": {
+   "nazov": "4-izbový",
+   "izby": 4,
+   "rozmer": [
+    14.0,
+    8.0
+   ],
+   "miestnosti": [
+    [
+     "Predsieň",
+     0,
+     0,
+     3.8,
+     2.6
+    ],
+    [
+     "Kúpeľňa",
+     3.8,
+     0,
+     2.6,
+     2.6
+    ],
+    [
+     "WC",
+     6.4,
+     0,
+     1.4,
+     2.6
+    ],
+    [
+     "Kúpeľňa 2",
+     7.8,
+     0,
+     2.4,
+     2.6
+    ],
+    [
+     "Šatník",
+     10.2,
+     0,
+     3.8,
+     2.6
+    ],
+    [
+     "Obývačka s kuchyňou",
+     0,
+     2.6,
+     5.6,
+     5.4
+    ],
+    [
+     "Detská izba",
+     5.6,
+     2.6,
+     2.8,
+     5.4
+    ],
+    [
+     "Detská izba 2",
+     8.4,
+     2.6,
+     2.8,
+     5.4
+    ],
+    [
+     "Spálňa",
+     11.2,
+     2.6,
+     2.8,
+     5.4
+    ]
+   ],
+   "balkon": [
+    0,
+    8.0,
+    8.4,
+    1.6
+   ],
+   "plocha": 112.0,
+   "popis": "Najväčší byt v dome: tri spálne, dve kúpeľne a obývačka s jedálňou.",
+   "okna": [
+    "dole",
+    "vlavo"
+   ]
+  }
+ },
+ "byty": [
+  {
+   "id": "1.01",
+   "podlazie": 1,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 12.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 240400,
+   "stav": "predany"
+  },
+  {
+   "id": "1.02",
+   "podlazie": 1,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 5.2,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 124100,
+   "stav": "predany"
+  },
+  {
+   "id": "1.03",
+   "podlazie": 1,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 7.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 179700,
+   "stav": "volny"
+  },
+  {
+   "id": "1.04",
+   "podlazie": 1,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 8.0,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 178800,
+   "stav": "predany"
+  },
+  {
+   "id": "1.05",
+   "podlazie": 1,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 13.4,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 323900,
+   "stav": "volny"
+  },
+  {
+   "id": "2.01",
+   "podlazie": 2,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 12.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 243900,
+   "stav": "rezervovany"
+  },
+  {
+   "id": "2.02",
+   "podlazie": 2,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 5.2,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 125900,
+   "stav": "volny"
+  },
+  {
+   "id": "2.03",
+   "podlazie": 2,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 7.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 182400,
+   "stav": "predany"
+  },
+  {
+   "id": "2.04",
+   "podlazie": 2,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 8.0,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 181400,
+   "stav": "volny"
+  },
+  {
+   "id": "2.05",
+   "podlazie": 2,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 13.4,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 328600,
+   "stav": "predany"
+  },
+  {
+   "id": "3.01",
+   "podlazie": 3,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 12.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 247400,
+   "stav": "volny"
+  },
+  {
+   "id": "3.02",
+   "podlazie": 3,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 5.2,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 127700,
+   "stav": "predany"
+  },
+  {
+   "id": "3.03",
+   "podlazie": 3,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 7.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 185000,
+   "stav": "volny"
+  },
+  {
+   "id": "3.04",
+   "podlazie": 3,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 8.0,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 184000,
+   "stav": "rezervovany"
+  },
+  {
+   "id": "3.05",
+   "podlazie": 3,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 13.4,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 333400,
+   "stav": "volny"
+  },
+  {
+   "id": "4.01",
+   "podlazie": 4,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 12.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 250900,
+   "stav": "volny"
+  },
+  {
+   "id": "4.02",
+   "podlazie": 4,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 5.2,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 129500,
+   "stav": "volny"
+  },
+  {
+   "id": "4.03",
+   "podlazie": 4,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 7.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 187600,
+   "stav": "volny"
+  },
+  {
+   "id": "4.04",
+   "podlazie": 4,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 8.0,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 186600,
+   "stav": "predany"
+  },
+  {
+   "id": "4.05",
+   "podlazie": 4,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 13.4,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 338100,
+   "stav": "volny"
+  },
+  {
+   "id": "5.01",
+   "podlazie": 5,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 12.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 254400,
+   "stav": "volny"
+  },
+  {
+   "id": "5.02",
+   "podlazie": 5,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 5.2,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 131300,
+   "stav": "rezervovany"
+  },
+  {
+   "id": "5.03",
+   "podlazie": 5,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 7.5,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 190200,
+   "stav": "volny"
+  },
+  {
+   "id": "5.04",
+   "podlazie": 5,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 8.0,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 189200,
+   "stav": "volny"
+  },
+  {
+   "id": "5.05",
+   "podlazie": 5,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 13.4,
+   "vonkajsia_druh": "balkón",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 342800,
+   "stav": "volny"
+  },
+  {
+   "id": "6.01",
+   "podlazie": 6,
+   "pozicia": 1,
+   "typ": "D",
+   "plocha": 80.6,
+   "vonkajsia": 27.5,
+   "vonkajsia_druh": "terasa",
+   "orientacia": [
+    "sever",
+    "západ"
+   ],
+   "cena": 279400,
+   "stav": "predany"
+  },
+  {
+   "id": "6.02",
+   "podlazie": 6,
+   "pozicia": 2,
+   "typ": "A",
+   "plocha": 38.4,
+   "vonkajsia": 11.4,
+   "vonkajsia_druh": "terasa",
+   "orientacia": [
+    "sever"
+   ],
+   "cena": 143400,
+   "stav": "volny"
+  },
+  {
+   "id": "6.03",
+   "podlazie": 6,
+   "pozicia": 3,
+   "typ": "B",
+   "plocha": 58.8,
+   "vonkajsia": 16.5,
+   "vonkajsia_druh": "terasa",
+   "orientacia": [
+    "sever",
+    "východ"
+   ],
+   "cena": 207700,
+   "stav": "volny"
+  },
+  {
+   "id": "6.04",
+   "podlazie": 6,
+   "pozicia": 4,
+   "typ": "C",
+   "plocha": 57.6,
+   "vonkajsia": 17.6,
+   "vonkajsia_druh": "terasa",
+   "orientacia": [
+    "juh",
+    "východ"
+   ],
+   "cena": 206900,
+   "stav": "predany"
+  },
+  {
+   "id": "6.05",
+   "podlazie": 6,
+   "pozicia": 5,
+   "typ": "E",
+   "plocha": 112.0,
+   "vonkajsia": 29.6,
+   "vonkajsia_druh": "terasa",
+   "orientacia": [
+    "juh",
+    "západ"
+   ],
+   "cena": 374300,
+   "stav": "rezervovany"
+  }
+ ],
+ "standard": [
+  "Tepelné čerpadlo, podlahové kúrenie a rekuperácia",
+  "Trojsklá v hliníkových rámoch, vonkajšie žalúzie na juhu",
+  "Dubové parkety v izbách, veľkoformátová dlažba v kúpeľni",
+  "Sprcha bez vaničky, závesné WC, batérie Hansgrohe",
+  "Výťah do všetkých podlaží, nabíjanie áut v garáži"
+ ],
+ "financovanie": [
+  "Rezervácia 3 000 €, vrátime ju, ak vám banka neschváli hypotéku",
+  "10 % pri zmluve o budúcej kúpnej zmluve",
+  "90 % pri kolaudácii, aj z hypotéky"
+ ]
+}
