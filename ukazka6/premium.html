@@ -95,7 +95,8 @@ body.prem{background:#0F1420;color:#E8ECF2}
 .nav-st button{width:42px;height:42px;border-radius:50%;border:0;background:rgba(15,20,32,.78);color:#fff;display:grid;place-items:center;cursor:pointer}
 .nav-st button:disabled{opacity:.35;cursor:default}
 .nav-st svg{width:20px;height:20px}
-.tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;font-size:14px;color:#fff;background:rgba(15,20,32,.78);padding:7px 14px;border-radius:99px;pointer-events:none;white-space:nowrap}
+.stage.hraje .tip{opacity:0}
+.tip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;transition:opacity .3s;font-size:14px;color:#fff;background:rgba(15,20,32,.78);padding:7px 14px;border-radius:99px;pointer-events:none;white-space:nowrap}
 /* panel */
 .panel{background:#151B2B;border-left:1px solid #232B3B;padding:24px;overflow:auto;max-height:calc(100svh - var(--hh) - 37px)}
 .panel h1{font-size:30px;color:#fff;margin-bottom:6px}
@@ -259,7 +260,7 @@ function hash() {
 // ---------- prelety (krátke videá medzi scénami, prvý raz v návšteve) ----------
 const VID = { 1: 'video/prelet-1.mp4' };
 // vlety do konkrétnych izieb (pozícia bytu-index izby) – pridávajú sa, ako vzniknú; bez videa ide priblíženie + prelínanie
-const VLETY = [];
+const VLETY = ['3-0'];
 VLETY.forEach((k) => { VID['izba-' + k] = `video/izba-${k}.mp4`; });
 const videl = {}; let bezVidea = true, preskoc = null;
 // každé video má vlastný prvok, aby sa raz stiahnuté video už nesťahovalo znova
@@ -295,9 +296,9 @@ async function prelet(n) {
   const hra = await v.play().then(() => true, () => false);
   if (!hra) return false;
   videl[n] = true;
-  v.classList.add('on'); sk.hidden = false;
+  v.classList.add('on'); sk.hidden = false; $('#stage').classList.add('hraje');
   await new Promise((done) => { preskoc = done; v.onended = done; setTimeout(done, ((v.duration || 6) / v.playbackRate + 1.5) * 1000); });
-  preskoc = null; v.onended = null; sk.hidden = true;
+  preskoc = null; v.onended = null; sk.hidden = true; $('#stage').classList.remove('hraje');
   v.classList.remove('on'); setTimeout(() => v.pause(), 400);
   return true;
 }
