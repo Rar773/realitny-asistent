@@ -258,6 +258,9 @@ function hash() {
 
 // ---------- prelety (krátke videá medzi scénami, prvý raz v návšteve) ----------
 const VID = { 1: 'video/prelet-1.mp4' };
+// vlety do konkrétnych izieb (pozícia bytu-index izby) – pridávajú sa, ako vzniknú; bez videa ide priblíženie + prelínanie
+const VLETY = [];
+VLETY.forEach((k) => { VID['izba-' + k] = `video/izba-${k}.mp4`; });
 const videl = {}; let bezVidea = true, preskoc = null;
 // každé video má vlastný prvok, aby sa raz stiahnuté video už nesťahovalo znova
 const vids = {};
@@ -288,7 +291,7 @@ async function prelet(n) {
   $('#stage').classList.remove('nacitava');
   if (!ok) return false;
   v.currentTime = 0;
-  v.playbackRate = videl[n] ? 2 : 1; // prvý raz celý, potom zrýchlene
+  v.playbackRate = String(n).startsWith('izba') ? 1.5 : videl[n] ? 2 : 1; // budova: prvý raz celý, potom zrýchlene; izby 1,5×
   const hra = await v.play().then(() => true, () => false);
   if (!hra) return false;
   videl[n] = true;
@@ -356,6 +359,7 @@ async function naByt(id) {
   });
   document.querySelectorAll('#svgPod .fb.akt .fi[role]').forEach((g) => g.setAttribute('tabindex', '0'));
   kamera($('#sPod'), pad(bbox([...z.p, ...z.balk]), 30), 900, [1672, 941]);
+  if (!RM) z.izby.forEach((_, i) => { if (VID['izba-' + b.pozicia + '-' + i]) video('izba-' + b.pozicia + '-' + i); }); // vlety bytu sa stiahnu vopred
   S = { u: 'byt', p: b.podlazie, b, i: -1 }; obnov();
   await cakaj(300); zamok = false;
 }
@@ -366,7 +370,18 @@ async function naIzbu(i) {
   if (zByt) zamok = true;
   const r = D.galeria.find((g) => g[0] === f), img = $('#izbaImg');
   const nova = new Image(); nova.src = `img/${f}.webp`; // načíta sa počas priblíženia
-  if (zByt && poly && !RM) {
+  const kv = 'izba-' + S.b.pozicia + '-' + i, vyrez = D.premium.vlety_vyrez && D.premium.vlety_vyrez[S.b.pozicia + '-' + i];
+  if (zByt && VID[kv] && vyrez && !RM) {
+    // ako v ukážke Pri parku: zvýraznenie izby, kamera na presný prvý záber videa, potom vlet do izby
+    document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
+    const g = document.querySelector(`#svgPod .fb.akt .fi[data-i="${i}"]`); if (g) g.classList.add('vyb');
+    video(kv);
+    await cakaj(300);
+    $('#svgPod').classList.add('vstup');
+    kamera($('#sPod'), vyrez, 800, [1672, 941]);
+    await cakaj(850);
+    await prelet(kv);
+  } else if (zByt && poly && !RM) {
     // 1) zvýrazní kliknutú izbu, 2) kamera priblíži presne túto izbu, 3) prelínanie do vizualizácie
     document.querySelectorAll('#svgPod .fi.vyb').forEach((g) => g.classList.remove('vyb'));
     const g = document.querySelector(`#svgPod .fb.akt .fi[data-i="${i}"]`); if (g) g.classList.add('vyb');
